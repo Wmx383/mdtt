@@ -10,7 +10,13 @@ export default new Router({
       path: '/',
       name: '登录',
       hidden   : true,
-      component: login
+      component: ()=>import("../page/login.vue")
+    },
+    {
+      path: '/index',
+      name: '首页',
+      hidden   : true,
+      component: ()=>import("../page/index.vue")
     }
   ]
 })

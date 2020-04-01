@@ -21,7 +21,7 @@
 
           <el-tabs v-model="activeName" stretch="stretch" style="margin-top: 5%">
 
-            <el-tab-pane label= "账户密码登录" name="first">
+            <el-tab-pane label="账户密码登录" name="first">
               <el-form-item style="text-align: center; margin-top: 5%;">
                 <span style="font-size: 25px; color: #696969">账户密码登录</span>
               </el-form-item>
@@ -44,11 +44,15 @@
                   prefix-icon="el-icon-unlock">
                 </el-input>
               </el-form-item>
-              <el-form-item >
-                <el-button type="primary" class="loginBtn" style="width: 80%; margin-left: 10%; text-align: center; margin-top: 4%; background-color: #ff6600; border: white">登录</el-button>
+              <el-form-item>
+                <el-button type="primary" class="loginBtn" @click="login"
+                           style="width: 80%; margin-left: 10%; text-align: center; margin-top: 4%; background-color: #ff6600; border: white">
+                  登录
+                </el-button>
               </el-form-item>
               <el-form-item style="width: 80%; margin-left: 10%; text-align: center; margin-top: 5%;">
-                <el-checkbox v-model="userChecked" class="checked" style="float: left; "><span style="color: #A9A9A9">自动登录</span></el-checkbox>
+                <el-checkbox v-model="userChecked" class="checked" style="float: left; "><span style="color: #A9A9A9">自动登录</span>
+                </el-checkbox>
                 <el-link href="" type="info" class="forgetPw" style="float: right;">忘记密码</el-link>
               </el-form-item>
             </el-tab-pane>
@@ -76,11 +80,15 @@
                   prefix-icon="el-icon-unlock">
                 </el-input>
               </el-form-item>
-              <el-form-item >
-                <el-button type="primary" class="loginBtn" style="width: 80%; margin-left: 10%; text-align: center; margin-top: 4%;  background-color: #ff6600; border: white"">登录</el-button>
+              <el-form-item>
+                <el-button type="primary" class="loginBtn"
+                           style="width: 80%; margin-left: 10%; text-align: center; margin-top: 4%;  background-color: #ff6600; border: white">
+                  登录
+                </el-button>
               </el-form-item>
               <el-form-item style="width: 80%; margin-left: 10%; text-align: center; margin-top: 5%;">
-                <el-checkbox v-model="userChecked" class="checked" style="float: left;" ><span style="color: #A9A9A9">自动登录</span></el-checkbox>
+                <el-checkbox v-model="userChecked" class="checked" style="float: left;"><span style="color: #A9A9A9">自动登录</span>
+                </el-checkbox>
                 <el-link href="" type="info" class="forgetPw" style="float: right;">忘记密码</el-link>
               </el-form-item>
             </el-tab-pane>
@@ -117,6 +125,23 @@
         userChecked: true,
         unifiedChecked: true
       }
+    },
+    methods: {
+      login() {
+        this.$http({
+          url: "/api/users",
+          "content-type": "application/json",
+          method: 'post',
+          data: this.loginForm
+        }).then(res=>{
+          console.log(res)
+          if(res.data.code==1){
+            this.$router.push({path:"/index"})
+          }else{
+            alert(res.data.msg)
+          }
+        })
+      }
     }
 
   }
@@ -133,22 +158,25 @@
     left: 20%;
     top: 20%;
     border: solid 1px white;
-    box-shadow: 0px 5px 10px rgba(0,0,0,0.9)
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.9)
   }
-  .bigDiv{
+
+  .bigDiv {
     width: 99%;
     position: absolute;
     background: url('https://gw.alipayobjects.com/zos/rmsportal/TVYTbAXWheQpRcWDaDMu.svg') no-repeat center;
-    background-size:cover;
+    background-size: cover;
     height: 99%;
     z-index: 3;
   }
-  .h1{
+
+  .h1 {
     color: #FF6600;
     font-size: 40px;
     margin-left: 5%;
   }
-  .top_p{
+
+  .top_p {
     color: #ccc;
     font-size: 15px;
     margin-left: 11%;
