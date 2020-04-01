@@ -1,13 +1,13 @@
 <template>
   <div class="bigDiv">
-    <div style="margin-top: 5%">
-      <h1 style="text-align: center">
+    <div class="page">
+      <h1 class="h1">
         北京淇朗工业大数据系统
       </h1>
-      <p style="text-align: center; color: #ccc; font-size: 15px">
+      <p class="top_p">
         全球领先的工业大数据展示平台
       </p>
-      <div style="width: 20%; position: absolute; left: 40%; margin-top: 2%">
+      <div class="form">
         <el-form
           ref="loginForm"
           :model="loginForm"
@@ -34,11 +34,11 @@
                       </el-input>
                   </el-form-item>
                   <el-form-item>
-                      <el-checkbox v-model="userChecked" style="float: left">自动登录</el-checkbox>
-                      <el-link href="" type="primary" style="float: right">忘记密码</el-link>
+                      <el-checkbox v-model="userChecked" class="checked">自动登录</el-checkbox>
+                      <el-link href="" type="primary" class="forgetPw">忘记密码</el-link>
                   </el-form-item>
                   <el-form-item>
-                      <el-button type="primary" style="width: 100%">登录</el-button>
+                      <el-button type="primary" class="loginBtn">登录</el-button>
                   </el-form-item>
               </el-tab-pane>
 
@@ -61,11 +61,11 @@
                       </el-input>
                   </el-form-item>
                   <el-form-item>
-                      <el-checkbox v-model="unifiedChecked" style="float: left">自动登录</el-checkbox>
-                      <el-link href="" type="primary" style="float: right">忘记密码</el-link>
+                      <el-checkbox v-model="unifiedChecked" class="checked">自动登录</el-checkbox>
+                      <el-link href="" type="primary" class="forgetPw">忘记密码</el-link>
                   </el-form-item>
                   <el-form-item>
-                      <el-button type="primary" style="width: 100%">登录</el-button>
+                      <el-button type="primary" class="loginBtn">登录</el-button>
                   </el-form-item>
               </el-tab-pane>
 
@@ -73,7 +73,7 @@
 
         </el-form>
       </div>
-      <p style="position: absolute; bottom: 0%; right: 42%; color: #ccc; font-size: 15px">
+      <p class="bottom_p">
         Copyright©2019北京淇朗科技有限公司
       </p>
     </div>
@@ -110,5 +110,38 @@
     background-size:cover;
     height: 99%;
     z-index: 3;
+  }
+  .page{
+    margin-top: 5%;
+  }
+  .h1{
+    text-align: center;
+  }
+  .top_p{
+    text-align: center;
+    color: #ccc;
+    font-size: 15px;
+  }
+  .form{
+    width: 20%;
+    position: absolute;
+    left: 40%;
+    margin-top: 2%;
+  }
+  .checked{
+    float: left;
+  }
+  .forgetPw{
+    float: right;
+  }
+  .loginBtn{
+    width: 100%;
+  }
+  .bottom_p{
+    position: absolute;
+    bottom: 0%;
+    right: 42%;
+    color: #ccc;
+    font-size: 15px;
   }
 </style>
