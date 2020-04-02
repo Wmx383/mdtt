@@ -1,3 +1,4 @@
+<!--收率展示页面-->
 <template>
     <div>我是收率展示页面</div>
 </template>

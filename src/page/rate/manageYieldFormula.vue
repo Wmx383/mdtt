@@ -1,3 +1,4 @@
+<!--我是管理收率公式页面-->
 <template>
     <div>我是管理收率公式页面</div>
 </template>

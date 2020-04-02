@@ -1,3 +1,4 @@
+<!--预测特征页面-->
 <template>
     <div>我是预测特征页面</div>
 </template>
