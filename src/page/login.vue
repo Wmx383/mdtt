@@ -17,6 +17,7 @@
         <el-form
           ref="loginForm"
           :model="loginForm"
+          class="login_form"
         >
 
           <el-tabs v-model="activeName" stretch="stretch" style="margin-top: 5%">
@@ -98,8 +99,8 @@
       </div>
 
     </div>
-    <div class="bottomPage">
-      <p>
+    <div>
+      <p class="bottomPage">
         Copyright©2019北京淇朗科技有限公司
       </p>
     </div>
@@ -161,16 +162,15 @@
 
 <style scoped>
   .centerPage {
-    background: url("../images/background02.png") no-repeat center;
+    background: url("../images/loginForm.png") no-repeat center;
     background-size: cover;
-    z-index: 3;
     width: 60%;
-    position: absolute;
     height: 60%;
-    left: 20%;
-    top: 20%;
-    border: solid 1px white;
+    border: solid 0px white;
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.9);
+    min-width: 800px;
+    min-height: 400px;
+    margin: 0 auto;
   }
 
   .bigDiv {
@@ -185,26 +185,27 @@
   .h1 {
     color: #FF6600;
     font-size: 42px;
-    margin-left: 2%;
   }
 
   .top_p {
     color: #a679b9;
     font-size: 12px;
-    margin-left: 17%;
-    position: relative;
-    bottom: 10%;
+    margin-top: -1%;
+    margin-left: 2%;
   }
   .topPage {
-    width: 20%;
-    height: 20%;
     margin-left: 10%;
+    margin-bottom: 3%;
   }
   .form{
     background-color: white;
     width: 44%;
     height: 100%;
     float: right;
+  }
+  .login_form{
+    width: 100%;
+    height: 100%;
   }
   .form-top-span{
     font-size: 25px;
@@ -241,11 +242,10 @@
     margin-top: 5%;
   }
   .bottomPage{
-    position:absolute;
-    bottom: 0%;
-    right: 42%;
     color: #2f4f4f;
     font-size: 15px;
+    text-align: center;
+    margin-top: 9.5%;
   }
 </style>
 
