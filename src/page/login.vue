@@ -3,7 +3,7 @@
 
     <div class="topPage">
       <h1 class="h1">
-        D.PERSPCIRE
+        D.Perspcire
       </h1>
       <h2 class="top_p">
         全球领先的工业大数据展示平台
@@ -25,20 +25,20 @@
               <el-form-item style="text-align: center; margin-top: 5%;">
                 <span style="font-size: 25px; color: #696969">账户密码登录</span>
               </el-form-item>
-              <el-form-item prop='userId' :rules="[{ required: true, message: '用户名不能为空' ,trigger: 'blur' }]"
+              <el-form-item prop='userName' :rules="[{ required: true, message: '用户名不能为空' ,trigger: 'blur' }]"
                             style="width: 80%; margin-left: 10%; text-align: center; margin-top: 5%;">
                 <el-input
                   placeholder="用户名："
-                  v-model="loginForm.userId"
+                  v-model="loginForm.userName"
                   clearable
                   prefix-icon="el-icon-user">
                 </el-input>
               </el-form-item>
-              <el-form-item prop='userPassword' :rules="[{ required: true, message: '密码不能为空' ,trigger: 'blur' }]"
+              <el-form-item prop='password' :rules="[{ required: true, message: '密码不能为空' ,trigger: 'blur' }]"
                             style="width: 80%; margin-left: 10%; text-align: center; margin-top: 7%;">
                 <el-input
                   placeholder="密码："
-                  v-model="loginForm.userPassword"
+                  v-model="loginForm.password"
                   clearable
                   show-password
                   prefix-icon="el-icon-unlock">
@@ -111,35 +111,49 @@
 
 <script>
   export default {
+    inject: ['reload'],
     name: "login",
-
+    provide() {
+      return {
+        reload: this.reload
+      }
+    },
     data() {
       return {
         activeName: 'first',
         loginForm: {
-          userId: '',
-          userPassword: '',
+          userName: '',
+          password: '',
+          loginType: '1',
           unifiedId: '',
           unifiedPassword: ''
         },
         userChecked: true,
-        unifiedChecked: true
+        unifiedChecked: true,
+        isRouterAlive: true
       }
     },
     methods: {
       login() {
         this.$http({
-          url: "/api/api/user/login",
+          url: "/api/api/login",
           "content-type": "application/json",
           method: 'post',
           data: this.loginForm
         }).then(res => {
           console.log(res)
-          if (res.data.code == 1001) {
+          if (res.data.status == 1) {
             this.$router.push({path: "/index"})
           } else {
-            alert(res.data.msg)
+            alert(res.data.msg);
+            this.reload()
           }
+        })
+      },
+      reload() {
+        this.isRouterAlive = false
+        this.$nextTick(function () {
+          this.isRouterAlive = true
         })
       }
     }
