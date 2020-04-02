@@ -132,7 +132,18 @@
         isRouterAlive: true
       }
     },
+   mounted(){
+     this.keyupEnter();
+   },
     methods: {
+      keyupEnter(){
+        document.onkeydown = e =>{
+          let body = document.getElementsByTagName('body')[0]
+          if (e.keyCode === 13) {
+            this.login();
+          }
+        }
+      },
       login() {
         /*this.$http({
           url: "/api/api/login",
@@ -147,6 +158,30 @@
             this.reload()
           }
         })*/
+        if(this.loginForm.userName == "" && this.loginForm.password == ""){
+          this.$message({
+            message: '请填写用户名和密码',
+            duration: '2000',
+            type: 'warning'
+          });
+          return;
+        }
+        if(this.loginForm.userName == ""){
+          this.$message({
+            message: '请填写用户名',
+            duration: '2000',
+            type: 'warning'
+          });
+          return;
+        }
+        if(this.loginForm.password == ""){
+          this.$message({
+            message: '请填写密码',
+            duration: '2000',
+            type: 'warning'
+          });
+          return;
+        }
         this.$router.push({path: "/exception/manageException"})
       },
       reload() {
@@ -184,7 +219,10 @@
 
   .h1 {
     color: #FF6600;
-    font-size: 36px;
+    font-size: 44px;
+    font-family: 华文新魏;
+  ;
+    font-weight: bolder;
   }
 
   .top_p {
