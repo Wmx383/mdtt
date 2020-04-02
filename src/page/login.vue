@@ -26,7 +26,7 @@
               <el-form-item class="form-top">
                 <span class="form-top-span">账户密码登录</span>
               </el-form-item>
-              <el-form-item prop='userId' :rules="[{ required: true, message: '用户名不能为空' ,trigger: 'blur' }]"
+              <el-form-item prop='userName' :rules="[{ required: true, message: '用户名不能为空' ,trigger: 'blur' }]"
                             class="form-id">
                 <el-input
                   placeholder="用户名："
@@ -35,7 +35,7 @@
                   prefix-icon="el-icon-user">
                 </el-input>
               </el-form-item>
-              <el-form-item prop='userPassword' :rules="[{ required: true, message: '密码不能为空' ,trigger: 'blur' }]"
+              <el-form-item prop='password' :rules="[{ required: true, message: '密码不能为空' ,trigger: 'blur' }]"
                             class="form-psd">
                 <el-input
                   placeholder="密码："
