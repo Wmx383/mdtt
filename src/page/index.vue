@@ -90,18 +90,18 @@
 <style lang="less" scoped>
   .indexH1{
     position: absolute;
-    left: 73px;
+    left: 83px;
     top: 5px;
     color: #FF6600;
     font-size: 22px;
-    font-family: 华文隶书;
+    font-family: 华文新魏;
   }
 
   .indexSubTitle{
     position: absolute;
     color: #a679b9;
     font-size: 12px;
-    left: 38px;
+    left: 48px;
     top : 15px;
 
   }
@@ -128,7 +128,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 245px;
+    width: 280px;
     background-color: #fff;
     height: 62px;
     border: 1px solid rgba(0, 21, 41, 0.08);
@@ -137,7 +137,7 @@
 
   .headerNavigation {
     position: absolute;
-    left: 248px;
+    left: 283px;
     top: 0;
     right: 0;
     background-color: #fff;

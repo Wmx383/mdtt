@@ -56,6 +56,19 @@
       },
       _getUserRoleOrgTree(){
         console.log('开始查询');
+        this.$http({
+          url: "/api/api/user/getUserRoleOrgTree",
+          "content-type": "application/json",
+          method: 'get',
+          data: ''
+        }).then(res => {
+          if (res.data.status == 1) {
+            console.log(res);
+          } else {
+            console.log(res);
+          }
+        })
+        console.log("结束查询");
       }
     },
     mounted(){
