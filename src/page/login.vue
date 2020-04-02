@@ -1,5 +1,5 @@
 <template>
-  <div class="bigDiv">
+  <div class="bigDiv" id="particles-js">
 
     <div class="topPage">
       <h1 class="h1">
@@ -176,7 +176,7 @@
   .bigDiv {
     width: 99%;
     position: absolute;
-    background: url('https://gw.alipayobjects.com/zos/rmsportal/TVYTbAXWheQpRcWDaDMu.svg') no-repeat center;
+    background: url("../images/loginBackground.png") no-repeat center;
     background-size: cover;
     height: 99%;
     z-index: 3;
