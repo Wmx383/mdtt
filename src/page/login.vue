@@ -212,8 +212,8 @@
 
   .h1 {
     color: #FF6600;
-    font-size: 44px;
-    font-family: 华文新魏;
+    font-size: 52px;
+    font-family: 华文隶书;
   ;
     font-weight: bolder;
   }
