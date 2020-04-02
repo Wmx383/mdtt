@@ -14,99 +14,99 @@
 
       <div class="form">
 
-          <el-tabs v-model="activeName" stretch="stretch" style="margin-top: 5%">
+        <el-tabs v-model="activeName" stretch="stretch" style="margin-top: 5%">
 
-            <el-tab-pane label="账户密码登录" name="first">
+          <el-tab-pane label="账户密码登录" name="first">
 
-              <el-form
-                ref="loginUserForm"
-                :model="loginUserForm"
-                class="login_form"
-              >
+            <el-form
+              ref="loginUserForm"
+              :model="loginUserForm"
+              class="login_form"
+            >
 
-                <el-form-item class="form-top">
-                  <span class="form-top-span">账户密码登录</span>
-                </el-form-item>
-                <el-form-item prop='userName' :rules="[{ required: true, message: '用户名不能为空' ,trigger: 'blur' }]"
-                              class="form-id">
-                  <el-input
-                    placeholder="用户名："
-                    v-model="loginUserForm.userName"
-                    clearable
-                    prefix-icon="el-icon-user">
-                  </el-input>
-                </el-form-item>
-                <el-form-item prop='password' :rules="[{ required: true, message: '密码不能为空' ,trigger: 'blur' }]"
-                              class="form-psd">
-                  <el-input
-                    placeholder="密码："
-                    v-model="loginUserForm.password"
-                    clearable
-                    show-password
-                    prefix-icon="el-icon-unlock">
-                  </el-input>
-                </el-form-item>
-                <el-form-item>
-                  <el-button type="primary" class="loginBtn" @click="login('loginUserForm')">
-                    登录
-                  </el-button>
-                </el-form-item>
-                <el-form-item class="form-checked">
-                  <el-checkbox v-model="userChecked" class="checked" style="float: left; "><span style="color: #A9A9A9">自动登录</span>
-                  </el-checkbox>
-                  <el-link href="" type="info" class="forgetPw" style="float: right;">忘记密码</el-link>
-                </el-form-item>
+              <el-form-item class="form-top">
+                <span class="form-top-span">账户密码登录</span>
+              </el-form-item>
+              <el-form-item prop='userName' :rules="[{ required: true, message: '用户名不能为空' ,trigger: 'blur' }]"
+                            class="form-id">
+                <el-input
+                  placeholder="用户名："
+                  v-model="loginUserForm.userName"
+                  clearable
+                  prefix-icon="el-icon-user">
+                </el-input>
+              </el-form-item>
+              <el-form-item prop='password' :rules="[{ required: true, message: '密码不能为空' ,trigger: 'blur' }]"
+                            class="form-psd">
+                <el-input
+                  placeholder="密码："
+                  v-model="loginUserForm.password"
+                  clearable
+                  show-password
+                  prefix-icon="el-icon-unlock">
+                </el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" class="loginBtn" @click="login('loginUserForm')">
+                  登录
+                </el-button>
+              </el-form-item>
+              <el-form-item class="form-checked">
+                <el-checkbox v-model="userChecked" class="checked" style="float: left; "><span style="color: #A9A9A9">自动登录</span>
+                </el-checkbox>
+                <el-link href="" type="info" class="forgetPw" style="float: right;">忘记密码</el-link>
+              </el-form-item>
 
-              </el-form>
+            </el-form>
 
-            </el-tab-pane>
+          </el-tab-pane>
 
-            <el-tab-pane label="统一认证登录" name="second">
+          <el-tab-pane label="统一认证登录" name="second">
 
-              <el-form
-                ref="loginUnifiedForm"
-                :model="loginUnifiedForm"
-                class="login_form"
-              >
+            <el-form
+              ref="loginUnifiedForm"
+              :model="loginUnifiedForm"
+              class="login_form"
+            >
 
-                <el-form-item class="form-top">
-                  <span class="form-top-span">统一认证账号密码登录</span>
-                </el-form-item>
-                <el-form-item prop='unifiedId' :rules="[{ required: true, message: '统一认证账号不能为空' ,trigger: 'blur' }]"
-                              class="form-id">
-                  <el-input
-                    placeholder="统一认证账号："
-                    v-model="loginUnifiedForm.unifiedId"
-                    clearable
-                    prefix-icon="el-icon-user">
-                  </el-input>
-                </el-form-item>
-                <el-form-item prop='unifiedPassword' :rules="[{ required: true, message: '密码不能为空' ,trigger: 'blur' }]"
-                              class="form-psd">
-                  <el-input
-                    placeholder="密码："
-                    v-model="loginUnifiedForm.unifiedPassword"
-                    clearable
-                    show-password
-                    prefix-icon="el-icon-unlock">
-                  </el-input>
-                </el-form-item>
-                <el-form-item>
-                  <el-button type="primary" class="loginBtn">
-                    登录
-                  </el-button>
-                </el-form-item>
-                <el-form-item class="form-checked">
-                  <el-checkbox v-model="unifiedChecked" class="checked" style="float: left;"><span style="color: #A9A9A9">自动登录</span>
-                  </el-checkbox>
-                  <el-link href="" type="info" class="forgetPw" style="float: right;">忘记密码</el-link>
-                </el-form-item>
+              <el-form-item class="form-top">
+                <span class="form-top-span">统一认证账号密码登录</span>
+              </el-form-item>
+              <el-form-item prop='unifiedId' :rules="[{ required: true, message: '统一认证账号不能为空' ,trigger: 'blur' }]"
+                            class="form-id">
+                <el-input
+                  placeholder="统一认证账号："
+                  v-model="loginUnifiedForm.unifiedId"
+                  clearable
+                  prefix-icon="el-icon-user">
+                </el-input>
+              </el-form-item>
+              <el-form-item prop='unifiedPassword' :rules="[{ required: true, message: '密码不能为空' ,trigger: 'blur' }]"
+                            class="form-psd">
+                <el-input
+                  placeholder="密码："
+                  v-model="loginUnifiedForm.unifiedPassword"
+                  clearable
+                  show-password
+                  prefix-icon="el-icon-unlock">
+                </el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" class="loginBtn">
+                  登录
+                </el-button>
+              </el-form-item>
+              <el-form-item class="form-checked">
+                <el-checkbox v-model="unifiedChecked" class="checked" style="float: left;"><span style="color: #A9A9A9">自动登录</span>
+                </el-checkbox>
+                <el-link href="" type="info" class="forgetPw" style="float: right;">忘记密码</el-link>
+              </el-form-item>
 
-              </el-form>
+            </el-form>
 
-            </el-tab-pane>
+          </el-tab-pane>
 
-          </el-tabs>
+        </el-tabs>
 
       </div>
 
@@ -135,19 +135,21 @@
         loginUserForm: {
           userName: '',
           password: '',
+          loginType : '1'
         },
         loginUnifiedForm:{
           unifiedId: '',
-          unifiedPassword: ''
+          unifiedPassword: '',
+          loginType : '2'
         },
         userChecked: true,
         unifiedChecked: true,
         isRouterAlive: true
       }
     },
-   mounted(){
-     this.keyupEnter();
-   },
+    mounted(){
+      this.keyupEnter();
+    },
     methods: {
       keyupEnter(){
         document.onkeydown = e =>{
@@ -158,22 +160,27 @@
         }
       },
       login(loginUserForm) {
-        /*this.$http({
-          url: "/api/api/login",
-          "content-type": "application/json",
-          method: 'post',
-          data: this.loginForm
-        }).then(res => {
-          if (res.data.status == 1) {
-            this.$router.push({path: "/index"})
-          } else {
-            alert(res.data.msg);
-            this.reload()
-          }
-        })*/
         this.$refs[loginUserForm].validate((valid) => {
           if(valid){
-            this.$router.push({path: "/exception/manageException"})
+            this.$http({
+              url: "/api/api/login",
+              "content-type": "application/json",
+              method: 'post',
+              data: this.loginUserForm
+            }).then(res => {
+              if (res.data.status == 1) {
+                console.log(res.data.result.token);
+
+                let content = JSON.stringify(res.data.result.token);
+                window.localStorage.setItem('Token', content);
+
+                this.$router.push({path: "/exception/manageException"});
+              } else {
+                alert(res.data.msg);
+                this.reload()
+              }
+            })
+
           }
         });
       },
