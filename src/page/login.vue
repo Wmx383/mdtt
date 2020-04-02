@@ -134,7 +134,7 @@
     },
     methods: {
       login() {
-        this.$http({
+        /*this.$http({
           url: "/api/api/login",
           "content-type": "application/json",
           method: 'post',
@@ -146,7 +146,8 @@
             alert(res.data.msg);
             this.reload()
           }
-        })
+        })*/
+        this.$router.push({path: "/exception/manageException"})
       },
       reload() {
         this.isRouterAlive = false
