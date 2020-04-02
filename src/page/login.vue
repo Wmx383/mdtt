@@ -3,11 +3,11 @@
 
     <div class="topPage">
       <h1 class="h1">
-        北京淇朗工业大数据系统
+        D.PERSPCIRE
       </h1>
-      <p class="top_p">
+      <h2 class="top_p">
         全球领先的工业大数据展示平台
-      </p>
+      </h2>
     </div>
 
     <div class="centerPage">
@@ -129,15 +129,15 @@
     methods: {
       login() {
         this.$http({
-          url: "/api/users",
+          url: "/api/api/user/login",
           "content-type": "application/json",
           method: 'post',
           data: this.loginForm
-        }).then(res=>{
+        }).then(res => {
           console.log(res)
-          if(res.data.code==1){
-            this.$router.push({path:"/index"})
-          }else{
+          if (res.data.code == 1001) {
+            this.$router.push({path: "/index"})
+          } else {
             alert(res.data.msg)
           }
         })
@@ -172,14 +172,21 @@
 
   .h1 {
     color: #FF6600;
-    font-size: 40px;
-    margin-left: 5%;
+    font-size: 42px;
+    margin-left: 10%;
   }
 
   .top_p {
-    color: #ccc;
-    font-size: 15px;
-    margin-left: 11%;
+    color: #a679b9;
+    font-size: 16px;
+    margin-left: 15%;
+    margin-top: 1%;
+  }
+
+  .topPage {
+    width: 20%;
+    height: 20%;
+    margin-left: 10%;
   }
 </style>
 
