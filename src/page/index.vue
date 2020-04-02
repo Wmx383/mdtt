@@ -18,6 +18,7 @@
               </el-menu-item>
               <el-menu-item index="/realTimeMonitoring/forecastFeatures"><i class="el-icon-menu"></i>预测特征</el-menu-item>
               <el-menu-item index="/realTimeMonitoring/workShopModel"><i class="el-icon-menu"></i>车间模型</el-menu-item>
+              <el-menu-item index="/org/viewOrg">测试树</el-menu-item>
             </el-submenu>
             <el-submenu index="3">
               <template slot="title"><i class="el-icon-cpu"></i>系统管理</template>
@@ -89,10 +90,11 @@
 <style lang="less" scoped>
   .indexH1{
     position: absolute;
-    left: 60px;
+    left: 73px;
     top: 5px;
     color: #FF6600;
     font-size: 22px;
+    font-family: 华文隶书;
   }
 
   .indexSubTitle{

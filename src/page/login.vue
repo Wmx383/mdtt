@@ -46,7 +46,7 @@
                 </el-input>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" class="loginBtn" @click="login">
+                <el-button type="primary" class="loginBtn" @click="login('loginForm')">
                   登录
                 </el-button>
               </el-form-item>
@@ -144,7 +144,7 @@
           }
         }
       },
-      login() {
+      login(loginForm) {
         /*this.$http({
           url: "/api/api/login",
           "content-type": "application/json",
@@ -158,31 +158,11 @@
             this.reload()
           }
         })*/
-        if(this.loginForm.userName == "" && this.loginForm.password == ""){
-          this.$message({
-            message: '请填写用户名和密码',
-            duration: '2000',
-            type: 'warning'
-          });
-          return;
-        }
-        if(this.loginForm.userName == ""){
-          this.$message({
-            message: '请填写用户名',
-            duration: '2000',
-            type: 'warning'
-          });
-          return;
-        }
-        if(this.loginForm.password == ""){
-          this.$message({
-            message: '请填写密码',
-            duration: '2000',
-            type: 'warning'
-          });
-          return;
-        }
-        this.$router.push({path: "/exception/manageException"})
+        this.$refs[loginForm].validate((valid) => {
+          if(valid){
+            this.$router.push({path: "/exception/manageException"})
+          }
+        });
       },
       reload() {
         this.isRouterAlive = false

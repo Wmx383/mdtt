@@ -112,6 +112,12 @@ export default new Router({
           name: '合格率',
           hidden : true,
           component :() => import('@/page/rate/viewPassRate')
+        },
+        {
+          path: '/org/viewOrg',
+          name: '树菜单',
+          hidden : true,
+          component :() => import('@/page/org/viewOrg')
         }
       ]
     }
