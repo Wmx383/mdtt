@@ -5,9 +5,9 @@
         <span class="indexH1">
           D.Perspcire
         </span>
-        <h5 class="indexSubTitle">
+        <!--<h5 class="indexSubTitle">
           全球领先的工业大数据展示平台
-        </h5></div>
+        </h5>--></div>
       <div class="headerNavigation"><span class="systemDateSpan">系统时间: {{ this.systemDate }}</span>
         <div class="menuNav">
           <el-menu :default-active="$route.path" class="el-menu-demo" mode="horizontal" @select="_handleSelect" router>
@@ -88,21 +88,21 @@
 </script>
 
 <style lang="less" scoped>
-  .indexH1{
+  .indexH1 {
     position: absolute;
-    left: 73px;
-    top: 5px;
+    left: 15px;
+    top: 2px;
     color: #FF6600;
-    font-size: 22px;
+    font-size: 52px;
     font-family: 华文隶书;
   }
 
-  .indexSubTitle{
+  .indexSubTitle {
     position: absolute;
     color: #a679b9;
     font-size: 12px;
     left: 38px;
-    top : 15px;
+    top: 15px;
 
   }
 
