@@ -12,7 +12,7 @@
 
     <div class="centerPage">
 
-      <div class="form" style="background-color: white; width: 44%; height: 100%; float: right">
+      <div class="form">
 
         <el-form
           ref="loginForm"
@@ -21,12 +21,12 @@
 
           <el-tabs v-model="activeName" stretch="stretch" style="margin-top: 5%">
 
-            <el-tab-pane label="账户密码登录" name="first">
-              <el-form-item style="text-align: center; margin-top: 5%;">
-                <span style="font-size: 25px; color: #696969">账户密码登录</span>
+            <el-tab-pane label= "账户密码登录" name="first">
+              <el-form-item class="form-top">
+                <span class="form-top-span">账户密码登录</span>
               </el-form-item>
-              <el-form-item prop='userName' :rules="[{ required: true, message: '用户名不能为空' ,trigger: 'blur' }]"
-                            style="width: 80%; margin-left: 10%; text-align: center; margin-top: 5%;">
+              <el-form-item prop='userId' :rules="[{ required: true, message: '用户名不能为空' ,trigger: 'blur' }]"
+                            class="form-id">
                 <el-input
                   placeholder="用户名："
                   v-model="loginForm.userName"
@@ -34,8 +34,8 @@
                   prefix-icon="el-icon-user">
                 </el-input>
               </el-form-item>
-              <el-form-item prop='password' :rules="[{ required: true, message: '密码不能为空' ,trigger: 'blur' }]"
-                            style="width: 80%; margin-left: 10%; text-align: center; margin-top: 7%;">
+              <el-form-item prop='userPassword' :rules="[{ required: true, message: '密码不能为空' ,trigger: 'blur' }]"
+                            class="form-psd">
                 <el-input
                   placeholder="密码："
                   v-model="loginForm.password"
@@ -45,12 +45,11 @@
                 </el-input>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" class="loginBtn" @click="login"
-                           style="width: 80%; margin-left: 10%; text-align: center; margin-top: 4%; background-color: #ff6600; border: white">
+                <el-button type="primary" class="loginBtn" @click="login">
                   登录
                 </el-button>
               </el-form-item>
-              <el-form-item style="width: 80%; margin-left: 10%; text-align: center; margin-top: 5%;">
+              <el-form-item class="form-checked">
                 <el-checkbox v-model="userChecked" class="checked" style="float: left; "><span style="color: #A9A9A9">自动登录</span>
                 </el-checkbox>
                 <el-link href="" type="info" class="forgetPw" style="float: right;">忘记密码</el-link>
@@ -58,11 +57,11 @@
             </el-tab-pane>
 
             <el-tab-pane label="统一认证登录" name="second">
-              <el-form-item style="text-align: center; margin-top: 5%;">
-                <span style="font-size: 25px; color: #696969">统一认证账号密码登录</span>
+              <el-form-item class="form-top">
+                <span class="form-top-span">统一认证账号密码登录</span>
               </el-form-item>
               <el-form-item prop='unifiedId' :rules="[{ required: true, message: '统一认证账号不能为空' ,trigger: 'blur' }]"
-                            style="width: 80%; margin-left: 10%; text-align: center; margin-top: 5%;">
+                            class="form-id">
                 <el-input
                   placeholder="统一认证账号："
                   v-model="loginForm.unifiedId"
@@ -71,7 +70,7 @@
                 </el-input>
               </el-form-item>
               <el-form-item prop='unifiedPassword' :rules="[{ required: true, message: '密码不能为空' ,trigger: 'blur' }]"
-                            style="width: 80%; margin-left: 10%; text-align: center; margin-top: 7%;">
+                            class="form-psd">
                 <el-input
                   placeholder="密码："
                   v-model="loginForm.unifiedPassword"
@@ -81,12 +80,11 @@
                 </el-input>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" class="loginBtn"
-                           style="width: 80%; margin-left: 10%; text-align: center; margin-top: 4%;  background-color: #ff6600; border: white">
+                <el-button type="primary" class="loginBtn">
                   登录
                 </el-button>
               </el-form-item>
-              <el-form-item style="width: 80%; margin-left: 10%; text-align: center; margin-top: 5%;">
+              <el-form-item class="form-checked">
                 <el-checkbox v-model="userChecked" class="checked" style="float: left;"><span style="color: #A9A9A9">自动登录</span>
                 </el-checkbox>
                 <el-link href="" type="info" class="forgetPw" style="float: right;">忘记密码</el-link>
@@ -100,7 +98,7 @@
       </div>
 
     </div>
-    <div class="bottomPage" style="position:absolute; bottom: 0%; right: 42%; color: #2f4f4f; font-size: 15px;">
+    <div class="bottomPage">
       <p>
         Copyright©2019北京淇朗科技有限公司
       </p>
@@ -163,7 +161,7 @@
 
 <style scoped>
   .centerPage {
-    background: url("../images/background01.jpg") no-repeat center;
+    background: url("../images/background02.png") no-repeat center;
     background-size: cover;
     z-index: 3;
     width: 60%;
@@ -172,7 +170,7 @@
     left: 20%;
     top: 20%;
     border: solid 1px white;
-    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.9)
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.9);
   }
 
   .bigDiv {
@@ -187,23 +185,90 @@
   .h1 {
     color: #FF6600;
     font-size: 42px;
-    margin-left: 10%;
+    margin-left: 2%;
   }
 
   .top_p {
     color: #a679b9;
-    font-size: 16px;
-    margin-left: 15%;
-    margin-top: 1%;
+    font-size: 12px;
+    margin-left: 17%;
+    position: relative;
+    bottom: 10%;
   }
-
   .topPage {
     width: 20%;
     height: 20%;
     margin-left: 10%;
   }
+  .form{
+    background-color: white;
+    width: 44%;
+    height: 100%;
+    float: right;
+  }
+  .form-top-span{
+    font-size: 25px;
+    color: #696969;
+  }
+  .form-top{
+    text-align: center;
+    margin-top: 5%;
+  }
+  .form-id{
+    width: 80%;
+    margin-left: 10%;
+    text-align: center;
+    margin-top: 5%;
+  }
+  .form-psd{
+    width: 80%;
+    margin-left: 10%;
+    text-align: center;
+    margin-top: 7%;
+  }
+  .loginBtn{
+    width: 80%;
+    margin-left: 10%;
+    text-align: center;
+    margin-top: 4%;
+    background-color: #ff6600;
+    border: white
+  }
+  .form-checked{
+    width: 80%;
+    margin-left: 10%;
+    text-align: center;
+    margin-top: 5%;
+  }
+  .bottomPage{
+    position:absolute;
+    bottom: 0%;
+    right: 42%;
+    color: #2f4f4f;
+    font-size: 15px;
+  }
 </style>
 
-<style>
-
+<style scoped>
+  /deep/ .el-tabs__item.is-active{
+    color: #FF6600;
+  }
+  /deep/ .el-tabs__item:hover{
+    color: #FF6600;
+  }
+  /deep/ .el-checkbox__inner{
+    background-color: #ff6600;
+    border-color: #ff6600;
+  }
+  /deep/ .el-tabs__active-bar{
+    background-color: #ff6600;
+  }
+  /deep/ .el-checkbox__input.is-focus .el-checkbox__inner{
+    border-color: #ff6600;
+    background-color: white;
+  }
+  /deep/ .el-checkbox__input.is-checked .el-checkbox__inner{
+    border-color: #ff6600;
+    background-color: #ff6600;
+  }
 </style>
