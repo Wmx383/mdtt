@@ -3,10 +3,10 @@
 
     <div class="topPage">
       <h1 class="h1">
-        D.Perspcire
+        D.Perspclre
       </h1>
       <h2 class="top_p">
-        全球领先的工业大数据展示平台
+        <!--全球领先的工业大数据展示平台-->
       </h2>
     </div>
 
@@ -140,7 +140,6 @@
           method: 'post',
           data: this.loginForm
         }).then(res => {
-          console.log(res)
           if (res.data.status == 1) {
             this.$router.push({path: "/index"})
           } else {
@@ -184,7 +183,7 @@
 
   .h1 {
     color: #FF6600;
-    font-size: 42px;
+    font-size: 36px;
   }
 
   .top_p {
@@ -194,7 +193,7 @@
     margin-left: 2%;
   }
   .topPage {
-    margin-left: 10%;
+    margin-left: 2%;
     margin-bottom: 3%;
   }
   .form{
