@@ -22,7 +22,7 @@
 
           <el-tabs v-model="activeName" stretch="stretch" style="margin-top: 5%">
 
-            <el-tab-pane label= "账户密码登录" name="first">
+            <el-tab-pane label="账户密码登录" name="first">
               <el-form-item class="form-top">
                 <span class="form-top-span">账户密码登录</span>
               </el-form-item>
@@ -193,41 +193,49 @@
     margin-top: -1%;
     margin-left: 2%;
   }
+
   .topPage {
     margin-left: 2%;
     margin-bottom: 3%;
   }
-  .form{
+
+  .form {
     background-color: white;
     width: 44%;
     height: 100%;
     float: right;
   }
-  .login_form{
+
+  .login_form {
     width: 100%;
     height: 100%;
   }
-  .form-top-span{
+
+  .form-top-span {
     font-size: 25px;
     color: #696969;
   }
-  .form-top{
+
+  .form-top {
     text-align: center;
     margin-top: 5%;
   }
-  .form-id{
+
+  .form-id {
     width: 80%;
     margin-left: 10%;
     text-align: center;
     margin-top: 5%;
   }
-  .form-psd{
+
+  .form-psd {
     width: 80%;
     margin-left: 10%;
     text-align: center;
     margin-top: 7%;
   }
-  .loginBtn{
+
+  .loginBtn {
     width: 80%;
     margin-left: 10%;
     text-align: center;
@@ -235,13 +243,15 @@
     background-color: #ff6600;
     border: white
   }
-  .form-checked{
+
+  .form-checked {
     width: 80%;
     margin-left: 10%;
     text-align: center;
     margin-top: 5%;
   }
-  .bottomPage{
+
+  .bottomPage {
     color: #2f4f4f;
     font-size: 15px;
     text-align: center;
@@ -250,24 +260,29 @@
 </style>
 
 <style scoped>
-  /deep/ .el-tabs__item.is-active{
+  /deep/ .el-tabs__item.is-active {
     color: #FF6600;
   }
-  /deep/ .el-tabs__item:hover{
+
+  /deep/ .el-tabs__item:hover {
     color: #FF6600;
   }
-  /deep/ .el-checkbox__inner{
+
+  /deep/ .el-checkbox__inner {
     background-color: #ff6600;
     border-color: #ff6600;
   }
-  /deep/ .el-tabs__active-bar{
+
+  /deep/ .el-tabs__active-bar {
     background-color: #ff6600;
   }
-  /deep/ .el-checkbox__input.is-focus .el-checkbox__inner{
+
+  /deep/ .el-checkbox__input.is-focus .el-checkbox__inner {
     border-color: #ff6600;
     background-color: white;
   }
-  /deep/ .el-checkbox__input.is-checked .el-checkbox__inner{
+
+  /deep/ .el-checkbox__input.is-checked .el-checkbox__inner {
     border-color: #ff6600;
     background-color: #ff6600;
   }

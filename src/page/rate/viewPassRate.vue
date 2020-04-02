@@ -1,3 +1,4 @@
+<!--合格率页面-->
 <template>
     <div>我是合格率页面</div>
 </template>

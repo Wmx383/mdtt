@@ -1,3 +1,4 @@
+<!--管理采样点页面-->
 <template>
     <div>我是管理采样点页面</div>
 </template>

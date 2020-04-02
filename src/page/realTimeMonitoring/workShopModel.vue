@@ -1,3 +1,4 @@
+<!--车间模型页面-->
 <template>
     <div>我是车间模型页面</div>
 </template>

@@ -1,3 +1,4 @@
+<!--管理指标页面-->
 <template>
     <div>我是管理指标页面</div>
 </template>
