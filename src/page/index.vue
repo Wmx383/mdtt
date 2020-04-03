@@ -3,11 +3,11 @@
     <header class="indexDiv">
       <div class="headerTitle">
         <span class="indexH1">
-          D.Perspclre
+          D.Perspcire
         </span>
-        <!--<h5 class="indexSubTitle">
+        <h5 class="indexSubTitle">
           全球领先的工业大数据展示平台
-        </h5>--></div>
+        </h5></div>
       <div class="headerNavigation"><span class="systemDateSpan">系统时间: {{ this.systemDate }}</span>
         <div class="menuNav">
           <el-menu :default-active="$route.path" class="el-menu-demo" mode="horizontal" @select="_handleSelect" router>
@@ -88,21 +88,21 @@
 </script>
 
 <style lang="less" scoped>
-  .indexH1 {
+  .indexH1{
     position: absolute;
-    left: 38px;
-    top: 10px;
+    left: 83px;
+    top: 5px;
     color: #FF6600;
-    font-size: 32px;
-    font-family: 华文宋体;
+    font-size: 22px;
+    font-family: 华文新魏;
   }
 
-  .indexSubTitle {
+  .indexSubTitle{
     position: absolute;
     color: #a679b9;
     font-size: 12px;
-    left: 38px;
-    top: 15px;
+    left: 48px;
+    top : 15px;
 
   }
 
@@ -128,7 +128,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 245px;
+    width: 280px;
     background-color: #fff;
     height: 62px;
     border: 1px solid rgba(0, 21, 41, 0.08);
@@ -137,7 +137,7 @@
 
   .headerNavigation {
     position: absolute;
-    left: 248px;
+    left: 283px;
     top: 0;
     right: 0;
     background-color: #fff;

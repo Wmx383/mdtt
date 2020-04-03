@@ -5,8 +5,8 @@
     <div>
 
       <div class="orgTree" :style="orgTreeAndUserHeight">
-        <el-tree :data="data" :props="defaultProps">
-        </el-tree>
+        <viewOrgCom ref="viewOrgComRef"
+                       @_handleOnClickOrg="_handleOnClickOrg"></viewOrgCom>
       </div>
 
       <div class="userTable" :style="orgTreeAndUserHeight">
@@ -104,9 +104,11 @@
 </template>
 
 <script>
-  export default {
-    name: "manageUser",
+  import viewOrgCom from "../org/viewOrg.vue";
 
+  export default {
+    components: {viewOrgCom},
+    name: "manageUser",
     data() {
       return {
         orgTreeAndUserHeight: {
@@ -141,6 +143,9 @@
       setOrgTreeAndUserHeight(){
         this.orgTreeAndUserHeight.height= window.innerHeight - 110 + 'px'
       },
+      _handleOnClickOrg(){
+
+      }
     }
 
   }
