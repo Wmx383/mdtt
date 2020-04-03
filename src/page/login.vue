@@ -293,7 +293,7 @@
     color: #2f4f4f;
     font-size: 15px;
     text-align: center;
-    margin-top: 9.5%;
+    margin-top: 8.5%;
   }
 </style>
 
