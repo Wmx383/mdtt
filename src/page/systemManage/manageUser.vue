@@ -6,7 +6,7 @@
 
       <div class="orgTree" :style="orgTreeAndUserHeight">
         <viewOrgCom ref="viewOrgComRef"
-                       @_handleOnClickOrg="_handleOnClickOrg"></viewOrgCom>
+                       @_handleOnClickOrg="_handleOnClickOrg(arguments)"></viewOrgCom>
       </div>
 
       <div class="userTable" :style="orgTreeAndUserHeight">
@@ -143,8 +143,8 @@
       setOrgTreeAndUserHeight(){
         this.orgTreeAndUserHeight.height= window.innerHeight - 110 + 'px'
       },
-      _handleOnClickOrg(){
-
+      _handleOnClickOrg(args){
+          console.log(args);
       }
     }
 

@@ -109,7 +109,7 @@
                   "modelGroupId": 999,
                   "modelGroupName": "组1"
                 }, {
-                  "id": 1013,
+                  "id": 12,
                   "ogName": "模型4",
                   "parentId": 7,
                   "ogId": "1001010102",
