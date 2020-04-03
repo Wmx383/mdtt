@@ -1,17 +1,18 @@
 <!--用户管理页面-->
 <template>
 
-  <div >
+  <div>
     <div>
 
       <div class="orgTree" :style="orgTreeAndUserHeight">
         <viewOrgCom ref="viewOrgComRef"
-                       @_handleOnClickOrg="_handleOnClickOrg(arguments)"></viewOrgCom>
+                    @_handleOnClickOrg="_handleOnClickOrg(arguments)"></viewOrgCom>
       </div>
 
       <div class="userTable" :style="orgTreeAndUserHeight">
 
-        <div style="border: 1px solid; border-top-style: none; border-left-style: none; border-right-style: none; border-bottom-color: darkgrey;">
+        <div
+          style="border: 1px solid; border-top-style: none; border-left-style: none; border-right-style: none; border-bottom-color: darkgrey;">
           <h3 style="margin-left: 2%">用户信息</h3>
         </div>
 
@@ -136,15 +137,15 @@
         },
       }
     },
-    created(){
+    created() {
       this.setOrgTreeAndUserHeight()
     },
     methods: {
-      setOrgTreeAndUserHeight(){
-        this.orgTreeAndUserHeight.height= window.innerHeight - 110 + 'px'
+      setOrgTreeAndUserHeight() {
+        this.orgTreeAndUserHeight.height = window.innerHeight - 110 + 'px'
       },
-      _handleOnClickOrg(args){
-          console.log(args);
+      _handleOnClickOrg(args) {
+        console.log(args);
       }
     }
 
@@ -153,14 +154,15 @@
 
 <style scoped>
 
-  .orgTree{
+  .orgTree {
     position: absolute;
     left: 0;
     width: 280px;
     border: 1px solid rgba(0, 21, 41, 0.08);
     box-shadow: 0 10px 10px 0px #aaa, 10px 0 10px 0px #aaa;
   }
-  .userTable{
+
+  .userTable {
     position: absolute;
     left: 300px;
     right: 10px;
