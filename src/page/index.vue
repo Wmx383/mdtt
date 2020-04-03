@@ -3,7 +3,7 @@
     <header class="indexDiv">
       <div class="headerTitle">
         <span class="indexH1">
-          D.Perspcire
+          D.Perspclre
         </span>
         <!--<h5 class="indexSubTitle">
           全球领先的工业大数据展示平台
