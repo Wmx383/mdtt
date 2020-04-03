@@ -219,8 +219,8 @@
 
   .h1 {
     color: #FF6600;
-    font-size: 52px;
-    font-family: 华文隶书;
+    font-size: 42px;
+    font-family: 华文宋体;
   ;
     font-weight: bolder;
   }
@@ -250,7 +250,7 @@
   }
 
   .form-top-span {
-    font-size: 25px;
+    font-size: 20px;
     color: #696969;
   }
 

@@ -90,11 +90,11 @@
 <style lang="less" scoped>
   .indexH1 {
     position: absolute;
-    left: 15px;
-    top: 2px;
+    left: 38px;
+    top: 10px;
     color: #FF6600;
-    font-size: 52px;
-    font-family: 华文隶书;
+    font-size: 32px;
+    font-family: 华文宋体;
   }
 
   .indexSubTitle {
