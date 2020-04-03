@@ -121,6 +121,8 @@
 </template>
 
 <script>
+  import * as utils from '../utils/utils'
+
   export default {
     inject: ['reload'],
     name: "login",
@@ -172,7 +174,7 @@
                 console.log(res.data.result.token);
 
                 let content = JSON.stringify(res.data.result.token);
-                window.localStorage.setItem('Token', content);
+                utils.setStore('Token', res.data.result.token);
 
                 this.$router.push({path: "/exception/manageException"});
               } else {
