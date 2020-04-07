@@ -41,7 +41,7 @@
           url: "/api/api/user/getUserRoleOrgTree",
           "content-type": "application/json",
           method: 'get',
-          headers: {Authorization: token},
+          /*headers: {Authorization: token},*/
         }).then(res => {
           if (res.data.status == 1) {
             this.loading = false;
@@ -77,7 +77,7 @@
 <style>
   .el-tree-node:focus > .el-tree-node__content {
     /*background: -moz-linear-gradient(right,#FF9933,white);*/
-    background-color: #FF9933 !important;
+    background-color: #ffd30b !important;
     color: white;
   }
 

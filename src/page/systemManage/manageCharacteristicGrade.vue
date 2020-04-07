@@ -1,12 +1,12 @@
-<!--管理特征牌号页面-->
+<!--特征牌号管理-->
 <template>
-    <div>我是管理特征牌号页面</div>
+  <div>特征牌号管理</div>
 </template>
 
 <script>
-    export default {
-        name: "manageCharacteristicGrade"
-    }
+  export default {
+    name: "manageCharacteristicGrade"
+  }
 </script>
 
 <style scoped>

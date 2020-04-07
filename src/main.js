@@ -10,6 +10,7 @@ import  axios from "axios";
 Vue.prototype.$http = axios;
 
 import qs from 'qs';
+import * as utils from "./utils/utils";
 Vue.prototype.$qs=qs;
 
 Vue.config.productionTip = false;
@@ -22,4 +23,16 @@ new Vue({
   router,
   components: { App },
   template: '<App/>'
-})
+});
+axios.interceptors.request.use(
+  config => {
+    // 判断是否存在token，如果存在的话，则每个http header都加上token
+    let token = utils.getStore("Token")
+    if (token) {
+      config.headers.Authorization = token;
+    }
+    return config;
+  },
+  error => {
+    return Promise.reject(error);
+  });
