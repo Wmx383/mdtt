@@ -22,7 +22,7 @@
             </el-submenu>
             <el-submenu index="3">
               <template slot="title"><i class="el-icon-cpu"></i>系统管理</template>
-              <el-menu-item index="/systemManage/manageUser"><i class="el-icon-menu"></i>用户管理</el-menu-item>
+              <el-menu-item index="/user/manageUser"><i class="el-icon-menu"></i>用户管理</el-menu-item>
               <el-menu-item index="/systemManage/manageData"><i class="el-icon-menu"></i>数据配置</el-menu-item>
               <el-menu-item index="/systemManage/manageRole"><i class="el-icon-menu"></i>角色管理</el-menu-item>
               <el-menu-item index="/systemManage/manageOrg"><i class="el-icon-menu"></i>组织机构管理</el-menu-item>

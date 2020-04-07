@@ -42,10 +42,10 @@ export default new Router({
           component :() => import('@/page/realTimeMonitoring/workShopModel')
         },
         {
-          path: '/systemManage/manageUser',
+          path: '/user/manageUser',
           name: '用户管理',
           hidden : true,
-          component :() => import('@/page/systemManage/manageUser')
+          component :() => import('@/page/user/manageUser')
         },
         {
           path: '/systemManage/manageData',
