@@ -216,13 +216,17 @@
 
                 num++;
                 this.dataConfig.dataConfigList.push(tableItem);
-                //模拟分页
-                this._selectDataConfigByPaging();
+
               }
             }
 
+            //模拟分页
+            this._selectDataConfigByPaging();
+
           } else {
             this.$message({message: '系统异常,请联系管理员', type: 'error'});
+
+            this._selectDataConfigByPaging();
           }
         })
       },
