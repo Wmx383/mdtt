@@ -33,7 +33,7 @@
     },
     methods: {
       handleNodeClick(data) {
-        this.$emit('_handleOnClickOrg', data.id, data.ogId);
+        this.$emit('_handleOnClickOrg', data.id, data.ogId, data.level);
       },
       _getUserRoleOrgTree() {
         const token = utils.getStore('Token');
