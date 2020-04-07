@@ -18,7 +18,7 @@
           class="demo-form-inline search-form">
 
           <el-form-item>
-            <el-button type="primary" size="small">添加配置项</el-button>
+            <el-button type="primary" size="small" @click="_handleUpdateModelParamDisplay">添加配置项</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -160,6 +160,8 @@
         this.contentDivStyle.height = window.innerHeight - 110 + 'px'
       },
       async _selectDataConfig(ogId) {
+        this.numbers = [];
+        this.multipleSelection = [];
         this.dataConfig.gridLoading = true;
         this.dataConfig.dataConfigAllList = [];
         this.dataConfig.dataConfigList = [];
@@ -280,6 +282,34 @@
       _handleCurrentChange(page) {
         this.dataConfig.pagination.page_index = page;
         this._selectDataConfigByPaging()
+      },
+      //添加配置项
+      _handleUpdateModelParamDisplay() {
+        let ids = [];
+
+        if (this.multipleSelection.length == 0) {
+          this.$message({message: '请至少选择一条配置项', type: 'warning'});
+          return;
+        }
+
+        for (let i = 0; i < this.multipleSelection.length; i++) {
+          ids.push(this.multipleSelection[i].id);
+        }
+
+        this.$http({
+          url: '/api/api/modelParam/updateModelParamDisplay?modelId=' + this.multipleSelection[0].modelId + '&ids='+ ids +'',
+          "content-type": "application/json",
+          method: 'put',
+          /*headers: {Authorization: token},*/
+        }).then(res => {
+          if (res.data.status == 1) {
+            this.$message({message: '操作成功', type: 'success'});
+
+            this._selectDataConfig(this.multipleSelection[0].modelId);
+          } else {
+            this.$message({message: '系统异常,请联系管理员', type: 'error'});
+          }
+        })
       }
     }
   }
