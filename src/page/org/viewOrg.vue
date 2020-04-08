@@ -68,14 +68,16 @@
     align-items: center;
     justify-content: space-between;
     font-size: 14px;
-    padding-right: 8px;
+    padding-block: 0px;
+    /*padding-right: 8px;*/
+    background-color: ghostwhite;
   }
 
 </style>
 
 <style>
   .el-tree-node:focus > .el-tree-node__content {
-    /*background: -moz-linear-gradient(right,#FF9933,white);*/
+    /*background: -moz-linear-gradient(right,#FF9933, #42b983);*/
     background-color: #ffd30b !important;
     color: white;
   }
@@ -83,10 +85,14 @@
   .el-scrollbar .el-scrollbar__wrap {
     overflow-x: hidden;
     overflow-y: visible;
+    /*background-color: #b5b6b9;*/
   }
 
   .el-tree > .el-tree-node {
     min-width: 100%;
+    height: 370px;
+    font-size: 15px;
     display: inline-block;
+    background-color: ghostwhite;
   }
 </style>

@@ -129,7 +129,7 @@
     top: 0;
     left: 0;
     width: 280px;
-    background-color: #fff;
+    background-color: white;
     height: 62px;
     border: 1px solid rgba(0, 21, 41, 0.08);
     border-radius: 3px;

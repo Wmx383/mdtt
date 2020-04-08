@@ -325,13 +325,13 @@
     left: 0;
     width: 280px;
     border: 1px solid rgba(0, 21, 41, 0.08);
-    box-shadow: 0 10px 10px 0px #aaa, 10px 0 10px 0px #aaa;
+    /*box-shadow: 0 10px 10px 0px #aaa, 10px 0 10px 0px #aaa;*/
   }
 
   .contentDiv {
     position: absolute;
     left: 300px;
     right: 10px;
-    box-shadow: 0 10px 10px 0px #aaa, 10px 0 10px 0px #aaa;
+    /*box-shadow: 0 10px 10px 0px #aaa, 10px 0 10px 0px #aaa;*/
   }
 </style>
