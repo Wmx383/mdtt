@@ -146,7 +146,7 @@
       }
     },
     created() {
-      this._init()
+      this._initData()
     },
     methods: {
       _handleOnClickOrg(args) {
@@ -155,7 +155,7 @@
           this._selectDataConfig(args[1]);
         }
       },
-      _init() {
+      _initData() {
         this.orgTreeStyle.height = window.innerHeight - 110 + 'px'
         this.contentDivStyle.height = window.innerHeight - 110 + 'px'
       },

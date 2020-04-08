@@ -3,7 +3,10 @@
     <el-scrollbar style="height: 100%">
       <el-tree
         :data="data"
+        ref="tree"
+        node-key="id"
         default-expand-all
+        highlight-current
         :props="defaultProps"
         @node-click="handleNodeClick"
         :expand-on-click-node="false"
@@ -28,7 +31,7 @@
           children: 'childList',
           label: 'ogName'
         },
-        loading : true
+        loading: true
       }
     },
     methods: {
@@ -76,10 +79,14 @@
 </style>
 
 <style>
-  .el-tree-node:focus > .el-tree-node__content {
-    /*background: -moz-linear-gradient(right,#FF9933, #42b983);*/
+  /*.el-tree-node:focus > .el-tree-node__content {
+    !*background: -moz-linear-gradient(right,#FF9933, #42b983);*!
     background-color: #ffd30b !important;
     color: white;
+  }*/
+
+  .el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content {
+    background-color: #ffd30b;
   }
 
   .el-scrollbar .el-scrollbar__wrap {
