@@ -35,8 +35,8 @@
       </el-row>
     </div>
     <footer class="text_right">
-      <el-button type="primary" size="small" @click="_handleUpdateModelParamDisplay">取消</el-button>
-      <el-button type="primary" size="small" @click="_handleUpdateModelParamDisplay">提交</el-button>
+      <el-button type="primary" size="small" @click="_closeModelViewDialog">取消</el-button>
+      <el-button type="primary" size="small" @click="_closeModelViewDialog">提交</el-button>
     </footer>
   </div>
 
@@ -112,6 +112,9 @@
             this.model.gridLoading = false;
           }
         })
+      },
+      _closeModelViewDialog(){
+        this.$emit('_closeModelViewDialog');
       },
       _selectModelByPaging(){
         this.model.modelPageList = this.model.modelAllList.filter((item, index) =>

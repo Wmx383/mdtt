@@ -36,7 +36,6 @@
         this.$emit('_handleOnClickOrg', data.id, data.ogId, data.level);
       },
       _getUserRoleOrgTree() {
-        const token = utils.getStore('Token');
         this.$http({
           url: "/api/api/user/getUserRoleOrgTree",
           "content-type": "application/json",

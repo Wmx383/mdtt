@@ -8,7 +8,7 @@
         <h3 style="margin-left: 2%">模型组</h3>
       </div>
 
-      <div style="margin-left: 2%; margin-top: 1%; ">
+      <div style="margin-left: 5px; margin-top: 5px">
         <el-form
           :inline="true"
           class="demo-form-inline search-form">
@@ -91,14 +91,35 @@
           :modal-append-to-body="false"
           :modal="true"
           :width="viewModel.width"
-          @close="closeProjectPersonDialog"
+          @close="_closeModelViewDialog"
         >
           <template>
-            <viewModelCom ref="viewModelRef" v-if="viewModel.dialogVisible" :modelGroupId="modelGroupId"
-                              ></viewModelCom>
+            <viewModelCom
+              ref="viewModelRef"
+              v-if="viewModel.dialogVisible"
+              @_closeModelViewDialog="_closeModelViewDialog()"
+            ></viewModelCom>
           </template>
         </el-dialog>
-        
+
+        <!--选择-->
+        <el-dialog
+          :title="chooseModel.title"
+          :visible.sync="chooseModel.show"
+          :close-on-click-modal='false'
+          :close-on-press-escape='false'
+          :modal-append-to-body="false"
+          :modal="true"
+          :width="chooseModel.width"
+          style="height: 400px"
+          @close="_closeChooseModelDialog"
+        >
+          <el-cascader
+            placeholder="试试搜索：指南"
+            :options="chooseModel.options"
+            filterable></el-cascader>
+        </el-dialog>
+
       </div>
 
 
@@ -137,15 +158,24 @@
           },
           selectedDate: [],
         },
-        //管理人员窗口
+        //查看模型
         viewModel: {
           show: false,
           title: '查看模型',
           viewModelLoading: false,
-          dialogVisible : true,
+          dialogVisible: true,
           formLabelWidth: '120px',
           width: '700px',
-          modelGroupId : ''
+          options: []
+        },
+        //绑定模型
+        chooseModel: {
+          show: false,
+          title: '选择模型',
+          chooseModelLoading: false,
+          dialogVisible: true,
+          formLabelWidth: '120px',
+          width: '700px',
         },
       }
     },
@@ -154,6 +184,7 @@
     },
     mounted() {
       this._selectModelGroup();
+      this._selectUserRoleOrgTree();
     },
     methods: {
       _initModel() {
@@ -192,7 +223,7 @@
         })
       },
       //点击查看模型
-      _viewModel(index, row){
+      _viewModel(index, row) {
         let that = this;
         this.viewModel.show = true;
         this.viewModel.dialogVisible = true;
@@ -203,6 +234,11 @@
       },
       _handleUpdateModelParamDisplay() {
 
+      },
+      //关闭监听
+      _closeModelViewDialog() {
+        this.viewModel.dialogVisible = false;
+        this.viewModel.show = false;
       },
       _selectModelGroupByPaging() {
         this.modelGroup.modelGroupPageList = this.modelGroup.modelGroupAllList.filter((item, index) =>
@@ -221,6 +257,30 @@
       _handleCurrentChange(page) {
         this.modelGroup.pagination.page_index = page;
         this._selectModelGroupByPaging()
+      },
+      _selectUserRoleOrgTree() {
+        this.$http({
+          url: "/api/api/user/getUserRoleOrgTree",
+          "content-type": "application/json",
+          method: 'get',
+          /*headers: {Authorization: token},*/
+        }).then(res => {
+          if (res.data.status == 1) {
+            const resultList = res.data.result;
+
+            for (let i = 0; i < resultList.length; i++) {
+              let temp = resultList[i];
+              if (temp.childList.length > 0) {
+
+              }
+
+            }
+
+
+          } else {
+            this.$message({message: res.data.msg, type: 'error'});
+          }
+        })
       }
     }
   }
@@ -237,7 +297,7 @@
 
 <style>
   /*//用来设置当前页面element全局table 选中某行时的背景色*/
-  .table_container .el-table__body tr.current-row>td{
+  .table_container .el-table__body tr.current-row > td {
     background-color: #9999FF !important;
     color: #fff;
   }

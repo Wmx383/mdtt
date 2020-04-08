@@ -24,8 +24,9 @@
   }
 
   .el-table th{
-    background-color: #663333;
-    color: #fff;
+    background-color: #ccc;
+    color: #000033;
+    font-weight: bold;
   }
 
 </style>
