@@ -60,7 +60,7 @@
                 <el-button
                   type="info"
                   size="mini"
-                  @click="_insertDaily(scope.$index, scope.row)">绑定模型
+                  @click="_preChooseModel(scope.$index, scope.row)">绑定模型
                 </el-button>
               </div>
             </template>
@@ -115,9 +115,18 @@
           @close="_closeChooseModelDialog"
         >
           <el-cascader
-            placeholder="试试搜索：指南"
-            :options="chooseModel.options"
-            filterable></el-cascader>
+            ref="chooseModelRef"
+            placeholder="请选择或输入模型...."
+            v-model="chooseModel.modelId"
+            :options="chooseModel.orgTreeList"
+            :props="chooseModel.defaultProps"
+            style="width: 100%"
+            filterable>
+          </el-cascader>
+          <div class="text_right">
+            <el-button type="primary" size="small" @click="_closeChooseModelDialog">取消</el-button>
+            <el-button type="primary" size="small" @click="_recursionOrgTree">确定</el-button>
+          </div>
         </el-dialog>
 
       </div>
@@ -166,7 +175,6 @@
           dialogVisible: true,
           formLabelWidth: '120px',
           width: '700px',
-          options: []
         },
         //绑定模型
         chooseModel: {
@@ -176,6 +184,13 @@
           dialogVisible: true,
           formLabelWidth: '120px',
           width: '700px',
+          orgTreeList: [],
+          defaultProps: {
+            children: 'childList',
+            label: 'ogName',
+            value: 'ogId'
+          },
+          modelId: ''
         },
       }
     },
@@ -224,21 +239,30 @@
       },
       //点击查看模型
       _viewModel(index, row) {
-        let that = this;
         this.viewModel.show = true;
         this.viewModel.dialogVisible = true;
-        console.log(row.id)
         this.$nextTick(_ => {
           this.$refs.viewModelRef._selectModel(row.id);
         })
       },
-      _handleUpdateModelParamDisplay() {
-
+      //打开绑定模型
+      _preChooseModel(index, row) {
+        this.chooseModel.modelId = '';
+        this.chooseModel.show = true;
+        this.chooseModel.dialogVisible = true;
       },
-      //关闭监听
+      _handleUpdateModelParamDisplay() {
+        this.$message({message: '此功能暂未开发,敬请期待', type: 'warning'});
+      },
+      //关闭查询模型监听
       _closeModelViewDialog() {
         this.viewModel.dialogVisible = false;
         this.viewModel.show = false;
+      },
+      //关闭选择模型监听
+      _closeChooseModelDialog(){
+        this.chooseModel.dialogVisible = false;
+        this.chooseModel.show = false;
       },
       _selectModelGroupByPaging() {
         this.modelGroup.modelGroupPageList = this.modelGroup.modelGroupAllList.filter((item, index) =>
@@ -258,25 +282,38 @@
         this.modelGroup.pagination.page_index = page;
         this._selectModelGroupByPaging()
       },
+      //下拉联动树查询
       _selectUserRoleOrgTree() {
         this.$http({
           url: "/api/api/user/getUserRoleOrgTree",
           "content-type": "application/json",
           method: 'get',
+        }).then(res => {
+          if (res.data.status == 1) {
+            this.chooseModel.orgTreeList = res.data.result;
+
+          } else {
+            this.$message({message: res.data.msg, type: 'error'});
+          }
+        })
+      },
+      _recursionOrgTree() {
+        let nodesList = this.$refs['chooseModelRef'].getCheckedNodes(true);
+        if(nodesList.length <= 0){
+          this.$message({message: '请选择模型...', type: 'warning'});
+          return;
+        }
+
+        this.$http({
+          url: '/api/api/modelGroup/999/relateModel?modelId=' + nodesList[0].data.ogId +'',
+          "content-type": "application/json",
+          method: 'put',
           /*headers: {Authorization: token},*/
         }).then(res => {
           if (res.data.status == 1) {
-            const resultList = res.data.result;
+            this.$message({message: '操作成功', type: 'success'});
 
-            for (let i = 0; i < resultList.length; i++) {
-              let temp = resultList[i];
-              if (temp.childList.length > 0) {
-
-              }
-
-            }
-
-
+            this._closeChooseModelDialog();
           } else {
             this.$message({message: res.data.msg, type: 'error'});
           }
@@ -292,6 +329,10 @@
     left: 10px;
     right: 10px;
     box-shadow: 0 10px 10px 0px #aaa, 10px 0 10px 0px #aaa;
+  }
+  .text_right{
+    margin-top: 60px;
+    text-align: right;
   }
 </style>
 
