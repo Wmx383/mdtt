@@ -12,7 +12,7 @@
         <h3 style="margin-left: 2%">数据配置</h3>
       </div>
 
-      <div style="margin-left: 2%; margin-top: 1%; ">
+      <div style="margin-left: 5px; margin-top: 5px">
         <el-form
           :inline="true"
           class="demo-form-inline search-form">
@@ -48,14 +48,14 @@
           <el-table-column
             prop="name"
             label="参数名称"
-            align='center'
+            align='left'
             min-width="300"
           >
           </el-table-column>
           <el-table-column
             prop="maxValue"
             label="最大值"
-            align='center'
+            align='left'
             width="200"
             sortable
           >
@@ -63,7 +63,7 @@
           <el-table-column
             prop="minValue"
             label="最小值"
-            align='center'
+            align='left'
             width="200"
             sortable
           >
@@ -71,7 +71,7 @@
           <el-table-column
             prop="typeName"
             label="参数类型"
-            align='center'
+            align='left'
             width="300"
             sortable
           >
@@ -79,7 +79,7 @@
           <el-table-column
             prop="displayName"
             label="是否展示"
-            align='center'
+            align='left'
             width="300"
             sortable
           >
@@ -226,7 +226,7 @@
           } else {
             this.$message({message: '系统异常,请联系管理员', type: 'error'});
 
-            this._selectDataConfigByPaging();
+            this.dataConfig.gridLoading = false;
           }
         })
       },

@@ -66,10 +66,10 @@ export default new Router({
           component :() => import('@/page/systemManage/manageOrg')
         },
         {
-          path: '/systemManage/manageModel',
+          path: '/modelGroup/manageModelGroup',
           name: '模型组管理',
           hidden : true,
-          component :() => import('@/page/systemManage/manageModel')
+          component :() => import('@/page/modelGroup/manageModelGroup')
         },
         {
           path: '/systemManage/manageSamplingPoint',
