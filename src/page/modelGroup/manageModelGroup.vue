@@ -206,6 +206,9 @@
         this.contentDivStyle.height = window.innerHeight - 110 + 'px'
       },
       _selectModelGroup() {
+        this.modelGroup.modelGroupAllList = [];
+        this.modelGroup.modelGroupList = [];
+        this.modelGroup.modelGroupPageList = [];
         this.modelGroup.gridLoading = true;
 
         this.$http({
@@ -338,10 +341,10 @@
 
 <style>
   /*//用来设置当前页面element全局table 选中某行时的背景色*/
-  .table_container .el-table__body tr.current-row > td {
+ /* .table_container .el-table__body tr.current-row > td {
     background-color: #9999FF !important;
     color: #fff;
-  }
+  }*/
 
   /* .el-table__body tr:hover>td {
     background-color:  	#d0d0d0;

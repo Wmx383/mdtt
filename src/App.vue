@@ -29,4 +29,13 @@
     font-weight: bold;
   }
 
+  .table_container .el-table__body tr.current-row > td {
+    background-color: #9999FF !important;
+    color: #fff;
+  }
+
+  .el-scrollbar__wrap{
+    margin-right: 0px !important;
+  }
+
 </style>

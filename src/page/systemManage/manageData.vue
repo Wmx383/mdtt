@@ -178,7 +178,7 @@
           if (res.data.status == 1) {
             this.dataConfig.dataConfigAllList = res.data.result;
           } else {
-            this.$message({message: '系统异常,请联系管理员', type: 'error'});
+            this.$message({message: res.data.msg, type: 'error'});
           }
         })
       },
@@ -224,7 +224,7 @@
             this._selectDataConfigByPaging();
 
           } else {
-            this.$message({message: '系统异常,请联系管理员', type: 'error'});
+            this.$message({message: res.data.msg, type: 'error'});
 
             this.dataConfig.gridLoading = false;
           }

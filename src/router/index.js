@@ -72,10 +72,10 @@ export default new Router({
           component :() => import('@/page/modelGroup/manageModelGroup')
         },
         {
-          path: '/systemManage/manageSamplingPoint',
+          path: '/samplePoint/manageSamplePoint',
           name: '采样点管理',
           hidden : true,
-          component :() => import('@/page/systemManage/manageSamplingPoint')
+          component :() => import('@/page/samplePoint/manageSamplePoint')
         },
         {
           path: '/systemManage/manageNorm',

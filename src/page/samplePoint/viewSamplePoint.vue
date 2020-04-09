@@ -1,46 +1,30 @@
 <template>
-  <div class="custom-tree-container orgTreeClass" v-loading="loading">
+  <div class="custom-tree-container samplePointTreeClass" v-loading="loading">
     <el-scrollbar style="height: 100%">
-      <el-tree
-        :data="data"
-        ref="tree"
-        node-key="id"
-        default-expand-all
-        highlight-current
-        :props="defaultProps"
-        @node-click="handleNodeClick"
-        :expand-on-click-node="false"
-      >
-      <span class="custom-tree-node" slot-scope="{ node, data }">
-        <span><i :class="data.icon"></i> {{node.label}}</span>
-      </span>
-      </el-tree>
+      <el-tree ref="samplePointTree" :data="data" :props="defaultProps" @node-click="handleNodeClick" node-key="id" highlight-current></el-tree>
     </el-scrollbar>
   </div>
 </template>
 
 <script>
-  import * as utils from '../../utils/utils'
-
   export default {
-    name: "viewOrg",
+    name: "viewSamplePoint",
     data() {
       return {
         data: [],
         defaultProps: {
-          children: 'childList',
-          label: 'ogName'
+          label: 'sampleName'
         },
         loading: true
       }
     },
     methods: {
       handleNodeClick(data) {
-        this.$emit('_handleOnClickOrg', data.id, data.ogId, data.level);
+        this.$emit('_handleOnClickSamplePoint', data.id, data.sourceName, data.sampleName, data.modelId, data.status);
       },
-      _getUserRoleOrgTree() {
-        this.$http({
-          url: "/api/api/user/getUserRoleOrgTree",
+      async _selectSamplePoint() {
+        await this.$http({
+          url: "/api/api/samplePoint/getSamplePointList",
           "content-type": "application/json",
           method: 'get',
           /*headers: {Authorization: token},*/
@@ -49,16 +33,22 @@
             this.loading = false;
             this.data = res.data.result;
           } else {
-            //TO-DO 临时先这么写提醒吧 哈哈哈哈
             this.loading = false;
-            alert(res.data.msg);
-            this.$router.push({path: "/"});
+            this.$message({message: res.data.msg, type: 'error'});
           }
         })
-      }
+      },
+      async _selectSamplePointByUpdate(id){
+        await this._selectSamplePoint();
+        this._setSamplePoint(id);
+      },
+      _setSamplePoint(id){
+        this.$refs.samplePointTree.setCurrentKey(id);
+        this.handleNodeClick(this.$refs.samplePointTree.getCurrentNode());
+      },
     },
     mounted() {
-      this._getUserRoleOrgTree();
+      this._selectSamplePoint();
     }
 
   }
@@ -95,9 +85,8 @@
     /*background-color: #b5b6b9;*/
   }
 
-  .orgTreeClass .el-tree > .el-tree-node {
+  .samplePointTreeClass .el-tree > .el-tree-node {
     min-width: 100%;
-    height: 370px;
     font-size: 15px;
     display: inline-block;
     background-color: ghostwhite;
