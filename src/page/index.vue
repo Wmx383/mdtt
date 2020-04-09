@@ -140,7 +140,7 @@
     left: 283px;
     top: 0;
     right: 0;
-    background-color: #fff;
+    background-color: white;
     min-width: 1050px;
     border: 1px solid rgba(0, 21, 41, 0.08);
     height: 62px;

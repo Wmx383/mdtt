@@ -269,14 +269,14 @@
     left: 0;
     width: 280px;
     border: 1px solid rgba(0, 21, 41, 0.08);
-    box-shadow: 0 0px 0px 0px #aaa, 0px 0 0px 0px #aaa;
+    /*box-shadow: 0 0px 0px 0px #aaa, 0px 0 0px 0px #aaa;*/
   }
 
   .userTable {
     position: absolute;
     left: 283px;
     right: 0px;
-    box-shadow: 0 0px 0px 0px #aaa, 0px 0 0px 0px #aaa;
+    /*box-shadow: 0 0px 0px 0px #aaa, 0px 0 0px 0px #aaa;*/
   }
 
 </style>
