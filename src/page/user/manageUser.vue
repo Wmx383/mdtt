@@ -185,9 +185,9 @@
         },
         //按钮状态
         BUTTON_STATUS: {
-          _preInsertUser: true,
-          _preUpdateUser: true,
-          _preDeleteUser: true
+          _preInsertUser: false,
+          _preUpdateUser: false,
+          _preDeleteUser: false
         },
         userGrid: {
           userList: [],
@@ -273,7 +273,7 @@
       //后台获取数据存放于临时data
       getUserPageList(){
         this.userGrid.userGridLoading = true;
-        this._setButtonStatus();
+       // this._setButtonStatus();
         let that = this;
         const token = utils.getStore('Token');
         this.$http({
@@ -412,7 +412,7 @@
         this.rowValue.rowMail = row.mail;
         this.rowValue.rowPhone = row.phone;
 
-        this._setButtonStatus(row);
+        //this._setButtonStatus(row);
       },
 
       //点击修改按钮
