@@ -113,116 +113,112 @@
             </div>
           </el-tab-pane>
         </el-tabs>
-
-        <!--添加采样点-->
-        <el-dialog
-          :title="insertSamplePointDialog.title"
-          :visible.sync="insertSamplePointDialog.show"
-          :close-on-click-modal='false'
-          :close-on-press-escape='false'
-          :modal-append-to-body="false"
-          :modal="false"
-          :style="insertSamplePointDialog.style"
-          :width="insertSamplePointDialog.width"
-          @close="closeInsertSamplePointDialog"
-        >
-          <template>
-            <insertSamplePointCom ref="insertSamplePointRef" v-if="insertSamplePointDialog.dialogVisible"
-                                  @insertSamplePointListeners="_completeInsertSamplePoint"
-                                  @closeInsertSamplePointDialog="closeInsertSamplePointDialog()"></insertSamplePointCom>
-          </template>
-        </el-dialog>
-
-        <!--修改采样点-->
-        <el-dialog
-          :title="updateSamplePointDialog.title"
-          :visible.sync="updateSamplePointDialog.show"
-          :close-on-click-modal='false'
-          :close-on-press-escape='false'
-          :modal-append-to-body="false"
-          :modal="false"
-          :style="updateSamplePointDialog.style"
-          :width="updateSamplePointDialog.width"
-          @close="closeUpdateSamplePointDialog"
-        >
-          <template>
-            <updateSamplePointCom ref="updateSamplePointRef" v-if="updateSamplePointDialog.dialogVisible"
-                                  @updateSamplePointListeners="_completeUpdateSamplePoint"
-                                  @closeUpdateSamplePointDialog="closeUpdateSamplePointDialog()"></updateSamplePointCom>
-          </template>
-        </el-dialog>
-
-        <!--关联模型-->
-        <el-dialog
-          :title="relateModel.title"
-          :visible.sync="relateModel.show"
-          :close-on-click-modal='false'
-          :close-on-press-escape='false'
-          :modal-append-to-body="false"
-          :modal="true"
-          :width="relateModel.width"
-          style="height: 400px"
-          @close="_closeRelateModelDialog"
-        >
-          <el-cascader
-            ref="relateModelRef"
-            placeholder="请选择或输入模型...."
-            v-model="relateModel.modelId"
-            :options="relateModel.orgTreeList"
-            :props="relateModel.defaultProps"
-            style="width: 100%"
-            filterable>
-          </el-cascader>
-          <div class="text_right">
-            <el-button type="primary" size="small" @click="_closeRelateModelDialog">取消</el-button>
-            <el-button type="primary" size="small" @click="_relateModel">确定</el-button>
-          </div>
-
-        </el-dialog>
-
-        <!--添加化验值-->
-        <el-dialog
-          :title="insertAssayDialog.title"
-          :visible.sync="insertAssayDialog.show"
-          :close-on-click-modal='false'
-          :close-on-press-escape='false'
-          :modal-append-to-body="false"
-          :modal="false"
-          :style="insertAssayDialog.style"
-          :width="insertAssayDialog.width"
-          @close="closeInsertAssayDialog"
-        >
-          <template>
-            <insertAssayCom ref="insertAssayRef" v-if="insertAssayDialog.dialogVisible"
-                                  @insertAssayListeners="_completeInsertAssay"
-                                  @closeInsertAssayDialog="closeInsertAssayDialog()"></insertAssayCom>
-          </template>
-        </el-dialog>
-
-        <!--修改化验值-->
-        <el-dialog
-          :title="updateAssayDialog.title"
-          :visible.sync="updateAssayDialog.show"
-          :close-on-click-modal='false'
-          :close-on-press-escape='false'
-          :modal-append-to-body="false"
-          :modal="false"
-          :style="updateAssayDialog.style"
-          :width="updateAssayDialog.width"
-          @close="closeUpdateAssayDialog"
-        >
-          <template>
-            <updateAssayCom ref="updateAssayRef" v-if="updateAssayDialog.dialogVisible"
-                                  @updateAssayListeners="_completeUpdateAssay"
-                                  @closeUpdateAssayDialog="closeUpdateAssayDialog()"></updateAssayCom>
-          </template>
-        </el-dialog>
-
-
       </div>
 
-
     </div>
+    <!--添加采样点-->
+    <el-dialog
+      :title="insertSamplePointDialog.title"
+      :visible.sync="insertSamplePointDialog.show"
+      :close-on-click-modal='false'
+      :close-on-press-escape='false'
+      :modal-append-to-body="false"
+      :modal="false"
+      :style="insertSamplePointDialog.style"
+      :width="insertSamplePointDialog.width"
+      @close="closeInsertSamplePointDialog"
+    >
+      <template>
+        <insertSamplePointCom ref="insertSamplePointRef" v-if="insertSamplePointDialog.dialogVisible"
+                              @insertSamplePointListeners="_completeInsertSamplePoint"
+                              @closeInsertSamplePointDialog="closeInsertSamplePointDialog()"></insertSamplePointCom>
+      </template>
+    </el-dialog>
+
+    <!--修改采样点-->
+    <el-dialog
+      :title="updateSamplePointDialog.title"
+      :visible.sync="updateSamplePointDialog.show"
+      :close-on-click-modal='false'
+      :close-on-press-escape='false'
+      :modal-append-to-body="false"
+      :modal="false"
+      :style="updateSamplePointDialog.style"
+      :width="updateSamplePointDialog.width"
+      @close="closeUpdateSamplePointDialog"
+    >
+      <template>
+        <updateSamplePointCom ref="updateSamplePointRef" v-if="updateSamplePointDialog.dialogVisible"
+                              @updateSamplePointListeners="_completeUpdateSamplePoint"
+                              @closeUpdateSamplePointDialog="closeUpdateSamplePointDialog()"></updateSamplePointCom>
+      </template>
+    </el-dialog>
+
+    <!--关联模型-->
+    <el-dialog
+      :title="relateModel.title"
+      :visible.sync="relateModel.show"
+      :close-on-click-modal='false'
+      :close-on-press-escape='false'
+      :modal-append-to-body="false"
+      :modal="true"
+      :width="relateModel.width"
+      style="height: 400px"
+      @close="_closeRelateModelDialog"
+    >
+      <el-cascader
+        ref="relateModelRef"
+        placeholder="请选择或输入模型...."
+        v-model="relateModel.modelId"
+        :options="relateModel.orgTreeList"
+        :props="relateModel.defaultProps"
+        style="width: 100%"
+        filterable>
+      </el-cascader>
+      <div class="text_right">
+        <el-button type="primary" size="small" @click="_closeRelateModelDialog">取消</el-button>
+        <el-button type="primary" size="small" @click="_relateModel">确定</el-button>
+      </div>
+
+    </el-dialog>
+
+    <!--添加化验值-->
+    <el-dialog
+      :title="insertAssayDialog.title"
+      :visible.sync="insertAssayDialog.show"
+      :close-on-click-modal='false'
+      :close-on-press-escape='false'
+      :modal-append-to-body="false"
+      :modal="false"
+      :style="insertAssayDialog.style"
+      :width="insertAssayDialog.width"
+      @close="closeInsertAssayDialog"
+    >
+      <template>
+        <insertAssayCom ref="insertAssayRef" v-if="insertAssayDialog.dialogVisible"
+                        @insertAssayListeners="_completeInsertAssay"
+                        @closeInsertAssayDialog="closeInsertAssayDialog()"></insertAssayCom>
+      </template>
+    </el-dialog>
+
+    <!--修改化验值-->
+    <el-dialog
+      :title="updateAssayDialog.title"
+      :visible.sync="updateAssayDialog.show"
+      :close-on-click-modal='false'
+      :close-on-press-escape='false'
+      :modal-append-to-body="false"
+      :modal="false"
+      :style="updateAssayDialog.style"
+      :width="updateAssayDialog.width"
+      @close="closeUpdateAssayDialog"
+    >
+      <template>
+        <updateAssayCom ref="updateAssayRef" v-if="updateAssayDialog.dialogVisible"
+                        @updateAssayListeners="_completeUpdateAssay"
+                        @closeUpdateAssayDialog="closeUpdateAssayDialog()"></updateAssayCom>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -524,7 +520,10 @@
             this.$nextTick(_ => {
               this.$refs.viewSamplePointComRef._selectSamplePoint();
             });
-            this._selectAssay();
+            this.assay.assayAllList = [];
+            this.assay.assayList = [];
+            this.assay.assayPageList = [];
+            this.assay.selectedDate = {};
 
           } else {
             this.$message({message: res.data.msg, type: 'error'});
@@ -544,7 +543,6 @@
       _completeInsertSamplePoint() {
         if (this.samplePoint.samplePointPageList.length > 0) {
           this.$nextTick(_ => {
-            console.log(this.samplePoint.samplePointPageList[0].id);
             this.$refs.viewSamplePointComRef._selectSamplePointByUpdate(this.samplePoint.samplePointPageList[0].id);
           });
         } else {
@@ -606,11 +604,7 @@
       },
       _clickRow(row){
         this.assay.selectedDate = row;
-        console.log(this.assay.selectedDate);
-      },
-      _handleUpdateModelParamDisplay() {
-
-      },
+      }
     }
   }
 </script>

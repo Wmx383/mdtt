@@ -28,7 +28,7 @@
               <el-menu-item index="/systemManage/manageOrg"><i class="el-icon-menu"></i>组织机构管理</el-menu-item>
               <el-menu-item index="/modelGroup/manageModelGroup"><i class="el-icon-menu"></i>模型组管理</el-menu-item>
               <el-menu-item index="/samplePoint/manageSamplePoint"><i class="el-icon-menu"></i>采样点管理</el-menu-item>
-              <el-menu-item index="/systemManage/manageNorm"><i class="el-icon-menu"></i>指标管理</el-menu-item>
+              <el-menu-item index="/norm/manageNorm"><i class="el-icon-menu"></i>指标管理</el-menu-item>
               <el-menu-item index="/systemManage/manageCharacteristicGrade"><i class="el-icon-menu"></i>特征牌号管理
               </el-menu-item>
             </el-submenu>

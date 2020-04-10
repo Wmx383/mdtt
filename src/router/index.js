@@ -78,10 +78,10 @@ export default new Router({
           component :() => import('@/page/samplePoint/manageSamplePoint')
         },
         {
-          path: '/systemManage/manageNorm',
+          path: '/norm/manageNorm',
           name: '指标管理',
           hidden : true,
-          component :() => import('@/page/systemManage/manageNorm')
+          component :() => import('@/page/norm/manageNorm')
         },
         {
           path: '/systemManage/manageCharacteristicGrade',

@@ -36,7 +36,10 @@
     },
     methods: {
       handleNodeClick(data) {
-        this.$emit('_handleOnClickOrg', data.id, data.ogId, data.level);
+        this.$emit('_handleOnClickOrg', data.id, data.ogId, data.level, data.modelType);
+      },
+      _getCurrentNode(){
+        return this.$refs.tree.getCurrentNode();
       },
       _getUserRoleOrgTree() {
         this.$http({

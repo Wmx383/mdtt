@@ -130,7 +130,7 @@
           dataConfigList: [],
           gridTableStyle: {
             width: '100%',
-            height: window.innerHeight - 290 + 'px'
+            height: window.innerHeight - 250 + 'px'
           },
           pagination: {
             page_index: 1,  // 当前位于哪页
@@ -164,6 +164,7 @@
         this.multipleSelection = [];
         this.dataConfig.gridLoading = true;
         this.dataConfig.dataConfigAllList = [];
+        this.dataConfig.dataConfigPageList = [];
         this.dataConfig.dataConfigList = [];
         await this._getModelParamList(ogId);
         await this._getDisplayModelParamList(ogId);
@@ -320,18 +321,5 @@
 </script>
 
 <style lang="less" scoped>
-  .orgTree {
-    position: absolute;
-    left: 0;
-    width: 280px;
-    border: 1px solid rgba(0, 21, 41, 0.08);
-    /*box-shadow: 0 10px 10px 0px #aaa, 10px 0 10px 0px #aaa;*/
-  }
 
-  .contentDiv {
-    position: absolute;
-    left: 300px;
-    right: 10px;
-    /*box-shadow: 0 10px 10px 0px #aaa, 10px 0 10px 0px #aaa;*/
-  }
 </style>
