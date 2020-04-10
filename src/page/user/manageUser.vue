@@ -185,6 +185,8 @@
     name: "manageUser",
     data() {
       return {
+        bratTreeData : [],
+        treeOgIdList : [],
         abc: false,
         orgIdList: [],
         orgTreeAndUserHeight: {
@@ -283,8 +285,51 @@
         if (this.treeOrgType == '1') {
           this.getUserList();
         } else {
-          for (let i = 0; i < this.treeData.length; i++) {
-            this.getTreeId(this.treeData[i], this.treeOrgId);
+          this._selectBratTreeData(args[0], args[1])
+        }
+      },
+      _selectBratTreeData(id, orId){
+        for(let i = 0; i < this.treeData.length; i++){
+          if(id == this.treeData[i].id){
+            this.bratTreeData = this.treeData[i];
+            return;
+          }else if(this.treeData[i].childList != null){
+            this._getRecursionData(id, this.treeData[i].childList)
+          }
+        }
+        console.log("结束了");
+        console.log(this.bratTreeData);
+        console.log(this.bratTreeData.ogName);
+        console.log(this.bratTreeData.childList[0].ogName);
+
+        this._getTreeIdList();
+
+      },
+      _getRecursionData(id, treeDataList){
+        console.log(treeDataList);
+        for(let i = 0; i < treeDataList.length; i++){
+          if(id == treeDataList[i].id){
+            this.bratTreeData = treeDataList[i];
+            return;
+          }else if(treeDataList[i].childList != null){
+            this._getRecursionData(id, treeDataList[i].childList)
+          }
+        }
+      },
+      _getTreeIdList(){
+        console.log(this.bratTreeData)
+        this.treeOgIdList.push(this.bratTreeData.ogId);
+        if(this.bratTreeData.childList!=null){
+          this._getRecursionDataTreeOgId(this.bratTreeData.childList);
+        }
+        console.log('2次结束了');
+        console.log(this.treeOgIdList);
+      },
+      _getRecursionDataTreeOgId(bratTreeData){
+        for(let i = 0; i < bratTreeData.length; i++){
+          this.treeOgIdList.push(bratTreeData[i].ogId);
+          if(bratTreeData[i].childList!=null){
+            this._getRecursionDataTreeOgId(bratTreeData[i].childList);
           }
         }
       },
