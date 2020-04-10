@@ -69,7 +69,7 @@
           ownerId: '',
           upperLimit: '',
           lowerLimit: '',
-          type: '1',
+          type: '',
           num: '',
           code: '000'
         },
@@ -77,16 +77,26 @@
     },
     methods: {
       _insertInputNorm() {
-        this.$refs['insertProjectForm'].validate((valid) => {
+        this.$refs['insertInputNormForm'].validate((valid) => {
           if (valid) {//表单数据验证完成之后，提交数据;
+            this.typeList.forEach((item, index)=>{
+              if(this.insertInputNormForm.ownerId == item.id){
+                this.insertInputNormForm.num = item.num;
+                return;
+              }
+            });
+
             this.$http({
               url: '/api/api/target/createTarget',
               "content-type": "application/json",
               method: 'post',
               data: {
-                sampleName: this.insertInputNormForm.sampleName,
-                sourceName: this.insertInputNormForm.sourceName,
-                status: this.insertInputNormForm.status
+                code: this.insertInputNormForm.code,
+                lowerLimit: this.insertInputNormForm.lowerLimit,
+                upperLimit: this.insertInputNormForm.upperLimit,
+                ownerId: this.insertInputNormForm.ownerId,
+                type: this.insertInputNormForm.type,
+                num : this.insertInputNormForm.num
               }
             }).then(res => {
               if (res.data.status == 1) {

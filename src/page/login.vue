@@ -171,8 +171,6 @@
               data: this.loginUserForm
             }).then(res => {
               if (res.data.status == 1) {
-                console.log(res.data.result.token);
-
                 let content = JSON.stringify(res.data.result.token);
                 utils.setStore('Token', res.data.result.token);
 
