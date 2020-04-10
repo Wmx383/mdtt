@@ -22,9 +22,15 @@
             class="demo-form-inline search-form">
 
             <el-form-item>
-              <el-button type="primary" size="small" icon="el-icon-plus" :disabled="BUTTON_STATUS._preInsertUser" @click='preInsertUser()'>添加</el-button>
-              <el-button type="primary" size="small" icon="el-icon-edit" :disabled="BUTTON_STATUS._preUpdateUser" @click='preUpdateUser()'>修改</el-button>
-              <el-button type="primary" size="small" icon="el-icon-delete" :disabled="BUTTON_STATUS._preDeleteUser" @click='preDeleteUser()'>删除</el-button>
+              <el-button type="primary" size="small" icon="el-icon-plus" :disabled="BUTTON_STATUS._preInsertUser"
+                         @click='preInsertUser()'>添加
+              </el-button>
+              <el-button type="primary" size="small" icon="el-icon-edit" :disabled="BUTTON_STATUS._preUpdateUser"
+                         @click='preUpdateUser()'>修改
+              </el-button>
+              <el-button type="primary" size="small" icon="el-icon-delete" :disabled="BUTTON_STATUS._preDeleteUser"
+                         @click='preDeleteUser()'>删除
+              </el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -109,14 +115,14 @@
             <el-col :span="24">
               <div class="pagination">
                 <el-pagination
-                    @size-change="handleSizeChange"
-                    @current-change="handleCurrentChange"
-                    :current-page="userGrid.pagination.page_index"
-                    :page-sizes="userGrid.pagination.page_sizes"
-                    :page-size="userGrid.pagination.page_size"
-                    :layout="userGrid.pagination.layout"
-                    :total="userGrid.pagination.total"
-                 >
+                  @size-change="handleSizeChange"
+                  @current-change="handleCurrentChange"
+                  :current-page="userGrid.pagination.page_index"
+                  :page-sizes="userGrid.pagination.page_sizes"
+                  :page-size="userGrid.pagination.page_size"
+                  :layout="userGrid.pagination.layout"
+                  :total="userGrid.pagination.total"
+                >
                 </el-pagination>
               </div>
             </el-col>
@@ -134,7 +140,9 @@
             :width="insertUserDialog.width"
           >
             <template>
-              <insertUserCom ref="insert_user_ref" v-if="insertUserDialog.dialogVisible" :closeInsertUserDialog="closeInsertUserDialog" @insertUserListeners="insertUserReturn"></insertUserCom>
+              <insertUserCom ref="insert_user_ref" v-if="insertUserDialog.dialogVisible"
+                             :closeInsertUserDialog="closeInsertUserDialog"
+                             @insertUserListeners="insertUserReturn"></insertUserCom>
             </template>
           </el-dialog>
 
@@ -150,7 +158,9 @@
             :width="updateUserDialog.width"
           >
             <template>
-              <updateUserCom ref="update_user_ref" v-if="updateUserDialog.dialogVisible" :closeUpdateUserDialog="closeUpdateUserDialog" @updateUserListeners="updateUserReturn"></updateUserCom>
+              <updateUserCom ref="update_user_ref" v-if="updateUserDialog.dialogVisible"
+                             :closeUpdateUserDialog="closeUpdateUserDialog"
+                             @updateUserListeners="updateUserReturn"></updateUserCom>
             </template>
           </el-dialog>
 
@@ -175,6 +185,8 @@
     name: "manageUser",
     data() {
       return {
+        abc: false,
+        orgIdList: [],
         orgTreeAndUserHeight: {
           height: ''
         },
@@ -214,7 +226,7 @@
           show: false,
           title: '新增用户',
           insertProjectDialogLoading: false,
-          dialogVisible : true,
+          dialogVisible: true,
           formLabelWidth: '120px',
           width: '500px'
         },
@@ -223,7 +235,7 @@
           show: false,
           title: '修改用户',
           updateProjectDialogLoading: false,
-          dialogVisible : true,
+          dialogVisible: true,
           formLabelWidth: '120px',
           width: '500px'
         },
@@ -249,7 +261,7 @@
         this.orgTreeAndUserHeight.height = window.innerHeight - 110 + 'px'
       },
       //获取树
-      getOrgTree(){
+      getOrgTree() {
         this.$http({
           url: "/api/api/user/getUserRoleOrgTree",
           "content-type": "application/json",
@@ -268,12 +280,18 @@
         this.treeOrgId = args[1];
         this.treeOrgType = args[2];
 
-        this.selectUserByOrg();
+        if (this.treeOrgType == '1') {
+          this.getUserList();
+        } else {
+          for (let i = 0; i < this.treeData.length; i++) {
+            this.getTreeId(this.treeData[i], this.treeOrgId);
+          }
+        }
       },
       //后台获取数据存放于临时data
-      getUserPageList(){
+      getUserPageList() {
         this.userGrid.userGridLoading = true;
-       // this._setButtonStatus();
+        // this._setButtonStatus();
         let that = this;
         const token = utils.getStore('Token');
         this.$http({
@@ -285,9 +303,9 @@
           if (res.data.status == 1) {
             let orgUser = res.data.result;
             let userList = [];
-            for(let i = 0; i < orgUser.length; i ++){
-              if(orgUser[i].users.length > 0){
-                for(let j = 0; j < orgUser[i].users.length; j++){
+            for (let i = 0; i < orgUser.length; i++) {
+              if (orgUser[i].users.length > 0) {
+                for (let j = 0; j < orgUser[i].users.length; j++) {
                   let user = {
                     id: orgUser[i].users[j].id,
                     ogName: orgUser[i].ogName,
@@ -304,7 +322,7 @@
               }
             }
             that.userdata = [];
-            for(let i = 0; i < userList.length; i++){
+            for (let i = 0; i < userList.length; i++) {
               const tableItem = {
                 sortnum: that.sortnum + (i + 1),
                 id: userList[i].id,
@@ -330,7 +348,7 @@
         })
       },
       //把临时数据存于tableData 做分页
-      getUserList(){
+      getUserList() {
         this.userGrid.userList = [];
         this.userGrid.userList = this.userdata.filter((item, index) =>
           index < this.userGrid.pagination.page_index * this.userGrid.pagination.page_size && index >= this.userGrid.pagination.page_size * (this.userGrid.pagination.page_index - 1)
@@ -349,40 +367,52 @@
       },
 
       //点击树调用的方法
-      selectUserByOrg(){
-        if(this.treeOrgType == '1'){
-          let that = this;
-          that.getUserList();
-        }else{
-          let that = this;
-          that.userGrid.userList = [];
-          let userList = [];
-          for(let i = 0; i < that.userdata.length; i ++ ){
-            if(that.userdata[i].orgId == that.treeOrgId){
-              userList.push(that.userdata[i])
-            }
+      selectUserByOrg() {
+        let that = this;
+        that.userGrid.userList = [];
+        let userList = [];
+        for (let i = 0; i < that.userdata.length; i++) {
+          if (that.userdata[i].orgId == that.treeOrgId) {
+            userList.push(that.userdata[i])
           }
-          that.userGrid.userList = userList.filter((item, index) =>
-            index < that.userGrid.pagination.page_index * that.userGrid.pagination.page_size && index >= that.userGrid.pagination.page_size * (that.userGrid.pagination.page_index - 1)
-          )
-          that.userGrid.pagination.total = userList.length;
         }
+        that.userGrid.userList = userList.filter((item, index) =>
+          index < that.userGrid.pagination.page_index * that.userGrid.pagination.page_size && index >= that.userGrid.pagination.page_size * (that.userGrid.pagination.page_index - 1)
+        )
+        that.userGrid.pagination.total = userList.length;
       },
 
       //获取当前节点和子节点的所有treeId
-      getTreeId(treeOrgId){
+      getTreeId(treeData, treeOrgId) {
+        if(treeData != undefined){
+          for (let i = 0; i < treeData.childList.length; i++) {
+            if (treeOrgId == treeData.childList[i].ogId) {
+              this.treeDg();
+              return;
+            } else {
+              this.getTreeId(treeData.childList[i], treeOrgId);
+            }
+          }
+        }
+        else{
+          return
+        }
+      },
+
+      //节点递归
+      treeDg() {
 
       },
 
       //点击新增按钮
-      preInsertUser(){
-        if(this.treeOrgId == ''){
+      preInsertUser() {
+        if (this.treeOrgId == '') {
           this.$message({
             message: '请选择左侧的组织',
             type: 'warning'
           });
           return;
-        }else{
+        } else {
           this.insertUserDialog.show = true;
           this.insertUserDialog.dialogVisible = true;
           this.$nextTick(_ => {
@@ -393,17 +423,17 @@
       },
 
       //关闭新增页面
-      closeInsertUserDialog(){
+      closeInsertUserDialog() {
         this.insertUserDialog.show = false;
       },
 
       //新增页面的返回函数
-      insertUserReturn(){
+      insertUserReturn() {
         this.insertUserDialog.show = false;
       },
 
       //点击行事件
-      clickRow(row, column, event){
+      clickRow(row, column, event) {
         this.rowValue.rowId = row.id;
         this.rowValue.rowName = row.name;
         this.rowValue.rowUserName = row.userName;
@@ -416,7 +446,7 @@
       },
 
       //点击修改按钮
-      preUpdateUser(){
+      preUpdateUser() {
         this.updateUserDialog.show = true;
         this.updateUserDialog.dialogVisible = true;
         this.$nextTick(_ => {
@@ -431,17 +461,17 @@
       },
 
       //关闭修改页面
-      closeUpdateUserDialog(){
+      closeUpdateUserDialog() {
         this.updateUserDialog.show = false;
       },
 
       //修改页面的返回函数
-      updateUserReturn(){
+      updateUserReturn() {
         this.updateUserDialog.show = false;
       },
 
       //点击删除按钮
-      preDeleteUser(){
+      preDeleteUser() {
         this.$confirm('是否删除', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -453,9 +483,9 @@
             "content-type": "application/json",
             method: 'DELETE',
           }).then(res => {
-            if(res.data.status == '1'){
+            if (res.data.status == '1') {
               this.$message({message: '操作成功', type: 'success'});
-            }else{
+            } else {
               this.$message({message: '系统异常,请联系管理员', type: 'error'});
             }
           })
@@ -464,18 +494,18 @@
       },
 
       //设置按钮状态
-      _setButtonStatus(row){
-        if(row == undefined){
-          if(this.treeOrgId == ''){
+      _setButtonStatus(row) {
+        if (row == undefined) {
+          if (this.treeOrgId == '') {
             this.BUTTON_STATUS._preInsertUser = true;
             this.BUTTON_STATUS._preUpdateUser = true;
             this.BUTTON_STATUS._preDeleteUser = true;
-          }else{
+          } else {
             this.BUTTON_STATUS._preInsertUser = false;
             this.BUTTON_STATUS._preUpdateUser = true;
             this.BUTTON_STATUS._preDeleteUser = true;
           }
-        }else{
+        } else {
           this.BUTTON_STATUS._preInsertUser = true;
           this.BUTTON_STATUS._preUpdateUser = false;
           this.BUTTON_STATUS._preDeleteUser = false;
