@@ -22,14 +22,11 @@
             class="demo-form-inline search-form">
 
             <el-form-item>
-              <el-button type="primary" size="small" icon="el-icon-plus" :disabled="BUTTON_STATUS._preInsertUser"
-                         @click='preInsertUser()'>添加
+              <el-button type="primary" size="small" icon="el-icon-plus" @click='preInsertUser()'>添加
               </el-button>
-              <el-button type="primary" size="small" icon="el-icon-edit" :disabled="BUTTON_STATUS._preUpdateUser"
-                         @click='preUpdateUser()'>修改
+              <el-button type="primary" size="small" icon="el-icon-edit" @click='preUpdateUser()'>修改
               </el-button>
-              <el-button type="primary" size="small" icon="el-icon-delete" :disabled="BUTTON_STATUS._preDeleteUser"
-                         @click='preDeleteUser()'>删除
+              <el-button type="primary" size="small" icon="el-icon-delete" @click='preDeleteUser()'>删除
               </el-button>
             </el-form-item>
           </el-form>
@@ -104,8 +101,11 @@
               align='center'
             >
               <template slot-scope="scope">
-                <div>
-                  <el-button size="mini">绑定角色
+                <div class="operate-groups">
+                  <el-button
+                    type="info"
+                    size="mini"
+                    @click="bindRole(scope.$index, scope.row)">绑定角色
                   </el-button>
                 </div>
               </template>
@@ -141,7 +141,7 @@
           >
             <template>
               <insertUserCom ref="insert_user_ref" v-if="insertUserDialog.dialogVisible"
-                             :closeInsertUserDialog="closeInsertUserDialog"
+                             @_closeInsertUserDialog="closeInsertUserDialog"
                              @insertUserListeners="insertUserReturn"></insertUserCom>
             </template>
           </el-dialog>
@@ -159,8 +159,26 @@
           >
             <template>
               <updateUserCom ref="update_user_ref" v-if="updateUserDialog.dialogVisible"
-                             :closeUpdateUserDialog="closeUpdateUserDialog"
+                             @_closeUpdateUserDialog="closeUpdateUserDialog"
                              @updateUserListeners="updateUserReturn"></updateUserCom>
+            </template>
+          </el-dialog>
+
+          <!--绑定角色页面-->
+          <el-dialog
+            :title="userBindRoleDialog.title"
+            :visible.sync="userBindRoleDialog.show"
+            :close-on-click-modal='false'
+            :close-on-press-escape='false'
+            :modal-append-to-body="false"
+            :modal="true"
+            :style="userBindRoleDialog.style"
+            :width="userBindRoleDialog.width"
+          >
+            <template>
+              <userBindRoleCom ref="user_bind_role_ref" v-if="userBindRoleDialog.dialogVisible"
+                               @closeUserBindRoleDialog="closeUserBindRoleDialog"
+                               @userBindRoleListeners="userBindRoleReturn"></userBindRoleCom>
             </template>
           </el-dialog>
 
@@ -179,14 +197,15 @@
   import * as utils from '../../utils/utils';
   import insertUserCom from '../user/preInsertUser.vue';
   import updateUserCom from '../user/preUpdateUser.vue';
+  import userBindRoleCom from '../user/userBindRole.vue'
 
   export default {
-    components: {viewOrgCom, insertUserCom, updateUserCom},
+    components: {viewOrgCom, insertUserCom, updateUserCom, userBindRoleCom},
     name: "manageUser",
     data() {
       return {
-        bratTreeData : [],
-        treeOgIdList : [],
+        bratTreeData: [],
+        treeOgIdList: [],
         abc: false,
         orgIdList: [],
         orgTreeAndUserHeight: {
@@ -197,18 +216,12 @@
           children: 'children',
           label: 'label'
         },
-        //按钮状态
-        BUTTON_STATUS: {
-          _preInsertUser: false,
-          _preUpdateUser: false,
-          _preDeleteUser: false
-        },
         userGrid: {
           userList: [],
           userGridLoading: false,
           gridTableStyle: {
             width: '100%',
-            height: window.screen.height / 2 + 130
+            height: window.innerHeight - 250 + 'px'
           },
           pagination: {
             page_index: 1,  // 当前位于哪页
@@ -240,6 +253,18 @@
           dialogVisible: true,
           formLabelWidth: '120px',
           width: '500px'
+        },
+        //绑定角色窗口
+        userBindRoleDialog: {
+          style: {
+            height: window.screen.height / 2,
+          },
+          show: false,
+          title: '绑定角色',
+          userBindRoleDialogLoading: false,
+          dialogVisible: true,
+          formLabelWidth: '120px',
+          width: '1200px',
         },
         rowValue: {
           rowId: '',
@@ -285,50 +310,42 @@
         if (this.treeOrgType == '1') {
           this.getUserList();
         } else {
+          this.treeOgIdList = [];
           this._selectBratTreeData(args[0], args[1])
+          this.getUserList();
         }
       },
-      _selectBratTreeData(id, orId){
-        for(let i = 0; i < this.treeData.length; i++){
-          if(id == this.treeData[i].id){
+      _selectBratTreeData(id, orId) {
+        for (let i = 0; i < this.treeData.length; i++) {
+          if (id == this.treeData[i].id) {
             this.bratTreeData = this.treeData[i];
             return;
-          }else if(this.treeData[i].childList != null){
+          } else if (this.treeData[i].childList != null) {
             this._getRecursionData(id, this.treeData[i].childList)
           }
         }
-        console.log("结束了");
-        console.log(this.bratTreeData);
-        console.log(this.bratTreeData.ogName);
-        console.log(this.bratTreeData.childList[0].ogName);
-
         this._getTreeIdList();
-
       },
-      _getRecursionData(id, treeDataList){
-        console.log(treeDataList);
-        for(let i = 0; i < treeDataList.length; i++){
-          if(id == treeDataList[i].id){
+      _getRecursionData(id, treeDataList) {
+        for (let i = 0; i < treeDataList.length; i++) {
+          if (id == treeDataList[i].id) {
             this.bratTreeData = treeDataList[i];
             return;
-          }else if(treeDataList[i].childList != null){
+          } else if (treeDataList[i].childList != null) {
             this._getRecursionData(id, treeDataList[i].childList)
           }
         }
       },
-      _getTreeIdList(){
-        console.log(this.bratTreeData)
+      _getTreeIdList() {
         this.treeOgIdList.push(this.bratTreeData.ogId);
-        if(this.bratTreeData.childList!=null){
+        if (this.bratTreeData.childList != null) {
           this._getRecursionDataTreeOgId(this.bratTreeData.childList);
         }
-        console.log('2次结束了');
-        console.log(this.treeOgIdList);
       },
-      _getRecursionDataTreeOgId(bratTreeData){
-        for(let i = 0; i < bratTreeData.length; i++){
+      _getRecursionDataTreeOgId(bratTreeData) {
+        for (let i = 0; i < bratTreeData.length; i++) {
           this.treeOgIdList.push(bratTreeData[i].ogId);
-          if(bratTreeData[i].childList!=null){
+          if (bratTreeData[i].childList != null) {
             this._getRecursionDataTreeOgId(bratTreeData[i].childList);
           }
         }
@@ -395,10 +412,31 @@
       //把临时数据存于tableData 做分页
       getUserList() {
         this.userGrid.userList = [];
-        this.userGrid.userList = this.userdata.filter((item, index) =>
-          index < this.userGrid.pagination.page_index * this.userGrid.pagination.page_size && index >= this.userGrid.pagination.page_size * (this.userGrid.pagination.page_index - 1)
-        )
-        this.userGrid.pagination.total = this.userdata.length;
+        if (this.treeOrgType == '1') {
+          this.userGrid.userList = this.userdata.filter((item, index) =>
+            index < this.userGrid.pagination.page_index * this.userGrid.pagination.page_size && index >= this.userGrid.pagination.page_size * (this.userGrid.pagination.page_index - 1)
+          )
+          this.userGrid.pagination.total = this.userdata.length;
+        } else if (this.treeOrgType == '') {
+          this.userGrid.userList = this.userdata.filter((item, index) =>
+            index < this.userGrid.pagination.page_index * this.userGrid.pagination.page_size && index >= this.userGrid.pagination.page_size * (this.userGrid.pagination.page_index - 1)
+          )
+          this.userGrid.pagination.total = this.userdata.length;
+        } else {
+          let newUser = [];
+          for (let i = 0; i < this.userdata.length; i++) {
+            for (let j = 0; j < this.treeOgIdList.length; j++) {
+              if (this.treeOgIdList[j] == this.userdata[i].orgId) {
+                newUser.push(this.userdata[i]);
+              }
+            }
+          }
+          this.userGrid.userList = newUser.filter((item, index) =>
+            index < this.userGrid.pagination.page_index * this.userGrid.pagination.page_size && index >= this.userGrid.pagination.page_size * (this.userGrid.pagination.page_index - 1)
+          )
+          this.userGrid.pagination.total = newUser.length;
+        }
+
       },
       // 每页多少条切换
       handleSizeChange(page_size) {
@@ -427,28 +465,6 @@
         that.userGrid.pagination.total = userList.length;
       },
 
-      //获取当前节点和子节点的所有treeId
-      getTreeId(treeData, treeOrgId) {
-        if(treeData != undefined){
-          for (let i = 0; i < treeData.childList.length; i++) {
-            if (treeOrgId == treeData.childList[i].ogId) {
-              this.treeDg();
-              return;
-            } else {
-              this.getTreeId(treeData.childList[i], treeOrgId);
-            }
-          }
-        }
-        else{
-          return
-        }
-      },
-
-      //节点递归
-      treeDg() {
-
-      },
-
       //点击新增按钮
       preInsertUser() {
         if (this.treeOrgId == '') {
@@ -469,11 +485,14 @@
 
       //关闭新增页面
       closeInsertUserDialog() {
+        this.insertUserDialog.dialogVisible = false;
         this.insertUserDialog.show = false;
       },
 
       //新增页面的返回函数
       insertUserReturn() {
+        const node = this.$refs.viewOrgComRef._getCurrentNode();
+        this.getUserPageList();
         this.insertUserDialog.show = false;
       },
 
@@ -486,12 +505,17 @@
         this.rowValue.rowIdCard = row.idCard;
         this.rowValue.rowMail = row.mail;
         this.rowValue.rowPhone = row.phone;
-
-        //this._setButtonStatus(row);
       },
 
       //点击修改按钮
       preUpdateUser() {
+        if(this.rowValue.rowId == '' || this.rowValue.rowId == undefined){
+          this.$message({
+            message: '请选择一个用户',
+            type: 'warning'
+          });
+          return;
+        }
         this.updateUserDialog.show = true;
         this.updateUserDialog.dialogVisible = true;
         this.$nextTick(_ => {
@@ -500,23 +524,34 @@
           this.$refs.update_user_ref.updateUserForm.userName = this.rowValue.rowUserName;
           this.$refs.update_user_ref.updateUserForm.password = this.rowValue.rowPassword;
           this.$refs.update_user_ref.updateUserForm.idCard = this.rowValue.rowIdCard;
-          this.$refs.update_user_ref.updateUserForm.mail = this.rowValue.rowMail;
+          this.$refs.update_user_ref.updateUserForm.email = this.rowValue.rowMail;
           this.$refs.update_user_ref.updateUserForm.phone = this.rowValue.rowPhone;
         })
       },
 
       //关闭修改页面
       closeUpdateUserDialog() {
+        this.updateUserDialog.dialogVisible = false;
         this.updateUserDialog.show = false;
       },
 
       //修改页面的返回函数
       updateUserReturn() {
+        const node = this.$refs.viewOrgComRef._getCurrentNode();
+        this.getUserPageList();
+        this.rowValue.rowId = '';
         this.updateUserDialog.show = false;
       },
 
       //点击删除按钮
       preDeleteUser() {
+        if(this.rowValue.rowId == '' || this.rowValue.rowId == undefined){
+          this.$message({
+            message: '请选择一个用户',
+            type: 'warning'
+          });
+          return;
+        }
         this.$confirm('是否删除', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -530,12 +565,36 @@
           }).then(res => {
             if (res.data.status == '1') {
               this.$message({message: '操作成功', type: 'success'});
+              this.getUserPageList();
+              this.rowValue.rowId = '';
             } else {
               this.$message({message: '系统异常,请联系管理员', type: 'error'});
             }
           })
 
         });
+      },
+
+      //点击绑定角色
+      bindRole(row) {
+        this.userBindRoleDialog.show = true;
+        this.userBindRoleDialog.dialogVisible = true;
+        this.$nextTick(_ => {
+          this.$refs.user_bind_role_ref.getRolePageList();
+          this.$refs.user_bind_role_ref.userId = row.id;
+        });
+      },
+
+      //关闭角色管理页面
+      closeUserBindRoleDialog() {
+        this.userBindRoleDialog.dialogVisible = false;
+        this.userBindRoleDialog.show = false;
+      },
+
+      //关闭角色管理页面返回的监听
+      userBindRoleReturn() {
+        this.userBindRoleDialog.dialogVisible = false;
+        this.userBindRoleDialog.show = false;
       },
 
       //设置按钮状态
