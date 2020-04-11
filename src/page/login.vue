@@ -43,7 +43,8 @@
                   v-model="loginUserForm.password"
                   clearable
                   show-password
-                  prefix-icon="el-icon-unlock">
+                  prefix-icon="el-icon-unlock"
+                  @keyup.enter.native="login('loginUserForm')">
                 </el-input>
               </el-form-item>
               <el-form-item>
@@ -149,18 +150,8 @@
         isRouterAlive: true
       }
     },
-    mounted(){
-      this.keyupEnter();
-    },
     methods: {
-      keyupEnter(){
-        document.onkeydown = e =>{
-          let body = document.getElementsByTagName('body')[0]
-          if (e.keyCode === 13) {
-            this.login();
-          }
-        }
-      },
+
       login(loginUserForm) {
         this.$refs[loginUserForm].validate((valid) => {
           if(valid){
