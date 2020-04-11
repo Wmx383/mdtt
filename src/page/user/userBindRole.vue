@@ -58,7 +58,7 @@
       </el-col>
     </el-row>
     <el-row style="border-top: 1px solid #ccc; border-left:none; border-right:none; border-bottom:none;">
-      <el-col :span="24" style="margin-top: 20px">
+      <el-col :span="24" style="margin-top: 20px; padding-left: 1025px">
         <el-button type="primary" size="small" @click='createUserRoleRelation'>确 定</el-button>
         <el-button size="small" @click="_closeUserRole()">取 消</el-button>
       </el-col>
