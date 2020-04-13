@@ -306,6 +306,7 @@
       _handleOnClickOrg(args) {
         this.treeOrgId = args[1];
         this.treeOrgType = args[2];
+        this.rowValue.rowId = ''
 
         if (this.treeOrgType == '1') {
           this.getUserList();
