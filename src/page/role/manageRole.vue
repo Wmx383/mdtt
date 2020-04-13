@@ -74,7 +74,6 @@
                     <el-button
                       type=""
                       size="mini"
-                      :disabled="BUTTON_STATUS._prePermissionRole"
                       @click='permissionRole(scope.$index, scope.row)'>权限
                     </el-button>
                   </div>
@@ -244,6 +243,9 @@
       this.setOrgTreeAndUserHeight()
       this.getOrgTree();
       this.getRolePageList();
+      this.$nextTick(_ => {
+        this.$refs.viewOrgComRef._getUserRoleOrgTree();
+      })
     },
 
     methods: {
