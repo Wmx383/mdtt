@@ -64,6 +64,10 @@
     margin-right: 0px !important;
   }
 
+  .el-scrollbar__wrap{
+    margin-bottom: 0px !important;
+  }
+
   .el-tree{
     background-color: ghostwhite;
   }

@@ -51,9 +51,9 @@
                       >
                         <el-option
                           v-for="item in inputOutRelation.relationList_A"
-                          :key="item.code"
+                          :key="item.id"
                           :label="item.name"
-                          :value="item.code">
+                          :value="item.id">
                         </el-option>
                       </el-select>
                     </div>
@@ -137,6 +137,8 @@ export default {
     },
     _refresh () {
       this._setTitle('预测参数');
+      this.inputOutRelation.code_a = '';
+      this.inputOutRelation.code_b = '';
       this.inputOutRelation.relationList_A = [];
       this.inputOutRelation.relationList_B = [];
     },
@@ -182,6 +184,7 @@ export default {
     /*background-color: aqua;*/
     height: calc(~"50vh - 62px");
     margin-bottom: 10px;
+    min-width: 1050px;
   }
 
   .first_left_panel {
@@ -190,6 +193,7 @@ export default {
     left: 10px;
     width: 49%;
     bottom: 0px;
+    min-width: 480px;
   }
 
   .first_right_panel {
@@ -205,6 +209,7 @@ export default {
     width: 100%;
     /*background-color: brown;*/
     height: calc(~"50vh - 62px");
+    min-width: 1050px;
   }
 
   .second_left_panel {
