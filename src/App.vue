@@ -49,7 +49,7 @@
     /*box-shadow: 0 10px 10px 0px #aaa, 10px 0 10px 0px #aaa;*/
   }
 
-  .el-scrollbar__wrap{
+  .el-cascader_dropdown .el-cascader-panel .el-cascader-menu .el-scrollbar__wrap{
     margin-right: 0px !important;
   }
 
