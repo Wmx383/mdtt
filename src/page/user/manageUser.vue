@@ -281,6 +281,9 @@
       this.setOrgTreeAndUserHeight()
       this.getOrgTree();
       this.getUserPageList();
+      this.$nextTick(_ => {
+        this.$refs.viewOrgComRef._getUserRoleOrgTree();
+      })
     },
     methods: {
       //设置高度

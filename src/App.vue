@@ -8,7 +8,7 @@
   export default {}
 </script>
 
-<style>
+<style lang="less">
   body{
     margin: 0;
   }
@@ -39,6 +39,7 @@
     left: 0;
     width: 280px;
     border: 1px solid rgba(0, 21, 41, 0.08);
+    background-color: ghostwhite;
     /*box-shadow: 0 10px 10px 0px #aaa, 10px 0 10px 0px #aaa;*/
   }
 
@@ -49,8 +50,22 @@
     /*box-shadow: 0 10px 10px 0px #aaa, 10px 0 10px 0px #aaa;*/
   }
 
+  .contentEchartsDiv {
+    position: absolute;
+    left: 283px;
+    right: 10px;
+    /*background-color: #F5F5F5;*/
+    height: calc(~"100vh - 110px");
+    border-bottom: 1px solid rgba(0, 21, 41, 0.08);
+    /*box-shadow: 0 10px 10px 0px #aaa, 10px 0 10px 0px #aaa;*/
+  }
+
   .el-cascader_dropdown .el-cascader-panel .el-cascader-menu .el-scrollbar__wrap{
     margin-right: 0px !important;
+  }
+
+  .el-tree{
+    background-color: ghostwhite;
   }
 
 </style>

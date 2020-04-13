@@ -314,7 +314,10 @@ export default {
     }
   },
   created () {
-    this._initNorm()
+    this._initNorm();
+    this.$nextTick(_ => {
+      this.$refs.viewOrgComRef._getUserRoleOrgTree();
+    })
   },
   methods: {
     _initNorm () {

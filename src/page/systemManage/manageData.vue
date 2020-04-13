@@ -146,7 +146,10 @@
       }
     },
     created() {
-      this._initData()
+      this._initData();
+      this.$nextTick(_ => {
+        this.$refs.viewOrgComRef._getUserRoleOrgTree();
+      })
     },
     methods: {
       _handleOnClickOrg(args) {

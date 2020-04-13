@@ -20,51 +20,72 @@
 </template>
 
 <script>
-  import * as utils from '../../utils/utils'
+import * as utils from '../../utils/utils'
 
-  export default {
-    name: "viewOrg",
-    data() {
-      return {
-        data: [],
-        defaultProps: {
-          children: 'childList',
-          label: 'ogName'
-        },
-        loading: true
-      }
-    },
-    methods: {
-      handleNodeClick(data) {
-        this.$emit('_handleOnClickOrg', data.id, data.ogId, data.level, data.modelType);
+export default {
+  name: "viewOrg",
+  data () {
+    return {
+      data: [],
+      defaultProps: {
+        children: 'childList',
+        label: 'ogName'
       },
-      _getCurrentNode(){
-        return this.$refs.tree.getCurrentNode();
-      },
-      _getUserRoleOrgTree() {
-        this.$http({
-          url: "/api/api/user/getUserRoleOrgTree",
-          "content-type": "application/json",
-          method: 'get',
-          /*headers: {Authorization: token},*/
-        }).then(res => {
-          if (res.data.status == 1) {
-            this.loading = false;
-            this.data = res.data.result;
-          } else {
-            //TO-DO 临时先这么写提醒吧 哈哈哈哈
-            this.loading = false;
-            alert(res.data.msg);
-            this.$router.push({path: "/"});
-          }
-        })
-      }
-    },
-    mounted() {
-      this._getUserRoleOrgTree();
+      loading: true
     }
-
+  },
+  methods: {
+    handleNodeClick (data) {
+      this.$emit('_handleOnClickOrg', data.id, data.ogId, data.level, data.modelType, data.ogName);
+    },
+    _getCurrentNode () {
+      return this.$refs.tree.getCurrentNode();
+    },
+    _getUserRoleOrgTree () {
+      this.$http({
+        url: "/api/api/user/getUserRoleOrgTree",
+        "content-type": "application/json",
+        method: 'get',
+        /*headers: {Authorization: token},*/
+      }).then(res => {
+        if (res.data.status == 1) {
+          this.loading = false;
+          this.data = res.data.result;
+        } else {
+          //TO-DO 临时先这么写提醒吧 哈哈哈哈
+          this.$message({message: res.data.msg, type: 'error'});
+        }
+      })
+    },
+    _getUserRoleOrgTreeByException () {
+      this.$http({
+        url: "/api/api/user/getUserRoleOrgTree",
+        "content-type": "application/json",
+        method: 'get',
+        /*headers: {Authorization: token},*/
+      }).then(res => {
+        if (res.data.status == 1) {
+          this.loading = false;
+          let dataList = res.data.result;
+          this._handelData(dataList);
+          this.data = dataList;
+        } else {
+          this.$message({message: res.data.msg, type: 'error'});
+        }
+      })
+    },
+    _handelData (dataList) {
+      for (let i = 0; i < dataList.length; i++) {
+          if(dataList[i].level < 3){
+            this._handelData (dataList[i].childList);
+          }else if(dataList[i].level == 3){
+            dataList[i].childList = [];
+          }
+      }
+    }
   }
+
+}
 </script>
 
 <style lang="less" scoped>
@@ -76,7 +97,7 @@
     font-size: 14px;
     padding-block: 0px;
     /*padding-right: 8px;*/
-    background-color: ghostwhite;
+   /* background-color: red;*/
   }
 
 </style>
@@ -103,6 +124,6 @@
     height: 370px;
     font-size: 15px;
     display: inline-block;
-    background-color: ghostwhite;
+    /*background-color: ghostwhite;*/
   }
 </style>
