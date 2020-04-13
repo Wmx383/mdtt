@@ -142,7 +142,7 @@ export default {
               axisLine: {            // 坐标轴线
                 lineStyle: {       // 属性lineStyle控制线条样式
                   width: 10,
-                  color : [[0.2, '#ccc'], [0.4, 'red'], [0.6, 'blue'], [0.8, 'orange'], [1, 'black']]
+                  color : [[0.2, '#FFD30B'], [0.4, '#81EE0D'], [0.8, '#81EE0D'], [1, '#EE2A09']]
                 }
               },
               axisTick: {            // 坐标轴小标记
@@ -169,10 +169,10 @@ export default {
                 formatter: function (value) {
                   switch (value + '') {
                     case '0' : return '0';
-                    case '0.2' : return '0.2';
+                    /*case '0.2' : return '0.2';
                     case '0.4' : return '0.4';
-                    case '0.6' : return '0.6';
-                    case '0.8' : return '0.8';
+                    case '0.6' : return '0.6';*/
+                    case '0.5' : return '0.5';
                     case '1' : return '1';
                   }
                 }
@@ -235,7 +235,7 @@ export default {
               axisLine: {            // 坐标轴线
                 lineStyle: {       // 属性lineStyle控制线条样式
                   width: 10,
-                  color : [[0.2, '#ccc'], [0.4, 'red'], [0.6, 'blue'], [0.8, 'orange'], [1, 'black']]
+                  color : [[0.2, '#FFD30B'], [0.4, '#81EE0D'], [0.8, '#81EE0D'], [1, '#EE2A09']]
                 }
               },
               axisTick: {            // 坐标轴小标记
@@ -262,10 +262,10 @@ export default {
                 formatter: function (value) {
                   switch (value + '') {
                     case '0' : return '0';
-                    case '0.2' : return '0.2';
+                    /*case '0.2' : return '0.2';
                     case '0.4' : return '0.4';
-                    case '0.6' : return '0.6';
-                    case '0.8' : return '0.8';
+                    case '0.6' : return '0.6';*/
+                    case '0.5' : return '0.5';
                     case '1' : return '1';
                   }
                 }
@@ -292,7 +292,7 @@ export default {
                 textBorderColor: '#000',
                 textBorderWidth: 2,
                 textShadowBlur: 2,
-                textShadowColor: '#fff',
+                textShadowColor: '#eee',
                 textShadowOffsetX: 0,
                 textShadowOffsetY: 0,
                 fontFamily: 'Arial',
