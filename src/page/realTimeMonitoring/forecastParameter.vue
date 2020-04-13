@@ -164,7 +164,17 @@ export default {
                 textShadowBlur: 2,
                 textShadowOffsetX: 1,
                 textShadowOffsetY: 1,
-                textShadowColor: '#222'
+                textShadowColor: '#222',
+                formatter: function (value) {
+                  switch (value + '') {
+                    case '0' : return '0';
+                    case '0.2' : return '0.2';
+                    case '0.4' : return '0.4';
+                    case '0.6' : return '0.6';
+                    case '0.8' : return '0.8';
+                    case '1' : return '1';
+                  }
+                }
               },
               title: {
                 // 其余属性默认使用全局文本样式，详见TEXTSTYLE
@@ -246,7 +256,17 @@ export default {
                 textShadowBlur: 2,
                 textShadowOffsetX: 1,
                 textShadowOffsetY: 1,
-                textShadowColor: '#222'
+                textShadowColor: '#222',
+                formatter: function (value) {
+                  switch (value + '') {
+                    case '0' : return '0';
+                    case '0.2' : return '0.2';
+                    case '0.4' : return '0.4';
+                    case '0.6' : return '0.6';
+                    case '0.8' : return '0.8';
+                    case '1' : return '1';
+                  }
+                }
               },
               title: {
                 // 其余属性默认使用全局文本样式，详见TEXTSTYLE
