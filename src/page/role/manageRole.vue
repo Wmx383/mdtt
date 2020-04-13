@@ -1,158 +1,170 @@
 <!--管理角色页面-->
 <template>
+  <div>
     <div>
-      <div>
 
-        <div class="orgTree" :style="orgTreeAndUserHeight">
-          <viewOrgCom ref="viewOrgComRef"
-                      @_handleOnClickOrg="_handleOnClickOrg(arguments)"></viewOrgCom>
+      <div class="orgTree" :style="orgTreeAndUserHeight">
+        <viewOrgCom ref="viewOrgComRef"
+                    @_handleOnClickOrg="_handleOnClickOrg(arguments)"></viewOrgCom>
+      </div>
+
+      <div class="userTable" :style="orgTreeAndUserHeight">
+
+        <div
+          style="border: 1px solid; border-top-style: none; border-left-style: none; border-right-style: none; border-bottom-color: darkgrey;">
+          <h3 style="margin-left: 2%">角色信息</h3>
         </div>
 
-        <div class="userTable" :style="orgTreeAndUserHeight">
+        <div style="margin-left: 5px; margin-top: 5px">
+          <el-form
+            :inline="true"
+            class="demo-form-inline search-form">
 
-          <div style="border: 1px solid; border-top-style: none; border-left-style: none; border-right-style: none; border-bottom-color: darkgrey;">
-            <h3 style="margin-left: 2%">角色信息</h3>
-          </div>
+            <el-form-item>
+              <el-button type="primary" size="small" icon="el-icon-plus" @click='preInsertRole()'>添加</el-button>
+              <el-button type="primary" size="small" icon="el-icon-edit" @click='preUpdateRole()'>修改</el-button>
+              <el-button type="primary" size="small" icon="el-icon-delete" @click='preDeleteRole()'>删除</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
 
-          <div style="margin-left: 5px; margin-top: 5px">
-            <el-form
-              :inline="true"
-              class="demo-form-inline search-form">
-
-              <el-form-item>
-                <el-button type="primary" size="small" icon="el-icon-plus"  @click='preInsertRole()'>添加</el-button>
-                <el-button type="primary" size="small" icon="el-icon-edit"  @click='preUpdateRole()'>修改</el-button>
-                <el-button type="primary" size="small" icon="el-icon-delete"  @click='preDeleteRole()'>删除</el-button>
-              </el-form-item>
-            </el-form>
-          </div>
-
-          <div class="table_container">
-            <el-table
-              :data="roleGrid.roleList"
-              v-loading="roleGrid.roleGridLoading"
-              :style="roleGrid.gridTableStyle"
-              :height="roleGrid.gridTableStyle.height"
-              highlight-current-row
-              @row-click="clickRow"
+        <div class="table_container">
+          <el-table
+            :data="roleGrid.roleList"
+            v-loading="roleGrid.roleGridLoading"
+            :style="roleGrid.gridTableStyle"
+            :height="roleGrid.gridTableStyle.height"
+            highlight-current-row
+            @row-click="clickRow"
+          >
+            <el-table-column
+              v-if="idFlag"
+              prop="id"
+              label="id"
+              align='center'
             >
-              <el-table-column
-                v-if="idFlag"
-                prop="id"
-                label="id"
-                align='center'
-              >
-              </el-table-column>
-              <el-table-column
-                prop="roleName"
-                label="名称"
-                align='center'
-                sortable
-              >
-              </el-table-column>
-              <el-table-column
-                prop="roleCode"
-                label="编号"
-                align='center'
-                sortable
-              >
-              </el-table-column>
-              <el-table-column
-                prop="orgId"
-                label="所属组织"
-                align='center'
-                sortable
-              >
-
-              </el-table-column>
-              <el-table-column
-                label="操作"
-                align='center'
-              >
-                <template slot-scope="scope">
-                  <div class="operate-groups">
-                    <el-button
-                      type=""
-                      size="mini"
-                      @click='permissionRole(scope.$index, scope.row)'>权限
-                    </el-button>
-                  </div>
-                </template>
-              </el-table-column>
-            </el-table>
-
-            <el-row>
-              <el-col :span="24">
-                <div class="pagination">
-                  <el-pagination
-                    @size-change="handleSizeChange"
-                    @current-change="handleCurrentChange"
-                    :current-page="roleGrid.pagination.page_index"
-                    :page-sizes="roleGrid.pagination.page_sizes"
-                    :page-size="roleGrid.pagination.page_size"
-                    :layout="roleGrid.pagination.layout"
-                    :total="roleGrid.pagination.total"
-                  >
-                  </el-pagination>
+            </el-table-column>
+            <el-table-column
+              prop="roleName"
+              label="名称"
+              align='center'
+              sortable
+            >
+            </el-table-column>
+            <el-table-column
+              prop="roleCode"
+              label="编号"
+              align='center'
+              sortable
+            >
+            </el-table-column>
+            <el-table-column
+              prop="orgId"
+              label="所属组织"
+              align='center'
+              sortable
+            >
+            </el-table-column>
+            <el-table-column
+              prop="orgName"
+              label="所属组织"
+              align='center'
+              sortable
+            >
+            </el-table-column>
+            <el-table-column
+              label="操作"
+              align='center'
+            >
+              <template slot-scope="scope">
+                <div class="operate-groups">
+                  <el-button
+                    type="info"
+                    size="mini"
+                    @click="permissionRole(scope.$index, scope.row)">权限
+                  </el-button>
                 </div>
-              </el-col>
-            </el-row>
-
-            <!--新增角色页面-->
-            <el-dialog
-              :title="insertRoleDialog.title"
-              :visible.sync="insertRoleDialog.show"
-              :close-on-click-modal='false'
-              :close-on-press-escape='false'
-              :modal-append-to-body="false"
-              :modal="true"
-              :style="insertRoleDialog.style"
-              :width="insertRoleDialog.width"
-              @close="closeInsertRoleDialog"
-            >
-              <template>
-                <insertRoleCom ref="insert_role_ref" v-if="insertRoleDialog.dialogVisible" :closeInsertRolerDialog="closeInsertRoleDialog" @insertRoleListeners="insertRoleReturn"></insertRoleCom>
               </template>
-            </el-dialog>
+            </el-table-column>
+          </el-table>
 
-            <!--修改角色页面-->
-            <el-dialog
-              :title="updateRoleDialog.title"
-              :visible.sync="updateRoleDialog.show"
-              :close-on-click-modal='false'
-              :close-on-press-escape='false'
-              :modal-append-to-body="false"
-              :modal="true"
-              :style="updateRoleDialog.style"
-              :width="updateRoleDialog.width"
-              @close="closeUpdateRoleDialog"
-            >
-              <template>
-                <updateRoleCom ref="update_role_ref" v-if="updateRoleDialog.dialogVisible" :closeUpdateRoleDialog="closeUpdateRoleDialog" @updateRoleListeners="updateRoleReturn"></updateRoleCom>
-              </template>
-            </el-dialog>
+          <el-row>
+            <el-col :span="24">
+              <div class="pagination">
+                <el-pagination
+                  @size-change="handleSizeChange"
+                  @current-change="handleCurrentChange"
+                  :current-page="roleGrid.pagination.page_index"
+                  :page-sizes="roleGrid.pagination.page_sizes"
+                  :page-size="roleGrid.pagination.page_size"
+                  :layout="roleGrid.pagination.layout"
+                  :total="roleGrid.pagination.total"
+                >
+                </el-pagination>
+              </div>
+            </el-col>
+          </el-row>
 
-            <!--权限页面-->
-            <el-dialog
-              :title="permissionRoleDialog.title"
-              :visible.sync="permissionRoleDialog.show"
-              :close-on-click-modal='false'
-              :close-on-press-escape='false'
-              :modal-append-to-body="false"
-              :modal="true"
-              :style="permissionRoleDialog.style"
-              :width="permissionRoleDialog.width"
-              @close="closePermissionRoleDialog"
-            >
-              <template>
-                <permissiomRoleCom ref="permission_role_ref" v-if="permissionRoleDialog.dialogVisible" :closePermissionRolerDialog="closePermissionRoleDialog" :permissionRoleListeners="permissionRoleReturn"></permissiomRoleCom>
-              </template>
-            </el-dialog>
+          <!--新增角色页面-->
+          <el-dialog
+            :title="insertRoleDialog.title"
+            :visible.sync="insertRoleDialog.show"
+            :close-on-click-modal='false'
+            :close-on-press-escape='false'
+            :modal-append-to-body="false"
+            :modal="true"
+            :style="insertRoleDialog.style"
+            :width="insertRoleDialog.width"
+          >
+            <template>
+              <insertRoleCom ref="insert_role_ref" v-if="insertRoleDialog.dialogVisible"
+                             :closeInsertRolerDialog="closeInsertRoleDialog"
+                             @insertRoleListeners="insertRoleReturn"></insertRoleCom>
+            </template>
+          </el-dialog>
 
-          </div>
+          <!--修改角色页面-->
+          <el-dialog
+            :title="updateRoleDialog.title"
+            :visible.sync="updateRoleDialog.show"
+            :close-on-click-modal='false'
+            :close-on-press-escape='false'
+            :modal-append-to-body="false"
+            :modal="true"
+            :style="updateRoleDialog.style"
+            :width="updateRoleDialog.width"
+          >
+            <template>
+              <updateRoleCom ref="update_role_ref" v-if="updateRoleDialog.dialogVisible"
+                             :closeUpdateRoleDialog="closeUpdateRoleDialog"
+                             @updateRoleListeners="updateRoleReturn"></updateRoleCom>
+            </template>
+          </el-dialog>
+
+          <!--权限页面-->
+          <el-dialog
+            :title="permissionRoleDialog.title"
+            :visible.sync="permissionRoleDialog.show"
+            :close-on-click-modal='false'
+            :close-on-press-escape='false'
+            :modal-append-to-body="false"
+            :modal="true"
+            :style="permissionRoleDialog.style"
+            :width="permissionRoleDialog.width"
+          >
+            <!-- <template>
+               <permissiomRoleCom ref="permission_role_ref" v-if="permissionRoleDialog.dialogVisible" :closePermissionRolerDialog="closePermissionRoleDialog" :permissionRoleListeners="permissionRoleReturn"></permissiomRoleCom>
+             </template>-->
+            <template>
+              <permissiomRoleCom ref="permission_role_ref"
+                                 v-if="permissionRoleDialog.dialogVisible"></permissiomRoleCom>
+            </template>
+          </el-dialog>
+
         </div>
       </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -161,6 +173,7 @@
   import insertRoleCom from '../role/preInsertRole.vue';
   import updateRoleCom from '../role/preUpdateRole.vue';
   import permissionRoleCom from '../role/prePermissionRole.vue';
+
   export default {
     components: {viewOrgCom, insertRoleCom, updateRoleCom, permissionRoleCom},
     name: "manageUser",
@@ -176,10 +189,10 @@
           height: ''
         },
 
-        bratTreeData:[],
-        treeOgIdList:[],
-        abc:false,
-        orgIdList:[],
+        bratTreeData: [],
+        treeOgIdList: [],
+        abc: false,
+        orgIdList: [],
         orgTreeAndUserHeight: {
           height: ''
         },
@@ -221,7 +234,7 @@
           width: '500px',
         },
         //权限窗口
-        permissionRoleDialog:{
+        permissionRoleDialog: {
           show: false,
           title: '添加角色权限',
           permissionProjectDialogLoading: false,
@@ -236,13 +249,13 @@
           rowStatus: '',
           rowOrgId: '',
         },
+        allOrgIdList: [],
       }
     },
 
     created() {
       this.setOrgTreeAndUserHeight()
-      this.getOrgTree();
-      this.getRolePageList();
+      this.doSyncMethod();
       this.$nextTick(_ => {
         this.$refs.viewOrgComRef._getUserRoleOrgTree();
       })
@@ -253,20 +266,48 @@
       setOrgTreeAndUserHeight() {
         this.orgTreeAndUserHeight.height = window.innerHeight - 110 + 'px'
       },
-
+      async doSyncMethod() {
+        await this.getOrgTree();
+        this.getRolePageList();
+      },
       //获取树
-      getOrgTree() {
-        this.$http({
+      async getOrgTree() {
+        await this.$http({
           url: "/api/api/user/getUserRoleOrgTree",
           "content-type": "application/json",
           method: 'get',
         }).then(res => {
           if (res.data.status == 1) {
             this.treeData = res.data.result;
+            this.getAllOrgIdList(this.treeData);
           } else {
             this.$router.push({path: "/"});
           }
         })
+      },
+
+      //获取所有的orgId
+      getAllOrgIdList(treeData) {
+        let org = [];
+        for (let i = 0; i < treeData.length; i++) {
+          org = treeData[i]
+          if (org.childList.length > 0) {
+            this.allOrgIdList.push(org);
+            this.fillChildOrgId(org.id, org.childList);
+          }
+        }
+      },
+
+      //获取所有orgId的递归
+      fillChildOrgId(id, childList) {
+        let org = [];
+        for (let i = 0; i < childList.length; i++) {
+          org = childList[i];
+          this.allOrgIdList.push(org);
+          if (id == org.parentId && org.childList != undefined) {
+            this.fillChildOrgId(org.id, org.childList);
+          }
+        }
       },
 
       //点击树
@@ -275,34 +316,34 @@
         this.treeOrgType = args[2];
         this.rowValue.rowId = ''
 
-        if(this.treeOrgType == '1'){
+        if (this.treeOrgType == '1') {
           this.getRoleList();
-        }else {
+        } else {
           this.treeOgIdList = [],
-          this._selectBratTreeData(args[0],args[1]);
+            this._selectBratTreeData(args[0], args[1]);
           this.getRoleList();
         }
       },
 
-      _selectBratTreeData(id,orId){
-        for(let i = 0;i < this.treeData.length;i++){
+      _selectBratTreeData(id, orId) {
+        for (let i = 0; i < this.treeData.length; i++) {
           if (id == this.treeData[i].id) {
             this.bratTreeData = this.treeData[i];
-            return ;
+            return;
           } else if (this.treeData[i].childList != null) {
-            this._getRecursionData(id ,this.treeData[i].childList);
+            this._getRecursionData(id, this.treeData[i].childList);
           }
         }
         this._getTreeIdList();
       },
 
-      _getRecursionData(id,treeDataList){
-        for(let i = 0; i  < treeDataList.length; i++){
-          if(id == treeDataList[i].id){
+      _getRecursionData(id, treeDataList) {
+        for (let i = 0; i < treeDataList.length; i++) {
+          if (id == treeDataList[i].id) {
             this.bratTreeData = treeDataList[i];
-            return ;
-          } else if(treeDataList[i].childList != null){
-            this._getRecursionData(id,treeDataList[i].childList)
+            return;
+          } else if (treeDataList[i].childList != null) {
+            this._getRecursionData(id, treeDataList[i].childList)
           }
         }
       },
@@ -336,17 +377,21 @@
         }).then(res => {
           if (res.data.status == 1) {
             let orgRole = res.data.result;
-            console.log(orgRole);
             let roleList = [];
             for (let i = 0; i < orgRole.length; i++) {
-              let role = {
-                id: orgRole[i].id,
-                roleName: orgRole[i].roleName,
-                roleCode: orgRole[i].roleCode,
-                status: orgRole[i].status,
-                orgId: orgRole[i].orgId,
-              };
-              roleList.push(role);
+              for(let j = 0; j < this.allOrgIdList.length; j++){
+                if(this.allOrgIdList[j].ogId == orgRole[i].orgId){
+                  let role = {
+                    id: orgRole[i].id,
+                    roleName: orgRole[i].roleName,
+                    roleCode: orgRole[i].roleCode,
+                    status: orgRole[i].status,
+                    orgId: orgRole[i].orgId,
+                    orgName: this.allOrgIdList[j].ogName
+                  };
+                  roleList.push(role);
+                }
+              }
             }
             that.roledata = [];
             for (let i = 0; i < roleList.length; i++) {
@@ -357,6 +402,7 @@
                 roleCode: roleList[i].roleCode,
                 status: roleList[i].status,
                 orgId: orgRole[i].orgId,
+                orgName: roleList[i].orgName,
               }
               that.roledata.push(tableItem)
             }
@@ -372,7 +418,7 @@
       },
 
       //把临时数据存于tableData 做分页
-      getRoleList(){
+      getRoleList() {
         this.roleGrid.roleList = [];
 
         if (this.treeOrgType == '1') {
@@ -414,16 +460,16 @@
       },
 
       //点击树调用的方法
-      selectRoleByOrg(){
-        if(this.treeOrgType == '1'){
+      selectRoleByOrg() {
+        if (this.treeOrgType == '1') {
           let that = this;
           that.getRoleList();
-        }else{
+        } else {
           let that = this;
           that.roleGrid.roleList = [];
           let roleList = [];
-          for(let i = 0; i < that.roledata.length; i ++ ){
-            if(that.roledata[i].orgId == that.treeOrgId){
+          for (let i = 0; i < that.roledata.length; i++) {
+            if (that.roledata[i].orgId == that.treeOrgId) {
               roleList.push(that.roledata[i])
             }
           }
@@ -441,18 +487,17 @@
       // },
 
       //点击新增按钮
-      preInsertRole(){
-        if(this.treeOrgId == ''){
+      preInsertRole() {
+        if (this.treeOrgId == '') {
           this.$message({
             message: '请选择左侧的组织',
             type: 'warning'
           });
           return;
-        }else{
+        } else {
           this.insertRoleDialog.show = true;
           this.insertRoleDialog.dialogVisible = true;
           this.$nextTick(_ => {
-            console.log(this.treeOrgId);
             this.$refs.insert_role_ref.insertRoleForm.org_id = this.treeOrgId;
             this.$refs.insert_role_ref.setInsertRoleForm();
           })
@@ -460,13 +505,13 @@
       },
 
       //关闭新增页面
-      closeInsertRoleDialog(){
+      closeInsertRoleDialog() {
         this.insertRoleDialog.show = false;
         this.insertRoleDialog.dialogVisible = false;
       },
 
       //新增页面的返回函数
-      insertRoleReturn(){
+      insertRoleReturn() {
         const node = this.$refs.viewOrgComRef._getCurrentNode();
         this.getRolePageList();
         this.insertRoleDialog.show = false;
@@ -474,24 +519,23 @@
       },
 
       //点击行事件
-      clickRow(row, column, event){
+      clickRow(row, column, event) {
         this.rowValue.rowId = row.id;
         this.rowValue.rowRoleName = row.roleName;
         this.rowValue.rowRoleCode = row.roleCode;
         this.rowValue.rowStatus = row.status;
         this.rowValue.rowOrgId = row.orgId;
-        //this._setButtonStatus(row);
       },
 
       //点击修改按钮
-      preUpdateRole(){
-        if(this.rowValue.rowId == ''  || this.rowValue.rowId == undefined){
+      preUpdateRole() {
+        if (this.rowValue.rowId == '' || this.rowValue.rowId == undefined) {
           this.$message({
             message: '请选择你要修改的项',
-            type:'warning'
+            type: 'warning'
           });
           return;
-        }else {
+        } else {
           this.updateRoleDialog.show = true;
           this.updateRoleDialog.dialogVisible = true;
           this.$nextTick(_ => {
@@ -505,13 +549,13 @@
       },
 
       //关闭修改页面
-      closeUpdateRoleDialog(){
+      closeUpdateRoleDialog() {
         this.updateRoleDialog.show = false;
         this.updateRoleDialog.dialogVisible = false;
       },
 
       //修改页面的返回函数
-      updateRoleReturn(){
+      updateRoleReturn() {
         const node = this.$refs.viewOrgComRef._getCurrentNode();
         this.getRoleList();
         this.rowValue.rowId = '';
@@ -519,14 +563,14 @@
       },
 
       //点击删除按钮
-      preDeleteRole(){
-        if(this.rowValue.rowId == '' || this.rowValue.rowId == undefined){
+      preDeleteRole() {
+        if (this.rowValue.rowId == '' || this.rowValue.rowId == undefined) {
           this.$message({
             message: '请选择一个删除项',
-            type:'warning'
+            type: 'warning'
           });
-          return ;
-        }else {
+          return;
+        } else {
           const id = this.rowValue.rowId;
           this.$confirm('是否删除该行数据?', '提示', {
             confirmButtonText: '确定',
@@ -538,10 +582,10 @@
               "content-type": "application/json",
               method: 'DELETE',
             }).then(res => {
-              if(res.data.status == '1'){
+              if (res.data.status == '1') {
                 this.$message({message: '操作成功', type: 'success'});
                 this.getRoleList();
-              }else{
+              } else {
                 this.$message({message: '系统异常,请联系管理员', type: 'error'});
               }
             })
@@ -550,25 +594,6 @@
         }
 
       },
-
-      //设置按钮状态
-      _setButtonStatus(row){
-        if(row == undefined){
-          if(this.treeOrgId == ''){
-            this.BUTTON_STATUS._preInsertRole = true;
-            this.BUTTON_STATUS._preUpdateRole = true;
-            this.BUTTON_STATUS._preDeleteRole = true;
-          }else{
-            this.BUTTON_STATUS._preInsertRole = false;
-            this.BUTTON_STATUS._preUpdateRole = true;
-            this.BUTTON_STATUS._preDeleteRole = true;
-          }
-        }else{
-          this.BUTTON_STATUS._preInsertRole = true;
-          this.BUTTON_STATUS._preUpdateRole = false;
-          this.BUTTON_STATUS._preDeleteRole = false;
-        }
-      }
     },
     //点击权限
     permissionRole(row) {
@@ -580,13 +605,13 @@
       });
     },
     //  关闭权限页面
-    closePermissionRoleDialog(){
+    closePermissionRoleDialog() {
       this.permissionRoleDialog.show = false;
       this.permissionRoleDialog.dialogVisible = false;
     },
 
     //  权限页面的返回函数
-    permissionRoleReturn(){
+    permissionRoleReturn() {
       this.permissionRoleDialog.show = false;
       this.permissionRoleDialog.dialogVisible = false;
     }
@@ -594,14 +619,15 @@
 </script>
 
 <style scoped>
-  .orgTree{
+  .orgTree {
     position: absolute;
     left: 0;
     width: 280px;
     border: 1px solid rgba(0, 21, 41, 0.08);
     box-shadow: 0 10px 10px 0px #aaa, 10px 0 10px 0px #aaa;
   }
-  .userTable{
+
+  .userTable {
     position: absolute;
     left: 300px;
     right: 10px;
