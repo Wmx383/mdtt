@@ -57,7 +57,7 @@ export default new Router({
           path: '/systemManage/manageRole',
           name: '角色管理',
           hidden : true,
-          component :() => import('@/page/systemManage/manageRole')
+          component :() => import('@/page/role/manageRole')
         },
         {
           path: '/systemManage/manageOrg',
