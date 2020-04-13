@@ -141,7 +141,8 @@ export default {
               radius: '75%',
               axisLine: {            // 坐标轴线
                 lineStyle: {       // 属性lineStyle控制线条样式
-                  width: 10
+                  width: 10,
+                  color : [[0.2, '#ccc'], [0.4, 'red'], [0.6, 'blue'], [0.8, 'orange'], [1, 'black']]
                 }
               },
               axisTick: {            // 坐标轴小标记
@@ -233,7 +234,8 @@ export default {
               radius: '75%',
               axisLine: {            // 坐标轴线
                 lineStyle: {       // 属性lineStyle控制线条样式
-                  width: 10
+                  width: 10,
+                  color : [[0.2, '#ccc'], [0.4, 'red'], [0.6, 'blue'], [0.8, 'orange'], [1, 'black']]
                 }
               },
               axisTick: {            // 坐标轴小标记
