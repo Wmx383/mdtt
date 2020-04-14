@@ -734,7 +734,7 @@ export default {
               // 选中'系列1'
               '在线输出': true,
               // 不选中'系列2'
-              '实际输出': false
+              '实际输出': true,
             }
           },
           toolbox: {
@@ -816,13 +816,17 @@ export default {
             name: '输入值',
             data: [],
             type: 'line',
-            areaStyle: {},
+            areaStyle: {
+              color:'#fff546'
+            },
             smooth: true
           }, {
             name: '上次输入值',
             data: [],
             type: 'line',
-            areaStyle: {},
+            areaStyle: {
+              color:'#bec4ff'
+            },
             smooth: true
           }]
         }

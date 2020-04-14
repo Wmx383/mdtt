@@ -3,7 +3,7 @@
     <header class="indexDiv">
       <div class="headerTitle">
         <span class="indexH1">
-          D.Perspclre
+          <b>D.Perspclre</b>
         </span>
         <!--<h5 class="indexSubTitle">
           全球领先的工业大数据展示平台
@@ -88,21 +88,22 @@
 </script>
 
 <style lang="less" scoped>
-  .indexH1{
+  .indexH1 {
     position: absolute;
-    left: 50px;
-    top: 8px;
+    left: 20px;
+    top: 0px;
     color: #FF6600;
-    font-size: 30px;
+    font-size: 50px;
     font-family: 华文宋体;
+
   }
 
-  .indexSubTitle{
+  .indexSubTitle {
     position: absolute;
     color: #a679b9;
     font-size: 12px;
     left: 48px;
-    top : 15px;
+    top: 15px;
 
   }
 
