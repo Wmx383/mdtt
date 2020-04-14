@@ -902,6 +902,10 @@ export default {
     this._initInputOutParamDiff();
     //初始化输入输出仪表关系比对
     this._initInputOutRelationMeter();
+
+  },
+  beforeDestroy(){
+    clearInterval(this.timingTask);
   },
   methods: {
     _getToolTip (params) {
@@ -1077,6 +1081,7 @@ export default {
       let that = this;
       this.timingTask =  setInterval(function () {
         index++;
+        console.log(index);
         if (index == 5) {
           index = 0
         }
