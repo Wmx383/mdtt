@@ -29,6 +29,18 @@
               <div id="inputParam">
 
               </div>
+              <div class="inputParamTitle1">
+                {{inputOutRelation.inputMeterName_1}}
+              </div>
+              <div class="inputParamTitle2">
+                {{inputOutRelation.inputMeterName_2}}
+              </div>
+              <div class="inputParamTitle3">
+                {{inputOutRelation.inputMeterName_3}}、
+              </div>
+              <div class="inputParamTitle4">
+                {{inputOutRelation.inputMeterName_4}}
+              </div>
             </div>
           </div>
         </div>
@@ -199,6 +211,7 @@ export default {
               detail: {
                 formatter: '{value}',
                 fontWeight: 'bolder',
+                offsetCenter: [0, '70%'],
                 borderRadius: 3,
                 fontSize: 20,
                 backgroundColor: 'auto',
@@ -298,6 +311,7 @@ export default {
               detail: {
                 formatter: '{value}',
                 fontWeight: 'bolder',
+                offsetCenter: [0, '70%'],
                 borderRadius: 3,
                 fontSize: 20,
                 backgroundColor: 'auto',
@@ -322,9 +336,9 @@ export default {
             }
           ]
         },
-        inputOption : {
+        inputOption: {
           tooltip: {
-            formatter: "{a} <br/>{c} {b}"
+            formatter: '{a} <br/>输入值:{b} <br/>归一化输入值: {c}',
           },
           toolbox: {
             show: true,
@@ -333,7 +347,7 @@ export default {
               saveAsImage: {show: true}
             }
           },
-          series : [
+          series: [
             {
               name: '',
               type: 'gauge',
@@ -391,13 +405,34 @@ export default {
                 width: 5
               },
               title: {
+                show: false,
                 offsetCenter: [0, '-30%'],       // x, y，单位px
               },
               detail: {
-                // 其余属性默认使用全局文本样式，详见TEXTSTYLE
-                fontWeight: 'bolder'
+                formatter: '{value}',
+                fontWeight: 'bolder',
+                offsetCenter: [0, '70%'],
+                borderRadius: 3,
+                fontSize: 18,
+                backgroundColor: 'auto',
+                borderColor: '#aaa',
+                shadowBlur: 5,
+                shadowColor: '#333',
+                shadowOffsetX: 0,
+                shadowOffsetY: 3,
+                borderWidth: 2,
+                textBorderColor: '#000',
+                textBorderWidth: 2,
+                textShadowBlur: 2,
+                textShadowColor: '#fff',
+                textShadowOffsetX: 0,
+                textShadowOffsetY: 0,
+                fontFamily: 'Arial',
+                width: 60,
+                color: '#eee',
+                rich: {}
               },
-              data: [{value: 0.75, name: ''}]
+              data: [{value: 0, name: ''}]
             },
             {
               name: '',
@@ -460,6 +495,7 @@ export default {
               detail: {
                 formatter: '{value}',
                 fontWeight: 'bolder',
+                offsetCenter: [0, '70%'],
                 borderRadius: 3,
                 fontSize: 20,
                 backgroundColor: 'auto',
@@ -483,18 +519,19 @@ export default {
               data: [{value: 0, name: ''}]
             },
             {
-              name: '油表',
+              name: '',
               type: 'gauge',
-              center: ['77%', '50%'],    // 默认全局居中
-              radius: '25%',
+              center: ['80%', '50%'],    // 默认全局居中
+              radius: '60%',
               min: 0,
-              max: 2,
+              max: 1,
               startAngle: 135,
               endAngle: 45,
               splitNumber: 2,
               axisLine: {            // 坐标轴线
                 lineStyle: {       // 属性lineStyle控制线条样式
-                  width: 8
+                  width: 10,
+                  color: [[0.5, '#ccc'], [1, 'orange']]
                 }
               },
               axisTick: {            // 坐标轴小标记
@@ -505,11 +542,28 @@ export default {
                 }
               },
               axisLabel: {
-                formatter: function (v){
-                  switch (v + '') {
-                    case '0' : return 'E';
-                    case '1' : return 'Gas';
-                    case '2' : return 'F';
+                backgroundColor: 'auto',
+                borderRadius: 2,
+                color: '#eee',
+                padding: 3,
+                textShadowBlur: 2,
+                textShadowOffsetX: 1,
+                textShadowOffsetY: 1,
+                textShadowColor: '#222',
+                formatter: function (value) {
+                  switch (value + '') {
+                    case '0' :
+                      return '0';
+                    case '0.2' :
+                      return '0.2';
+                    case '0.4' :
+                      return '0.4';
+                    case '0.6' :
+                      return '0.6';
+                    case '0.8' :
+                      return '0.8';
+                    case '1' :
+                      return '1';
                   }
                 }
               },
@@ -528,32 +582,50 @@ export default {
               detail: {
                 show: false
               },
-              data: [{value: 0.5, name: 'gas'}]
+              data: [{value: 0.5, name: ''}]
             },
             {
-              name: '水表',
+              name: '',
               type: 'gauge',
-              center: ['77%', '50%'],    // 默认全局居中
-              radius: '25%',
+              center: ['80%', '50%'],    // 默认全局居中
+              radius: '60%',
               min: 0,
-              max: 2,
+              max: 1,
               startAngle: 315,
               endAngle: 225,
               splitNumber: 2,
               axisLine: {            // 坐标轴线
                 lineStyle: {       // 属性lineStyle控制线条样式
-                  width: 8
+                  width: 10,
+                  color: [[0.5, '#ccc'], [1, 'orange']]
                 }
               },
               axisTick: {            // 坐标轴小标记
                 show: false
               },
               axisLabel: {
-                formatter: function(v){
-                  switch (v + '') {
-                    case '0' : return 'H';
-                    case '1' : return 'Water';
-                    case '2' : return 'C';
+                backgroundColor: 'auto',
+                borderRadius: 2,
+                color: '#eee',
+                padding: 3,
+                textShadowBlur: 2,
+                textShadowOffsetX: 1,
+                textShadowOffsetY: 1,
+                textShadowColor: '#222',
+                formatter: function (value) {
+                  switch (value + '') {
+                    case '0' :
+                      return '0';
+                    case '0.2' :
+                      return '0.2';
+                    case '0.4' :
+                      return '0.4';
+                    case '0.6' :
+                      return '0.6';
+                    case '0.8' :
+                      return '0.8';
+                    case '1' :
+                      return '1';
                   }
                 }
               },
@@ -564,7 +636,7 @@ export default {
                 }
               },
               pointer: {
-                width:2
+                width: 2
               },
               title: {
                 show: false
@@ -572,10 +644,14 @@ export default {
               detail: {
                 show: false
               },
-              data: [{value: 0.5, name: 'gas'}]
+              data: [{value: 0.5, name: ''}]
             }
           ]
         },
+        inputMeterName_1: '',
+        inputMeterName_2: '',
+        inputMeterName_3: '',
+        inputMeterName_4: '',
         outPutOption: {
           color: ['#3398DB'],
           tooltip: {
@@ -658,9 +734,36 @@ export default {
       let OutPutChart = echarts.init(document.getElementById('outPutParam'));
       OutPutChart.setOption(this.inputOutRelation.outPutOption, true);
     },
-    _initInputParam(){
+    _initInputParam () {
       if (this.inputOutRelation.relationList_A.length > 0) {
+        this.inputOutRelation.relationList_A.forEach((item, index) => {
+          if (index == 0) {
+            this.inputOutRelation.inputOption.series[0].data[0].value = item.inputCountValue;
+            this.inputOutRelation.inputOption.series[0].data[0].name = item.input;
+            this.inputOutRelation.inputOption.series[0].name = item.name.substring(0, item.name.indexOf('-'));
+            this.inputOutRelation.inputMeterName_1 = item.name.substring(0, item.name.indexOf('-'));
+          } else if (index == 1) {
+            this.inputOutRelation.inputOption.series[1].data[0].value = item.inputCountValue;
+            this.inputOutRelation.inputOption.series[1].data[0].name = item.input;
+            this.inputOutRelation.inputOption.series[1].name = item.name.substring(0, item.name.indexOf('-'));
+            this.inputOutRelation.inputMeterName_2 = item.name.substring(0, item.name.indexOf('-'));
+          } else if (index == 2) {
+            this.inputOutRelation.inputOption.series[2].data[0].value = item.inputCountValue;
+            this.inputOutRelation.inputOption.series[2].data[0].name = item.input;
+            this.inputOutRelation.inputOption.series[2].name = item.name.substring(0, item.name.indexOf('-'));
+            this.inputOutRelation.inputMeterName_3 = item.name.substring(0, item.name.indexOf('-'));
+          } else if (index == 3) {
+            this.inputOutRelation.inputOption.series[3].data[0].value = item.inputCountValue;
+            this.inputOutRelation.inputOption.series[3].data[0].name = item.input;
+            this.inputOutRelation.inputOption.series[3].name = item.name.substring(0, item.name.indexOf('-'));
+            this.inputOutRelation.inputMeterName_4 = item.name.substring(0, item.name.indexOf('-'));
+          }
+          else {
+            return;
+          }
 
+
+        });
       }
       let inputChart = echarts.init(document.getElementById('inputParam'));
       inputChart.setOption(this.inputOutRelation.inputOption, true);
@@ -687,6 +790,7 @@ export default {
         await this._selectModelParamList(ogId);
         await this._selectNewestParameter(ogId);
         this._initOutPutParam();
+        this._initInputParam();
       }
     },
     _onMeterAChange (id) {
@@ -739,6 +843,24 @@ export default {
       this.inputOutRelation.outPutOption.xAxis[0].data = [];
       this.inputOutRelation.outPutOption.series[0].data = [];
 
+      this.inputOutRelation.inputOption.series[0].data[0].value = 0;
+      this.inputOutRelation.inputOption.series[0].data[0].name = '0';
+      this.inputOutRelation.inputOption.series[0].name = '';
+      this.inputOutRelation.inputMeterName_1 = '';
+      this.inputOutRelation.inputOption.series[1].data[0].value = 0;
+      this.inputOutRelation.inputOption.series[1].data[0].name = '0';
+      this.inputOutRelation.inputOption.series[1].name = '';
+      this.inputOutRelation.inputMeterName_2 = '';
+      this.inputOutRelation.inputOption.series[2].data[0].value = 0;
+      this.inputOutRelation.inputOption.series[2].data[0].name = '0';
+      this.inputOutRelation.inputOption.series[2].name = '';
+      this.inputOutRelation.inputMeterName_3 = '';
+      this.inputOutRelation.inputOption.series[3].data[0].value = 0;
+      this.inputOutRelation.inputOption.series[3].data[0].name = '0';
+      this.inputOutRelation.inputOption.series[3].name = '';
+      this.inputOutRelation.inputMeterName_4 = '';
+
+      this._initInputParam();
       this._initInputOutRelationMeter();
 
     },
@@ -883,6 +1005,41 @@ export default {
   #outPutParam, #inputParam {
     width: 100%;
     height: calc(~"50vh - 128px");
+  }
+
+  .inputParamTitle1 {
+    position: absolute;
+    margin-top: -40px;
+    width: 40%;
+    text-align: center;
+    font-size: 12px;
+  }
+
+  .inputParamTitle2 {
+    position: absolute;
+    left: 40%;
+    margin-top: -40px;
+    width: 20%;
+    text-align: center;
+    font-size: 12px;
+  }
+
+  .inputParamTitle3 {
+    position: absolute;
+    left: 60%;
+    margin-top: -40px;
+    width: 20%;
+    text-align: right;
+    font-size: 12px;
+  }
+
+  .inputParamTitle4 {
+    position: absolute;
+    left: 80%;
+    margin-top: -40px;
+    width: 20%;
+    text-align: left;
+    font-size: 12px;
   }
 
 </style>
