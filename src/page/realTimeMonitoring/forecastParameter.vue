@@ -26,6 +26,9 @@
                 style="border: 1px solid; border-top-style: none; border-left-style: none; border-right-style: none; border-bottom-color: darkgrey;">
                 <h3 style="margin-left: 5px">{{forecastParameter.title}}输入参数</h3>
               </div>
+              <div id="inputParam">
+
+              </div>
             </div>
           </div>
         </div>
@@ -319,6 +322,260 @@ export default {
             }
           ]
         },
+        inputOption : {
+          tooltip: {
+            formatter: "{a} <br/>{c} {b}"
+          },
+          toolbox: {
+            show: true,
+            feature: {
+              restore: {show: true},
+              saveAsImage: {show: true}
+            }
+          },
+          series : [
+            {
+              name: '',
+              type: 'gauge',
+              center: ['20%', '55%'],    // 默认全局居中
+              radius: '60%',
+              min: 0,
+              max: 1,
+              endAngle: 45,
+              splitNumber: 5,
+              axisLine: {            // 坐标轴线
+                lineStyle: {       // 属性lineStyle控制线条样式
+                  width: 10,
+                  color: [[0.2, '#ccc'], [0.4, 'red'], [0.6, 'blue'], [0.8, 'orange'], [1, 'black']]
+                }
+              },
+              axisTick: {            // 坐标轴小标记
+                length: 12,        // 属性length控制线长
+                lineStyle: {       // 属性lineStyle控制线条样式
+                  color: 'auto'
+                }
+              },
+              splitLine: {           // 分隔线
+                length: 20,         // 属性length控制线长
+                lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
+                  color: 'auto'
+                }
+              },
+              axisLabel: {
+                backgroundColor: 'auto',
+                borderRadius: 1,
+                color: '#eee',
+                padding: 2,
+                textShadowBlur: 1,
+                textShadowOffsetX: 1,
+                textShadowOffsetY: 1,
+                textShadowColor: '#222',
+                formatter: function (value) {
+                  switch (value + '') {
+                    case '0' :
+                      return '0';
+                    case '0.2' :
+                      return '0.2';
+                    case '0.4' :
+                      return '0.4';
+                    case '0.6' :
+                      return '0.6';
+                    case '0.8' :
+                      return '0.8';
+                    case '1' :
+                      return '1';
+                  }
+                }
+              },
+              pointer: {
+                width: 5
+              },
+              title: {
+                offsetCenter: [0, '-30%'],       // x, y，单位px
+              },
+              detail: {
+                // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+                fontWeight: 'bolder'
+              },
+              data: [{value: 0.75, name: ''}]
+            },
+            {
+              name: '',
+              type: 'gauge',
+              z: 3,
+              min: 0,
+              max: 1,
+              radius: '75%',
+              splitNumber: 10,
+              axisLine: {            // 坐标轴线
+                lineStyle: {       // 属性lineStyle控制线条样式
+                  width: 10,
+                  color: [[0.2, '#ccc'], [0.4, 'red'], [0.6, 'blue'], [0.8, 'orange'], [1, 'black']]
+                }
+              },
+              axisTick: {            // 坐标轴小标记
+                length: 15,        // 属性length控制线长
+                lineStyle: {       // 属性lineStyle控制线条样式
+                  color: 'auto'
+                }
+              },
+              splitLine: {           // 分隔线
+                length: 20,         // 属性length控制线长
+                lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
+                  color: 'auto'
+                }
+              },
+              axisLabel: {
+                backgroundColor: 'auto',
+                borderRadius: 2,
+                color: '#eee',
+                padding: 3,
+                textShadowBlur: 2,
+                textShadowOffsetX: 1,
+                textShadowOffsetY: 1,
+                textShadowColor: '#222',
+                formatter: function (value) {
+                  switch (value + '') {
+                    case '0' :
+                      return '0';
+                    case '0.2' :
+                      return '0.2';
+                    case '0.4' :
+                      return '0.4';
+                    case '0.6' :
+                      return '0.6';
+                    case '0.8' :
+                      return '0.8';
+                    case '1' :
+                      return '1';
+                  }
+                }
+              },
+              title: {
+                show: false,
+                fontWeight: 'bolder',
+                fontSize: 20,
+                fontStyle: 'italic',
+              },
+              detail: {
+                formatter: '{value}',
+                fontWeight: 'bolder',
+                borderRadius: 3,
+                fontSize: 20,
+                backgroundColor: 'auto',
+                borderColor: '#aaa',
+                shadowBlur: 5,
+                shadowColor: '#333',
+                shadowOffsetX: 0,
+                shadowOffsetY: 3,
+                borderWidth: 2,
+                textBorderColor: '#000',
+                textBorderWidth: 2,
+                textShadowBlur: 2,
+                textShadowColor: '#fff',
+                textShadowOffsetX: 0,
+                textShadowOffsetY: 0,
+                fontFamily: 'Arial',
+                width: 60,
+                color: '#eee',
+                rich: {}
+              },
+              data: [{value: 0, name: ''}]
+            },
+            {
+              name: '油表',
+              type: 'gauge',
+              center: ['77%', '50%'],    // 默认全局居中
+              radius: '25%',
+              min: 0,
+              max: 2,
+              startAngle: 135,
+              endAngle: 45,
+              splitNumber: 2,
+              axisLine: {            // 坐标轴线
+                lineStyle: {       // 属性lineStyle控制线条样式
+                  width: 8
+                }
+              },
+              axisTick: {            // 坐标轴小标记
+                splitNumber: 5,
+                length: 10,        // 属性length控制线长
+                lineStyle: {        // 属性lineStyle控制线条样式
+                  color: 'auto'
+                }
+              },
+              axisLabel: {
+                formatter: function (v){
+                  switch (v + '') {
+                    case '0' : return 'E';
+                    case '1' : return 'Gas';
+                    case '2' : return 'F';
+                  }
+                }
+              },
+              splitLine: {           // 分隔线
+                length: 15,         // 属性length控制线长
+                lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
+                  color: 'auto'
+                }
+              },
+              pointer: {
+                width: 2
+              },
+              title: {
+                show: false
+              },
+              detail: {
+                show: false
+              },
+              data: [{value: 0.5, name: 'gas'}]
+            },
+            {
+              name: '水表',
+              type: 'gauge',
+              center: ['77%', '50%'],    // 默认全局居中
+              radius: '25%',
+              min: 0,
+              max: 2,
+              startAngle: 315,
+              endAngle: 225,
+              splitNumber: 2,
+              axisLine: {            // 坐标轴线
+                lineStyle: {       // 属性lineStyle控制线条样式
+                  width: 8
+                }
+              },
+              axisTick: {            // 坐标轴小标记
+                show: false
+              },
+              axisLabel: {
+                formatter: function(v){
+                  switch (v + '') {
+                    case '0' : return 'H';
+                    case '1' : return 'Water';
+                    case '2' : return 'C';
+                  }
+                }
+              },
+              splitLine: {           // 分隔线
+                length: 15,         // 属性length控制线长
+                lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
+                  color: 'auto'
+                }
+              },
+              pointer: {
+                width:2
+              },
+              title: {
+                show: false
+              },
+              detail: {
+                show: false
+              },
+              data: [{value: 0.5, name: 'gas'}]
+            }
+          ]
+        },
         outPutOption: {
           color: ['#3398DB'],
           tooltip: {
@@ -374,6 +631,8 @@ export default {
   mounted () {
     //初始化输出参数
     this._initOutPutParam();
+    //初始化输入参数
+    this._initInputParam();
     //初始化输入输出仪表关系比对
     this._initInputOutRelationMeter();
   },
@@ -398,6 +657,13 @@ export default {
       }
       let OutPutChart = echarts.init(document.getElementById('outPutParam'));
       OutPutChart.setOption(this.inputOutRelation.outPutOption, true);
+    },
+    _initInputParam(){
+      if (this.inputOutRelation.relationList_A.length > 0) {
+
+      }
+      let inputChart = echarts.init(document.getElementById('inputParam'));
+      inputChart.setOption(this.inputOutRelation.inputOption, true);
     },
     _initInputOutRelationMeter () {
       let myChart_A = echarts.init(document.getElementById('inputOutRelationMeter_A'));
@@ -614,7 +880,7 @@ export default {
     height: calc(~"50vh - 155px");
   }
 
-  #outPutParam {
+  #outPutParam, #inputParam {
     width: 100%;
     height: calc(~"50vh - 128px");
   }
