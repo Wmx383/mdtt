@@ -123,25 +123,19 @@
               >
               </el-table-column>
               <el-table-column
-                prop="name"
+                prop=""
                 label="时间"
                 min-width="300"
               >
               </el-table-column>
               <el-table-column
-                prop="name"
+                prop="output"
                 label="预测输出值"
                 min-width="300"
               >
               </el-table-column>
               <el-table-column
-                prop="name"
-                label="在线输出值"
-                min-width="300"
-              >
-              </el-table-column>
-              <el-table-column
-                prop="name"
+                prop="limsOutput"
                 label="实际输出值"
                 min-width="300"
               >
@@ -730,12 +724,12 @@ export default {
           legend: {
             data: ['在线输出', '实际输出'],
             left: 'left',
-            selected: {
+            /*selected: {
               // 选中'系列1'
               '在线输出': true,
               // 不选中'系列2'
-              '实际输出': true,
-            }
+              '实际输出': false
+            }*/
           },
           toolbox: {
             feature: {
@@ -853,7 +847,7 @@ export default {
           "actualOutput": null,
           "actualOutputCV": [],
           "collectTime": null,
-          "limsOutput": ["99.88", "0.02", "0.10"]
+          "limsOutput": ["3", "4", "5"]
         },
         {
           "input": ["98.3168830872", "473.334106445", "427.420837402", "44.93264341354", "382.301818848", "309.436004639", "115.953674316", "57.1867294312", "68.1822967529"],
@@ -864,7 +858,7 @@ export default {
           "actualOutput": null,
           "actualOutputCV": [],
           "collectTime": null,
-          "limsOutput": ["99.88", "0.02", "0.10"]
+          "limsOutput": ["8", "25", "0.3"]
         },
         {
           "input": ["28.3168830872", "173.334106445", "347.420837402", "45.93264341354", "482.301818848", "359.436004639", "415.953674316", "57.1867294312", "68.1822967529"],
@@ -875,7 +869,7 @@ export default {
           "actualOutput": null,
           "actualOutputCV": [],
           "collectTime": null,
-          "limsOutput": ["99.88", "0.02", "0.10"]
+          "limsOutput": ["48", "111", "12"]
         },
         {
           "input": ["148.3168830872", "373.334106445", "337.420837402", "24.93264341354", "182.301818848", "509.436004639", "315.953674316", "57.1867294312", "68.1822967529"],
@@ -886,7 +880,7 @@ export default {
           "actualOutput": null,
           "actualOutputCV": [],
           "collectTime": null,
-          "limsOutput": ["99.88", "0.02", "0.10"]
+          "limsOutput": ["15", "233", "23"]
         }
       ]//用于假数据
     }
@@ -1070,6 +1064,7 @@ export default {
         this._setTitle(ogName);
         await this._selectModelParamList(ogId);
         await this._selectNewestParameter(ogId, this.tempList[0]);
+        this._selectOutputTable();
         this._timingTask();
       }
 
@@ -1078,6 +1073,9 @@ export default {
       this._initInputOutParamDiff();
       this._initInputOutRelationMeter();
 
+
+    },
+    _selectOutputTable(){
 
     },
     _timingTask () {
@@ -1173,8 +1171,10 @@ export default {
       this.inputOutRelation.inputOutParamDiffOption.xAxis.data = [];
       this.inputOutRelation.inputOutParamDiffOption.series[0].data = [];
       this.inputOutRelation.inputOutParamDiffOption.series[1].data = [];
-      this.inputOutRelation.inputOutParamDiffOption.dataZoom[0].startValue = ''
-      this.inputOutRelation.inputOutParamDiffOption.dataZoom[0].endValue = ''
+      this.inputOutRelation.inputOutParamDiffOption.dataZoom[0].startValue = '';
+      this.inputOutRelation.inputOutParamDiffOption.dataZoom[0].endValue = '';
+
+      this.forecastParameterTable.forecastParameterTablePageList = [];
     },
     _setTitle (ogName) {
       this.forecastParameter.title = ogName;
@@ -1254,6 +1254,7 @@ export default {
             this.inputOutRelation.relationListBefore_B = JSON.parse(JSON.stringify(this.inputOutRelation.relationList_B));
           }
 
+          this.forecastParameterTable.forecastParameterTablePageList = JSON.parse(JSON.stringify(this.inputOutRelation.relationList_B));
           this._initOutPutParam();
           this._initInputParam();
           this._initInputOutParamDiff();
