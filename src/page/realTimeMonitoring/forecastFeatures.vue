@@ -197,7 +197,7 @@ export default {
         newestParameterList: [],
         option_A: {
           tooltip: {
-            formatter: '{a} <br/>输入值:{b} <br/>归一化输入值: {c}'
+            formatter: '{a} <br/>输入值:{b}'
           },
           toolbox: {
             feature: {
@@ -831,7 +831,7 @@ export default {
           "input": ["48.3168830872", "303.334106445", "327.420837402", "14.93264341354", "202.301818848", "309.436004639", "325.953674316", "57.1867294312", "68.1822967529"],
           "output": ["44.00644", "421.51526", "333.30406", "319.63722", "63.9175"],
           "dataTime": 1574667658000,
-          "inputCountValue": ["0.22387", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
+          "inputCountValue": ["0.427", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
           "outputCountValue": ["0.25", "0.6", "1.66", "0.78949", "0.97270"],
           "actualOutput": null,
           "actualOutputCV": [],
@@ -842,8 +842,8 @@ export default {
           "input": ["88.3168830872", "273.334106445", "227.420837402", "24.93264341354", "288.301818848", "409.436004639", "215.953674316", "57.1867294312", "68.1822967529"],
           "output": ["219.00644", "295.51526", "327.30406", "349.63722", "363.9175"],
           "dataTime": 1574667658000,
-          "inputCountValue": ["0.22387", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
-          "outputCountValue": ["0.34426", "0.95355", "1.31815", "0.78949", "0.97270"],
+          "inputCountValue": ["0.234287", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
+          "outputCountValue": ["0.34426", "0.95355", "0.765", "0.78949", "0.97270"],
           "actualOutput": null,
           "actualOutputCV": [],
           "collectTime": null,
@@ -853,8 +853,8 @@ export default {
           "input": ["98.3168830872", "473.334106445", "427.420837402", "44.93264341354", "382.301818848", "309.436004639", "115.953674316", "57.1867294312", "68.1822967529"],
           "output": ["219.00644", "295.51526", "327.30406", "349.63722", "363.9175"],
           "dataTime": 1574667658000,
-          "inputCountValue": ["0.22387", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
-          "outputCountValue": ["0.34426", "0.95355", "1.31815", "0.78949", "0.97270"],
+          "inputCountValue": ["0.24517", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
+          "outputCountValue": ["0.34426", "0.95355", "241", "0.78949", "0.97270"],
           "actualOutput": null,
           "actualOutputCV": [],
           "collectTime": null,
@@ -864,8 +864,8 @@ export default {
           "input": ["28.3168830872", "173.334106445", "347.420837402", "45.93264341354", "482.301818848", "359.436004639", "415.953674316", "57.1867294312", "68.1822967529"],
           "output": ["219.00644", "295.51526", "327.30406", "349.63722", "363.9175"],
           "dataTime": 1574667658000,
-          "inputCountValue": ["0.22387", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
-          "outputCountValue": ["0.34426", "0.95355", "1.31815", "0.78949", "0.97270"],
+          "inputCountValue": ["0.51287", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
+          "outputCountValue": ["0.34426", "0.95355", "0.668", "0.78949", "0.97270"],
           "actualOutput": null,
           "actualOutputCV": [],
           "collectTime": null,
@@ -875,8 +875,8 @@ export default {
           "input": ["148.3168830872", "373.334106445", "337.420837402", "24.93264341354", "182.301818848", "509.436004639", "315.953674316", "57.1867294312", "68.1822967529"],
           "output": ["219.00644", "295.51526", "327.30406", "349.63722", "363.9175"],
           "dataTime": 1574667658000,
-          "inputCountValue": ["0.22387", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
-          "outputCountValue": ["0.34426", "0.95355", "1.31815", "0.78949", "0.97270"],
+          "inputCountValue": ["0.52187", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
+          "outputCountValue": ["0.34426", "0.95355", "1.441", "0.78949", "0.97270"],
           "actualOutput": null,
           "actualOutputCV": [],
           "collectTime": null,
@@ -1094,27 +1094,23 @@ export default {
         //目前只能模拟定时器传假数据
       }, 5000);
     },
-    _onMeterAChange (id) {
-      if(id != ''){
-        for (let i = 0; i < this.inputOutRelation.relationList_A.length; i++) {
-          if (id == this.inputOutRelation.relationList_A[i].id) {
-            let name = this.inputOutRelation.relationList_A[i].name;
-            if (name.indexOf('-') > 0) {
-              name = name.indexOf('-');
-            }
-            this._setMerter_A(this.inputOutRelation.relationList_A[i].input, this.inputOutRelation.relationList_A[i].inputCountValue, name);
-            return;
+    _onMeterAChange () {
+      for (let i = 0; i < this.inputOutRelation.relationList_A.length; i++) {
+        if (this.inputOutRelation.code_a == this.inputOutRelation.relationList_A[i].id) {
+          let name = this.inputOutRelation.relationList_A[i].name;
+          if (name.indexOf('-') > 0) {
+            name = name.substring(0, name.indexOf('-'));
           }
+          this._setMerter_A(this.inputOutRelation.relationList_A[i].input, this.inputOutRelation.relationList_A[i].inputCountValue, name);
+          return;
         }
       }
     },
-    _onMeterBChange (id) {
-      if(id != ''){
-        for (let i = 0; i < this.inputOutRelation.relationList_B.length; i++) {
-          if (id == this.inputOutRelation.relationList_B[i].id) {
-            this._setMerter_B(this.inputOutRelation.relationList_B[i].output, this.inputOutRelation.relationList_B[i].outputCountValue, this.inputOutRelation.relationList_B[i].name);
-            return;
-          }
+    _onMeterBChange () {
+      for (let i = 0; i < this.inputOutRelation.relationList_B.length; i++) {
+        if (this.inputOutRelation.code_b == this.inputOutRelation.relationList_B[i].id) {
+          this._setMerter_B(this.inputOutRelation.relationList_B[i].output, this.inputOutRelation.relationList_B[i].outputCountValue, this.inputOutRelation.relationList_B[i].name);
+          return;
         }
       }
     },
@@ -1258,8 +1254,8 @@ export default {
           this._initOutPutParam();
           this._initInputParam();
           this._initInputOutParamDiff();
-          this._onMeterAChange(this.inputOutRelation.code_a);
-          this._onMeterBChange(this.inputOutRelation.code_b);
+          this._onMeterAChange();
+          this._onMeterBChange();
         } else {
           this.$message({message: res.data.msg, type: 'error'});
         }

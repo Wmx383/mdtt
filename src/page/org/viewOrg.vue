@@ -85,7 +85,6 @@ export default {
         if (res.data.status == 1) {
           this.loading = false;
           let dataList = res.data.result;
-          console.log('111');
           let forecastFeaturesDataList = [];
           let features = {};
           for (let i = 0; i < dataList.length; i++) {
