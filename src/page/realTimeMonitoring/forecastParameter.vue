@@ -922,7 +922,7 @@ export default {
           seriesData_1.push({
             value: item.outputCountValue,
             name: item.output
-          })
+          });
           seriesData_2.push({
             value: item.limsOutput,
           })
@@ -1092,7 +1092,7 @@ export default {
         that.inputOutRelation.relationListBefore_B = JSON.parse(JSON.stringify(that.inputOutRelation.relationList_B));
         that._selectNewestParameter(node.ogId, that.tempList[index]);
         //目前只能模拟定时器传假数据
-      }, 5000);
+      }, 15000);
     },
     _onMeterAChange (id) {
       if(id != ''){
