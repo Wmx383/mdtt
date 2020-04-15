@@ -47,6 +47,7 @@
     position: absolute;
     left: 300px;
     right: 10px;
+    min-width: 1050px;
     /*box-shadow: 0 10px 10px 0px #aaa, 10px 0 10px 0px #aaa;*/
   }
 
