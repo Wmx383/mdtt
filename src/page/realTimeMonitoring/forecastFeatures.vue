@@ -733,7 +733,10 @@ export default {
           },
           toolbox: {
             feature: {
-              saveAsImage: {}
+              saveAsImage: {},
+              magicType: {
+                type: ['line', 'bar']
+              }
             }
           },
           grid: {
@@ -777,6 +780,14 @@ export default {
             trigger: 'axis',
             axisPointer: {            // 坐标轴指示器，坐标轴触发有效
               type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+            }
+          },
+          toolbox: {
+            feature: {
+              saveAsImage: {},
+              magicType: {
+                type: ['line', 'bar']
+              }
             }
           },
           xAxis: {
@@ -1092,7 +1103,7 @@ export default {
         that.inputOutRelation.relationListBefore_B = JSON.parse(JSON.stringify(that.inputOutRelation.relationList_B));
         that._selectNewestParameter(node.ogId, that.tempList[index]);
         //目前只能模拟定时器传假数据
-      }, 5000);
+      }, 15000);
     },
     _onMeterAChange () {
       for (let i = 0; i < this.inputOutRelation.relationList_A.length; i++) {

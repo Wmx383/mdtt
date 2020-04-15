@@ -166,7 +166,10 @@ export default {
           },
           toolbox: {
             feature: {
-              saveAsImage: {}
+              saveAsImage: {},
+              magicType: {
+                type: ['line', 'bar']
+              }
             }
           },
           grid: {
