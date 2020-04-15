@@ -150,1123 +150,1123 @@
 </template>
 
 <script>
-  import viewOrgCom from "../org/viewOrg.vue";
-  import echarts from 'echarts';
+import viewOrgCom from "../org/viewOrg.vue";
+import echarts from 'echarts';
 
-  export default {
-    name: "forecastParameter",
-    components: {viewOrgCom},
-    data () {
-      return {
-        idFlag: false,
-        orgTreeStyle: {
-          height: ''
+export default {
+  name: "forecastParameter",
+  components: {viewOrgCom},
+  data () {
+    return {
+      idFlag: false,
+      orgTreeStyle: {
+        height: ''
+      },
+      contentDivStyle: {
+        height: ''
+      },
+      forecastParameter: {
+        title: '预测参数'
+      },
+      forecastParameterTable: {
+        sortNum: 0,
+        gridLoading: false,
+        forecastParameterTableAllList: [],
+        forecastParameterTablePageList: [],
+        forecastParameterTableList: [],
+        gridTableStyle: {
+          width: '100%',
+          height: '350px',
         },
-        contentDivStyle: {
-          height: ''
+        pagination: {
+          page_index: 1,  // 当前位于哪页
+          total: 0,        // 总数
+          page_size: 5,   // 1页显示多少条
+          page_sizes: [5, 10, 15, 20],  //每页显示多少条
+          layout: "total, sizes, prev, pager, next, jumper"   // 翻页属性
         },
-        forecastParameter: {
-          title: '预测参数'
-        },
-        forecastParameterTable: {
-          sortNum: 0,
-          gridLoading: false,
-          forecastParameterTableAllList: [],
-          forecastParameterTablePageList: [],
-          forecastParameterTableList: [],
-          gridTableStyle: {
-            width: '100%',
-            height: '350px',
+        selectedDate: [],
+      },
+      inputOutRelation: {
+        code_a: '',
+        code_b: '',
+        relationList_A: [],
+        relationList_B: [],
+        relationListBefore_A: [],
+        relationListBefore_B: [],
+        newestParameterList: [],
+        option_A: {
+          tooltip: {
+            formatter: '{a} <br/>输入值:{b} <br/>归一化输入值: {c}'
           },
-          pagination: {
-            page_index: 1,  // 当前位于哪页
-            total: 0,        // 总数
-            page_size: 5,   // 1页显示多少条
-            page_sizes: [5, 10, 15, 20],  //每页显示多少条
-            layout: "total, sizes, prev, pager, next, jumper"   // 翻页属性
+          toolbox: {
+            feature: {
+              restore: {},
+              saveAsImage: {}
+            }
           },
-          selectedDate: [],
-        },
-        inputOutRelation: {
-          code_a: '',
-          code_b: '',
-          relationList_A: [],
-          relationList_B: [],
-          relationListBefore_A: [],
-          relationListBefore_B: [],
-          newestParameterList: [],
-          option_A: {
-            tooltip: {
-              formatter: '{a} <br/>输入值:{b} <br/>归一化输入值: {c}'
-            },
-            toolbox: {
-              feature: {
-                restore: {},
-                saveAsImage: {}
-              }
-            },
-            title: {
-              show: true,
-              text: '',
-            },
-            series: [
-              {
-                name: '',
-                type: 'gauge',
-                min: 0,
-                max: 1,
-                radius: '75%',
-                axisLine: {            // 坐标轴线
-                  lineStyle: {       // 属性lineStyle控制线条样式
-                    width: 10,
-                    color: [[0.2, '#FFB721'], [0.4, '#64CC35'], [0.8, '#64CC35'], [1, '#FF1C3A']]
-                  }
-                },
-                axisTick: {            // 坐标轴小标记
-                  length: 15,        // 属性length控制线长
-                  lineStyle: {       // 属性lineStyle控制线条样式
-                    color: 'auto'
-                  }
-                },
-                splitLine: {           // 分隔线
-                  length: 20,         // 属性length控制线长
-                  lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
-                    color: 'auto'
-                  }
-                },
-                axisLabel: {
-                  backgroundColor: 'auto',
-                  borderRadius: 2,
-                  color: '#eee',
-                  padding: 3,
-                  textShadowBlur: 2,
-                  textShadowOffsetX: 1,
-                  textShadowOffsetY: 1,
-                  /*textShadowColor: '#222',*/
-                  formatter: function (value) {
-                    switch (value + '') {
-                      case '0' :
-                        return '0';
-                      /*case '0.2' :
-                        return '0.2';
-                      case '0.4' :
-                        return '0.4';
-                      case '0.6' :
-                        return '0.6';*/
-                      case '0.5' :
-                        return '0.5';
-                      case '1' :
-                        return '1';
-                    }
-                  }
-                },
-                title: {
-                  // 其余属性默认使用全局文本样式，详见TEXTSTYLE
-                  show: false,
-                  fontWeight: 'bolder',
-                  fontSize: 20,
-                  fontStyle: 'italic',
-                },
-                detail: {
-                  formatter: '{value}',
-                  fontWeight: 'bolder',
-                  offsetCenter: [0, '70%'],
-                  borderRadius: 3,
-                  fontSize: 20,
-                  backgroundColor: 'auto',
-                  borderColor: '#aaa',
-                  shadowBlur: 5,
-                  shadowColor: '#333',
-                  shadowOffsetX: 0,
-                  shadowOffsetY: 3,
-                  borderWidth: 2,
-                  /*textBorderColor: '#000',*/
-                  textBorderWidth: 2,
-                  textShadowBlur: 2,
-                  textShadowColor: '#fff',
-                  textShadowOffsetX: 0,
-                  textShadowOffsetY: 0,
-                  fontFamily: 'Arial',
-                  width: 60,
-                  color: '#eee',
-                  rich: {}
-                },
-                data: [{value: 0, name: '0'}]
-              }
-            ]
+          title: {
+            show: true,
+            text: '',
           },
-          option_B: {
-            tooltip: {
-              formatter: '{a} <br/>输出值:{b} <br/>归一化输出值: {c}',
-            },
-            toolbox: {
-              feature: {
-                restore: {},
-                saveAsImage: {}
-              }
-            },
-            title: {
-              show: true,
-              text: '',
-            },
-            series: [
-              {
-                name: '',
-                type: 'gauge',
-                min: 0,
-                max: 1,
-                radius: '75%',
-                axisLine: {            // 坐标轴线
-                  lineStyle: {       // 属性lineStyle控制线条样式
-                    width: 10,
-                    color: [[0.2, '#FFB721'], [0.4, '#64CC35'], [0.8, '#64CC35'], [1, '#FF1C3A']]
-                  }
-                },
-                axisTick: {            // 坐标轴小标记
-                  length: 15,        // 属性length控制线长
-                  lineStyle: {       // 属性lineStyle控制线条样式
-                    color: 'auto'
-                  }
-                },
-                splitLine: {           // 分隔线
-                  length: 20,         // 属性length控制线长
-                  lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
-                    color: 'auto'
-                  }
-                },
-                axisLabel: {
-                  backgroundColor: 'auto',
-                  borderRadius: 2,
-                  color: '#eee',
-                  padding: 3,
-                  textShadowBlur: 2,
-                  textShadowOffsetX: 1,
-                  textShadowOffsetY: 1,
-                  /*textShadowColor: '#222',*/
-                  formatter: function (value) {
-                    switch (value + '') {
-                      case '0' :
-                        return '0';
-                      /*case '0.2' :
-                        return '0.2';
-                      case '0.4' :
-                        return '0.4';
-                      case '0.6' :
-                        return '0.6';*/
-                      case '0.5' :
-                        return '0.5';
-                      case '1' :
-                        return '1';
-                    }
-                  }
-                },
-                title: {
-                  // 其余属性默认使用全局文本样式，详见TEXTSTYLE
-                  show: false,
-                  fontWeight: 'bolder',
-                  fontSize: 20,
-                  fontStyle: 'italic',
-                },
-                detail: {
-                  formatter: '{value}',
-                  fontWeight: 'bolder',
-                  offsetCenter: [0, '70%'],
-                  borderRadius: 3,
-                  fontSize: 20,
-                  backgroundColor: 'auto',
-                  borderColor: '#aaa',
-                  shadowBlur: 5,
-                  shadowColor: '#333',
-                  shadowOffsetX: 0,
-                  shadowOffsetY: 3,
-                  borderWidth: 2,
-                  /*textBorderColor: '#000',*/
-                  textBorderWidth: 2,
-                  textShadowBlur: 2,
-                  textShadowColor: '#fff',
-                  textShadowOffsetX: 0,
-                  textShadowOffsetY: 0,
-                  fontFamily: 'Arial',
-                  width: 60,
-                  color: '#eee',
-                  rich: {}
-                },
-                data: [{value: 0, name: '0'}]
-              }
-            ]
-          },
-          inputOption: {
-            tooltip: {
-              formatter: '{a} <br/>输入值:{b} <br/>归一化输入值: {c}',
-            },
-            toolbox: {
-              show: true,
-              feature: {
-                restore: {show: true},
-                saveAsImage: {show: true}
-              }
-            },
-            series: [
-              {
-                name: '',
-                type: 'gauge',
-                center: ['20%', '55%'],    // 默认全局居中
-                radius: '60%',
-                min: 0,
-                max: 1,
-                endAngle: 45,
-                splitNumber: 5,
-                axisLine: {            // 坐标轴线
-                  lineStyle: {       // 属性lineStyle控制线条样式
-                    width: 10,
-                    color: [[0.2, '#FFB721'], [0.4, '#64CC35'], [0.8, '#64CC35'], [1, '#FF1C3A']]
-                  }
-                },
-                axisTick: {            // 坐标轴小标记
-                  length: 12,        // 属性length控制线长
-                  lineStyle: {       // 属性lineStyle控制线条样式
-                    color: 'auto'
-                  }
-                },
-                splitLine: {           // 分隔线
-                  length: 20,         // 属性length控制线长
-                  lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
-                    color: 'auto'
-                  }
-                },
-                axisLabel: {
-                  backgroundColor: 'auto',
-                  borderRadius: 1,
-                  color: '#eee',
-                  padding: 2,
-                  textShadowBlur: 1,
-                  textShadowOffsetX: 1,
-                  textShadowOffsetY: 1,
-                  /* textShadowColor: '#222',*/
-                  formatter: function (value) {
-                    switch (value + '') {
-                      case '0' :
-                        return '0';
-                      /* case '0.2' :
-                         return '0.2';
-                       case '0.4' :
-                         return '0.4';
-                       case '0.6' :
-                         return '0.6';*/
-                      case '0.5' :
-                        return '0.5';
-                      case '1' :
-                        return '1';
-                    }
-                  }
-                },
-                pointer: {
-                  width: 5
-                },
-                title: {
-                  show: false,
-                  offsetCenter: [0, '-30%'],       // x, y，单位px
-                },
-                detail: {
-                  formatter: '{value}',
-                  fontWeight: 'bolder',
-                  offsetCenter: [0, '70%'],
-                  borderRadius: 3,
-                  fontSize: 18,
-                  backgroundColor: 'auto',
-                  borderColor: '#aaa',
-                  shadowBlur: 5,
-                  shadowColor: '#333',
-                  shadowOffsetX: 0,
-                  shadowOffsetY: 3,
-                  borderWidth: 2,
-                  /*textBorderColor: '#000',*/
-                  textBorderWidth: 2,
-                  textShadowBlur: 2,
-                  textShadowColor: '#fff',
-                  textShadowOffsetX: 0,
-                  textShadowOffsetY: 0,
-                  fontFamily: 'Arial',
-                  width: 60,
-                  color: '#eee',
-                  rich: {}
-                },
-                data: [{value: 0, name: ''}]
-              },
-              {
-                name: '',
-                type: 'gauge',
-                z: 3,
-                min: 0,
-                max: 1,
-                radius: '75%',
-                splitNumber: 10,
-                axisLine: {            // 坐标轴线
-                  lineStyle: {       // 属性lineStyle控制线条样式
-                    width: 10,
-                    color: [[0.2, '#FFB721'], [0.4, '#64CC35'], [0.8, '#64CC35'], [1, '#FF1C3A']]
-                  }
-                },
-                axisTick: {            // 坐标轴小标记
-                  length: 15,        // 属性length控制线长
-                  lineStyle: {       // 属性lineStyle控制线条样式
-                    color: 'auto'
-                  }
-                },
-                splitLine: {           // 分隔线
-                  length: 20,         // 属性length控制线长
-                  lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
-                    color: 'auto'
-                  }
-                },
-                axisLabel: {
-                  backgroundColor: 'auto',
-                  borderRadius: 2,
-                  color: '#eee',
-                  padding: 3,
-                  textShadowBlur: 2,
-                  textShadowOffsetX: 1,
-                  textShadowOffsetY: 1,
-                  /*textShadowColor: '#222',*/
-                  formatter: function (value) {
-                    switch (value + '') {
-                      case '0' :
-                        return '0';
-                      /*case '0.2' :
-                        return '0.2';
-                      case '0.4' :
-                        return '0.4';
-                      case '0.6' :
-                        return '0.6';*/
-                      case '0.5' :
-                        return '0.5';
-                      case '1' :
-                        return '1';
-                    }
-                  }
-                },
-                title: {
-                  show: false,
-                  fontWeight: 'bolder',
-                  fontSize: 20,
-                  fontStyle: 'italic',
-                },
-                detail: {
-                  formatter: '{value}',
-                  fontWeight: 'bolder',
-                  offsetCenter: [0, '70%'],
-                  borderRadius: 3,
-                  fontSize: 20,
-                  backgroundColor: 'auto',
-                  borderColor: '#aaa',
-                  shadowBlur: 5,
-                  shadowColor: '#333',
-                  shadowOffsetX: 0,
-                  shadowOffsetY: 3,
-                  borderWidth: 2,
-                  /*textBorderColor: '#000',*/
-                  textBorderWidth: 2,
-                  textShadowBlur: 2,
-                  textShadowColor: '#fff',
-                  textShadowOffsetX: 0,
-                  textShadowOffsetY: 0,
-                  fontFamily: 'Arial',
-                  width: 60,
-                  color: '#eee',
-                  rich: {}
-                },
-                data: [{value: 0, name: ''}]
-              },
-              {
-                name: '',
-                type: 'gauge',
-                center: ['80%', '50%'],    // 默认全局居中
-                radius: '60%',
-                min: 0,
-                max: 1,
-                startAngle: 135,
-                endAngle: 45,
-                splitNumber: 2,
-                axisLine: {            // 坐标轴线
-                  lineStyle: {       // 属性lineStyle控制线条样式
-                    width: 10,
-                    color: [[0.5, '#ccc'], [1, 'orange']]
-                  }
-                },
-                axisTick: {            // 坐标轴小标记
-                  splitNumber: 5,
-                  length: 10,        // 属性length控制线长
-                  lineStyle: {        // 属性lineStyle控制线条样式
-                    color: 'auto'
-                  }
-                },
-                axisLabel: {
-                  backgroundColor: 'auto',
-                  borderRadius: 2,
-                  color: '#eee',
-                  padding: 3,
-                  textShadowBlur: 2,
-                  textShadowOffsetX: 1,
-                  textShadowOffsetY: 1,
-                  /*textShadowColor: '#222',*/
-                  formatter: function (value) {
-                    switch (value + '') {
-                      case '0' :
-                        return '0';
-                      /*case '0.2' :
-                        return '0.2';
-                      case '0.4' :
-                        return '0.4';
-                      case '0.6' :
-                        return '0.6';*/
-                      case '0.5' :
-                        return '0.5';
-                      case '1' :
-                        return '1';
-                    }
-                  }
-                },
-                splitLine: {           // 分隔线
-                  length: 15,         // 属性length控制线长
-                  lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
-                    color: 'auto'
-                  }
-                },
-                pointer: {
-                  width: 2
-                },
-                title: {
-                  show: false
-                },
-                detail: {
-                  show: false
-                },
-                data: [{value: 0.5, name: ''}]
-              },
-              {
-                name: '',
-                type: 'gauge',
-                center: ['80%', '50%'],    // 默认全局居中
-                radius: '60%',
-                min: 0,
-                max: 1,
-                startAngle: 315,
-                endAngle: 225,
-                splitNumber: 2,
-                axisLine: {            // 坐标轴线
-                  lineStyle: {       // 属性lineStyle控制线条样式
-                    width: 10,
-                    color: [[0.5, '#ccc'], [1, 'orange']]
-                  }
-                },
-                axisTick: {            // 坐标轴小标记
-                  show: false
-                },
-                axisLabel: {
-                  backgroundColor: 'auto',
-                  borderRadius: 2,
-                  color: '#eee',
-                  padding: 3,
-                  textShadowBlur: 2,
-                  textShadowOffsetX: 1,
-                  textShadowOffsetY: 1,
-                  /* textShadowColor: '#222',*/
-                  formatter: function (value) {
-                    switch (value + '') {
-                      case '0' :
-                        return '0';
-                      /*case '0.2' :
-                        return '0.2';
-                      case '0.4' :
-                        return '0.4';
-                      case '0.6' :
-                        return '0.6';*/
-                      case '0.5' :
-                        return '0.5';
-                      case '1' :
-                        return '1';
-                    }
-                  }
-                },
-                splitLine: {           // 分隔线
-                  length: 15,         // 属性length控制线长
-                  lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
-                    color: 'auto'
-                  }
-                },
-                pointer: {
-                  width: 2
-                },
-                title: {
-                  show: false
-                },
-                detail: {
-                  show: false
-                },
-                data: [{value: 0.5, name: ''}]
-              }
-            ]
-          },
-          inputMeterName_1: '',
-          inputMeterName_2: '',
-          inputMeterName_3: '',
-          inputMeterName_4: '',
-          outPutOption: {
-            /*color: ['#3398DB'],*/
-            tooltip: {
-              /* formatter: '{a} <br/>预测输出值:{b} <br/>归一化预测输出值: {c}',*/
-              formatter: this._getToolTip,
-              trigger: 'axis',
-              axisPointer: {            // 坐标轴指示器，坐标轴触发有效
-                type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
-              }
-            },
-            legend: {
-              data: ['在线输出', '实际输出'],
-              left: 'left',
-              /*selected: {
-                // 选中'系列1'
-                '在线输出': true,
-                // 不选中'系列2'
-                '实际输出': false
-              }*/
-            },
-            toolbox: {
-              feature: {
-                saveAsImage: {}
-              }
-            },
-            grid: {
-              left: '3%',
-              right: '4%',
-              bottom: '3%',
-              containLabel: true
-            },
-            xAxis: [
-              {
-                type: 'category',
-                data: [],
-                axisTick: {
-                  alignWithLabel: true
+          series: [
+            {
+              name: '',
+              type: 'gauge',
+              min: 0,
+              max: 1,
+              radius: '75%',
+              axisLine: {            // 坐标轴线
+                lineStyle: {       // 属性lineStyle控制线条样式
+                  width: 10,
+                  color: [[0.2, '#FFB721'], [0.4, '#64CC35'], [0.8, '#64CC35'], [1, '#FF1C3A']]
                 }
-              }
-            ],
-            yAxis: [
-              {
-                type: 'value'
-              }
-            ],
-            series: [
-              {
-                name: '在线输出',
-                type: 'bar',
-                barGap: 0,
-                data: []
               },
-              {
-                name: '实际输出',
-                type: 'bar',
-                data: []
-              }
-            ]
+              axisTick: {            // 坐标轴小标记
+                length: 15,        // 属性length控制线长
+                lineStyle: {       // 属性lineStyle控制线条样式
+                  color: 'auto'
+                }
+              },
+              splitLine: {           // 分隔线
+                length: 20,         // 属性length控制线长
+                lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
+                  color: 'auto'
+                }
+              },
+              axisLabel: {
+                backgroundColor: 'auto',
+                borderRadius: 2,
+                color: '#eee',
+                padding: 3,
+                textShadowBlur: 2,
+                textShadowOffsetX: 1,
+                textShadowOffsetY: 1,
+                /*textShadowColor: '#222',*/
+                formatter: function (value) {
+                  switch (value + '') {
+                    case '0' :
+                      return '0';
+                    /*case '0.2' :
+                      return '0.2';
+                    case '0.4' :
+                      return '0.4';
+                    case '0.6' :
+                      return '0.6';*/
+                    case '0.5' :
+                      return '0.5';
+                    case '1' :
+                      return '1';
+                  }
+                }
+              },
+              title: {
+                // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+                show: false,
+                fontWeight: 'bolder',
+                fontSize: 20,
+                fontStyle: 'italic',
+              },
+              detail: {
+                formatter: '{value}',
+                fontWeight: 'bolder',
+                offsetCenter: [0, '70%'],
+                borderRadius: 3,
+                fontSize: 20,
+                backgroundColor: 'auto',
+                borderColor: '#aaa',
+                shadowBlur: 5,
+                shadowColor: '#333',
+                shadowOffsetX: 0,
+                shadowOffsetY: 3,
+                borderWidth: 2,
+                /*textBorderColor: '#000',*/
+                textBorderWidth: 2,
+                textShadowBlur: 2,
+                textShadowColor: '#fff',
+                textShadowOffsetX: 0,
+                textShadowOffsetY: 0,
+                fontFamily: 'Arial',
+                width: 60,
+                color: '#eee',
+                rich: {}
+              },
+              data: [{value: 0, name: '0'}]
+            }
+          ]
+        },
+        option_B: {
+          tooltip: {
+            formatter: '{a} <br/>输出值:{b} <br/>归一化输出值: {c}',
           },
-          inputOutParamDiffOption: {
-            tooltip: {
-              /* formatter: '{a} <br/>预测输出值:{b} <br/>归一化预测输出值: {c}',*/
-              formatter: this._getToolTipByDiff,
-              trigger: 'axis',
-              axisPointer: {            // 坐标轴指示器，坐标轴触发有效
-                type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
-              }
+          toolbox: {
+            feature: {
+              restore: {},
+              saveAsImage: {}
+            }
+          },
+          title: {
+            show: true,
+            text: '',
+          },
+          series: [
+            {
+              name: '',
+              type: 'gauge',
+              min: 0,
+              max: 1,
+              radius: '75%',
+              axisLine: {            // 坐标轴线
+                lineStyle: {       // 属性lineStyle控制线条样式
+                  width: 10,
+                  color: [[0.2, '#FFB721'], [0.4, '#64CC35'], [0.8, '#64CC35'], [1, '#FF1C3A']]
+                }
+              },
+              axisTick: {            // 坐标轴小标记
+                length: 15,        // 属性length控制线长
+                lineStyle: {       // 属性lineStyle控制线条样式
+                  color: 'auto'
+                }
+              },
+              splitLine: {           // 分隔线
+                length: 20,         // 属性length控制线长
+                lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
+                  color: 'auto'
+                }
+              },
+              axisLabel: {
+                backgroundColor: 'auto',
+                borderRadius: 2,
+                color: '#eee',
+                padding: 3,
+                textShadowBlur: 2,
+                textShadowOffsetX: 1,
+                textShadowOffsetY: 1,
+                /*textShadowColor: '#222',*/
+                formatter: function (value) {
+                  switch (value + '') {
+                    case '0' :
+                      return '0';
+                    /*case '0.2' :
+                      return '0.2';
+                    case '0.4' :
+                      return '0.4';
+                    case '0.6' :
+                      return '0.6';*/
+                    case '0.5' :
+                      return '0.5';
+                    case '1' :
+                      return '1';
+                  }
+                }
+              },
+              title: {
+                // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+                show: false,
+                fontWeight: 'bolder',
+                fontSize: 20,
+                fontStyle: 'italic',
+              },
+              detail: {
+                formatter: '{value}',
+                fontWeight: 'bolder',
+                offsetCenter: [0, '70%'],
+                borderRadius: 3,
+                fontSize: 20,
+                backgroundColor: 'auto',
+                borderColor: '#aaa',
+                shadowBlur: 5,
+                shadowColor: '#333',
+                shadowOffsetX: 0,
+                shadowOffsetY: 3,
+                borderWidth: 2,
+                /*textBorderColor: '#000',*/
+                textBorderWidth: 2,
+                textShadowBlur: 2,
+                textShadowColor: '#fff',
+                textShadowOffsetX: 0,
+                textShadowOffsetY: 0,
+                fontFamily: 'Arial',
+                width: 60,
+                color: '#eee',
+                rich: {}
+              },
+              data: [{value: 0, name: '0'}]
+            }
+          ]
+        },
+        inputOption: {
+          tooltip: {
+            formatter: '{a} <br/>输入值:{b} <br/>归一化输入值: {c}',
+          },
+          toolbox: {
+            show: true,
+            feature: {
+              restore: {show: true},
+              saveAsImage: {show: true}
+            }
+          },
+          series: [
+            {
+              name: '',
+              type: 'gauge',
+              center: ['20%', '55%'],    // 默认全局居中
+              radius: '60%',
+              min: 0,
+              max: 1,
+              endAngle: 45,
+              splitNumber: 5,
+              axisLine: {            // 坐标轴线
+                lineStyle: {       // 属性lineStyle控制线条样式
+                  width: 10,
+                  color: [[0.2, '#FFB721'], [0.4, '#64CC35'], [0.8, '#64CC35'], [1, '#FF1C3A']]
+                }
+              },
+              axisTick: {            // 坐标轴小标记
+                length: 12,        // 属性length控制线长
+                lineStyle: {       // 属性lineStyle控制线条样式
+                  color: 'auto'
+                }
+              },
+              splitLine: {           // 分隔线
+                length: 20,         // 属性length控制线长
+                lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
+                  color: 'auto'
+                }
+              },
+              axisLabel: {
+                backgroundColor: 'auto',
+                borderRadius: 1,
+                color: '#eee',
+                padding: 2,
+                textShadowBlur: 1,
+                textShadowOffsetX: 1,
+                textShadowOffsetY: 1,
+                /* textShadowColor: '#222',*/
+                formatter: function (value) {
+                  switch (value + '') {
+                    case '0' :
+                      return '0';
+                    /* case '0.2' :
+                       return '0.2';
+                     case '0.4' :
+                       return '0.4';
+                     case '0.6' :
+                       return '0.6';*/
+                    case '0.5' :
+                      return '0.5';
+                    case '1' :
+                      return '1';
+                  }
+                }
+              },
+              pointer: {
+                width: 5
+              },
+              title: {
+                show: false,
+                offsetCenter: [0, '-30%'],       // x, y，单位px
+              },
+              detail: {
+                formatter: '{value}',
+                fontWeight: 'bolder',
+                offsetCenter: [0, '70%'],
+                borderRadius: 3,
+                fontSize: 18,
+                backgroundColor: 'auto',
+                borderColor: '#aaa',
+                shadowBlur: 5,
+                shadowColor: '#333',
+                shadowOffsetX: 0,
+                shadowOffsetY: 3,
+                borderWidth: 2,
+                /*textBorderColor: '#000',*/
+                textBorderWidth: 2,
+                textShadowBlur: 2,
+                textShadowColor: '#fff',
+                textShadowOffsetX: 0,
+                textShadowOffsetY: 0,
+                fontFamily: 'Arial',
+                width: 60,
+                color: '#eee',
+                rich: {}
+              },
+              data: [{value: 0, name: ''}]
             },
-            xAxis: {
+            {
+              name: '',
+              type: 'gauge',
+              z: 3,
+              min: 0,
+              max: 1,
+              radius: '75%',
+              splitNumber: 10,
+              axisLine: {            // 坐标轴线
+                lineStyle: {       // 属性lineStyle控制线条样式
+                  width: 10,
+                  color: [[0.2, '#FFB721'], [0.4, '#64CC35'], [0.8, '#64CC35'], [1, '#FF1C3A']]
+                }
+              },
+              axisTick: {            // 坐标轴小标记
+                length: 15,        // 属性length控制线长
+                lineStyle: {       // 属性lineStyle控制线条样式
+                  color: 'auto'
+                }
+              },
+              splitLine: {           // 分隔线
+                length: 20,         // 属性length控制线长
+                lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
+                  color: 'auto'
+                }
+              },
+              axisLabel: {
+                backgroundColor: 'auto',
+                borderRadius: 2,
+                color: '#eee',
+                padding: 3,
+                textShadowBlur: 2,
+                textShadowOffsetX: 1,
+                textShadowOffsetY: 1,
+                /*textShadowColor: '#222',*/
+                formatter: function (value) {
+                  switch (value + '') {
+                    case '0' :
+                      return '0';
+                    /*case '0.2' :
+                      return '0.2';
+                    case '0.4' :
+                      return '0.4';
+                    case '0.6' :
+                      return '0.6';*/
+                    case '0.5' :
+                      return '0.5';
+                    case '1' :
+                      return '1';
+                  }
+                }
+              },
+              title: {
+                show: false,
+                fontWeight: 'bolder',
+                fontSize: 20,
+                fontStyle: 'italic',
+              },
+              detail: {
+                formatter: '{value}',
+                fontWeight: 'bolder',
+                offsetCenter: [0, '70%'],
+                borderRadius: 3,
+                fontSize: 20,
+                backgroundColor: 'auto',
+                borderColor: '#aaa',
+                shadowBlur: 5,
+                shadowColor: '#333',
+                shadowOffsetX: 0,
+                shadowOffsetY: 3,
+                borderWidth: 2,
+                /*textBorderColor: '#000',*/
+                textBorderWidth: 2,
+                textShadowBlur: 2,
+                textShadowColor: '#fff',
+                textShadowOffsetX: 0,
+                textShadowOffsetY: 0,
+                fontFamily: 'Arial',
+                width: 60,
+                color: '#eee',
+                rich: {}
+              },
+              data: [{value: 0, name: ''}]
+            },
+            {
+              name: '',
+              type: 'gauge',
+              center: ['80%', '50%'],    // 默认全局居中
+              radius: '60%',
+              min: 0,
+              max: 1,
+              startAngle: 135,
+              endAngle: 45,
+              splitNumber: 2,
+              axisLine: {            // 坐标轴线
+                lineStyle: {       // 属性lineStyle控制线条样式
+                  width: 10,
+                  color: [[0.5, '#ccc'], [1, 'orange']]
+                }
+              },
+              axisTick: {            // 坐标轴小标记
+                splitNumber: 5,
+                length: 10,        // 属性length控制线长
+                lineStyle: {        // 属性lineStyle控制线条样式
+                  color: 'auto'
+                }
+              },
+              axisLabel: {
+                backgroundColor: 'auto',
+                borderRadius: 2,
+                color: '#eee',
+                padding: 3,
+                textShadowBlur: 2,
+                textShadowOffsetX: 1,
+                textShadowOffsetY: 1,
+                /*textShadowColor: '#222',*/
+                formatter: function (value) {
+                  switch (value + '') {
+                    case '0' :
+                      return '0';
+                    /*case '0.2' :
+                      return '0.2';
+                    case '0.4' :
+                      return '0.4';
+                    case '0.6' :
+                      return '0.6';*/
+                    case '0.5' :
+                      return '0.5';
+                    case '1' :
+                      return '1';
+                  }
+                }
+              },
+              splitLine: {           // 分隔线
+                length: 15,         // 属性length控制线长
+                lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
+                  color: 'auto'
+                }
+              },
+              pointer: {
+                width: 2
+              },
+              title: {
+                show: false
+              },
+              detail: {
+                show: false
+              },
+              data: [{value: 0.5, name: ''}]
+            },
+            {
+              name: '',
+              type: 'gauge',
+              center: ['80%', '50%'],    // 默认全局居中
+              radius: '60%',
+              min: 0,
+              max: 1,
+              startAngle: 315,
+              endAngle: 225,
+              splitNumber: 2,
+              axisLine: {            // 坐标轴线
+                lineStyle: {       // 属性lineStyle控制线条样式
+                  width: 10,
+                  color: [[0.5, '#ccc'], [1, 'orange']]
+                }
+              },
+              axisTick: {            // 坐标轴小标记
+                show: false
+              },
+              axisLabel: {
+                backgroundColor: 'auto',
+                borderRadius: 2,
+                color: '#eee',
+                padding: 3,
+                textShadowBlur: 2,
+                textShadowOffsetX: 1,
+                textShadowOffsetY: 1,
+                /* textShadowColor: '#222',*/
+                formatter: function (value) {
+                  switch (value + '') {
+                    case '0' :
+                      return '0';
+                    /*case '0.2' :
+                      return '0.2';
+                    case '0.4' :
+                      return '0.4';
+                    case '0.6' :
+                      return '0.6';*/
+                    case '0.5' :
+                      return '0.5';
+                    case '1' :
+                      return '1';
+                  }
+                }
+              },
+              splitLine: {           // 分隔线
+                length: 15,         // 属性length控制线长
+                lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
+                  color: 'auto'
+                }
+              },
+              pointer: {
+                width: 2
+              },
+              title: {
+                show: false
+              },
+              detail: {
+                show: false
+              },
+              data: [{value: 0.5, name: ''}]
+            }
+          ]
+        },
+        inputMeterName_1: '',
+        inputMeterName_2: '',
+        inputMeterName_3: '',
+        inputMeterName_4: '',
+        outPutOption: {
+          /*color: ['#3398DB'],*/
+          tooltip: {
+            /* formatter: '{a} <br/>预测输出值:{b} <br/>归一化预测输出值: {c}',*/
+            formatter: this._getToolTip,
+            trigger: 'axis',
+            axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+              type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+            }
+          },
+          legend: {
+            data: ['在线输出', '实际输出'],
+            left: 'left',
+            /*selected: {
+              // 选中'系列1'
+              '在线输出': true,
+              // 不选中'系列2'
+              '实际输出': false
+            }*/
+          },
+          toolbox: {
+            feature: {
+              saveAsImage: {}
+            }
+          },
+          grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+          },
+          xAxis: [
+            {
               type: 'category',
-              boundaryGap: false,
+              data: [],
+              axisTick: {
+                alignWithLabel: true
+              }
+            }
+          ],
+          yAxis: [
+            {
+              type: 'value'
+            }
+          ],
+          series: [
+            {
+              name: '在线输出',
+              type: 'bar',
+              barGap: 0,
               data: []
             },
-            legend: {
-              data: ['输入值', '上次输入值'],
-              left: 'left'
-            },
-            yAxis: {
-              type: 'value'
-            },
-            dataZoom: [{
-              type: 'inside',
-              startValue: '',
-              endValue: '',
-            }, {
-              handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
-              handleSize: '80%',
-              handleStyle: {
-                color: '#fff',
-                shadowBlur: 3,
-                shadowColor: 'rgba(0, 0, 0, 0.6)',
-                shadowOffsetX: 2,
-                shadowOffsetY: 2
-              }
-            }],
-            series: [{
-              name: '输入值',
-              data: [],
-              type: 'line',
-              areaStyle: {
-                color:'#fff546'
-              },
-              smooth: true
-            }, {
-              name: '上次输入值',
-              data: [],
-              type: 'line',
-              areaStyle: {
-                color:'#bec4ff'
-              },
-              smooth: true
-            }]
-          }
+            {
+              name: '实际输出',
+              type: 'bar',
+              data: []
+            }
+          ]
         },
-        timingTask: {},
-        tempList: [
-          {
-            "input": ["48.3168830872", "303.334106445", "327.420837402", "14.93264341354", "202.301818848", "309.436004639", "325.953674316", "57.1867294312", "68.1822967529"],
-            "output": ["44.00644", "421.51526", "333.30406", "319.63722", "63.9175"],
-            "dataTime": 1574667658000,
-            "inputCountValue": ["0.22387", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
-            "outputCountValue": ["0.25", "0.6", "1.66", "0.78949", "0.97270"],
-            "actualOutput": null,
-            "actualOutputCV": [],
-            "collectTime": null,
-            "limsOutput": ["99.88", "0.02", "0.10"]
+        inputOutParamDiffOption: {
+          tooltip: {
+            /* formatter: '{a} <br/>预测输出值:{b} <br/>归一化预测输出值: {c}',*/
+            formatter: this._getToolTipByDiff,
+            trigger: 'axis',
+            axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+              type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+            }
           },
-          {
-            "input": ["88.3168830872", "273.334106445", "227.420837402", "24.93264341354", "288.301818848", "409.436004639", "215.953674316", "57.1867294312", "68.1822967529"],
-            "output": ["219.00644", "295.51526", "327.30406", "349.63722", "363.9175"],
-            "dataTime": 1574667658000,
-            "inputCountValue": ["0.22387", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
-            "outputCountValue": ["0.34426", "0.95355", "1.31815", "0.78949", "0.97270"],
-            "actualOutput": null,
-            "actualOutputCV": [],
-            "collectTime": null,
-            "limsOutput": ["3", "4", "5"]
+          xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: []
           },
-          {
-            "input": ["98.3168830872", "473.334106445", "427.420837402", "44.93264341354", "382.301818848", "309.436004639", "115.953674316", "57.1867294312", "68.1822967529"],
-            "output": ["219.00644", "295.51526", "327.30406", "349.63722", "363.9175"],
-            "dataTime": 1574667658000,
-            "inputCountValue": ["0.22387", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
-            "outputCountValue": ["0.34426", "0.95355", "1.31815", "0.78949", "0.97270"],
-            "actualOutput": null,
-            "actualOutputCV": [],
-            "collectTime": null,
-            "limsOutput": ["8", "25", "0.3"]
+          legend: {
+            data: ['输入值', '上次输入值'],
+            left: 'left'
           },
-          {
-            "input": ["28.3168830872", "173.334106445", "347.420837402", "45.93264341354", "482.301818848", "359.436004639", "415.953674316", "57.1867294312", "68.1822967529"],
-            "output": ["219.00644", "295.51526", "327.30406", "349.63722", "363.9175"],
-            "dataTime": 1574667658000,
-            "inputCountValue": ["0.22387", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
-            "outputCountValue": ["0.34426", "0.95355", "1.31815", "0.78949", "0.97270"],
-            "actualOutput": null,
-            "actualOutputCV": [],
-            "collectTime": null,
-            "limsOutput": ["48", "111", "12"]
+          yAxis: {
+            type: 'value'
           },
-          {
-            "input": ["148.3168830872", "373.334106445", "337.420837402", "24.93264341354", "182.301818848", "509.436004639", "315.953674316", "57.1867294312", "68.1822967529"],
-            "output": ["219.00644", "295.51526", "327.30406", "349.63722", "363.9175"],
-            "dataTime": 1574667658000,
-            "inputCountValue": ["0.22387", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
-            "outputCountValue": ["0.34426", "0.95355", "1.31815", "0.78949", "0.97270"],
-            "actualOutput": null,
-            "actualOutputCV": [],
-            "collectTime": null,
-            "limsOutput": ["15", "233", "23"]
-          }
-        ]//用于假数据
+          dataZoom: [{
+            type: 'inside',
+            startValue: '',
+            endValue: '',
+          }, {
+            handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+            handleSize: '80%',
+            handleStyle: {
+              color: '#fff',
+              shadowBlur: 3,
+              shadowColor: 'rgba(0, 0, 0, 0.6)',
+              shadowOffsetX: 2,
+              shadowOffsetY: 2
+            }
+          }],
+          series: [{
+            name: '输入值',
+            data: [],
+            type: 'line',
+            areaStyle: {
+              color:'#fff546'
+            },
+            smooth: true
+          }, {
+            name: '上次输入值',
+            data: [],
+            type: 'line',
+            areaStyle: {
+              color:'#bec4ff'
+            },
+            smooth: true
+          }]
+        }
+      },
+      timingTask: {},
+      tempList: [
+        {
+          "input": ["48.3168830872", "303.334106445", "327.420837402", "14.93264341354", "202.301818848", "309.436004639", "325.953674316", "57.1867294312", "68.1822967529"],
+          "output": ["44.00644", "421.51526", "333.30406", "319.63722", "63.9175"],
+          "dataTime": 1574667658000,
+          "inputCountValue": ["0.22387", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
+          "outputCountValue": ["0.25", "0.6", "1.66", "0.78949", "0.97270"],
+          "actualOutput": null,
+          "actualOutputCV": [],
+          "collectTime": null,
+          "limsOutput": ["99.88", "0.02", "0.10"]
+        },
+        {
+          "input": ["88.3168830872", "273.334106445", "227.420837402", "24.93264341354", "288.301818848", "409.436004639", "215.953674316", "57.1867294312", "68.1822967529"],
+          "output": ["219.00644", "295.51526", "327.30406", "349.63722", "363.9175"],
+          "dataTime": 1574667658000,
+          "inputCountValue": ["0.22387", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
+          "outputCountValue": ["0.34426", "0.95355", "1.31815", "0.78949", "0.97270"],
+          "actualOutput": null,
+          "actualOutputCV": [],
+          "collectTime": null,
+          "limsOutput": ["3", "4", "5"]
+        },
+        {
+          "input": ["98.3168830872", "473.334106445", "427.420837402", "44.93264341354", "382.301818848", "309.436004639", "115.953674316", "57.1867294312", "68.1822967529"],
+          "output": ["219.00644", "295.51526", "327.30406", "349.63722", "363.9175"],
+          "dataTime": 1574667658000,
+          "inputCountValue": ["0.22387", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
+          "outputCountValue": ["0.34426", "0.95355", "1.31815", "0.78949", "0.97270"],
+          "actualOutput": null,
+          "actualOutputCV": [],
+          "collectTime": null,
+          "limsOutput": ["8", "25", "0.3"]
+        },
+        {
+          "input": ["28.3168830872", "173.334106445", "347.420837402", "45.93264341354", "482.301818848", "359.436004639", "415.953674316", "57.1867294312", "68.1822967529"],
+          "output": ["219.00644", "295.51526", "327.30406", "349.63722", "363.9175"],
+          "dataTime": 1574667658000,
+          "inputCountValue": ["0.22387", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
+          "outputCountValue": ["0.34426", "0.95355", "1.31815", "0.78949", "0.97270"],
+          "actualOutput": null,
+          "actualOutputCV": [],
+          "collectTime": null,
+          "limsOutput": ["48", "111", "12"]
+        },
+        {
+          "input": ["148.3168830872", "373.334106445", "337.420837402", "24.93264341354", "182.301818848", "509.436004639", "315.953674316", "57.1867294312", "68.1822967529"],
+          "output": ["219.00644", "295.51526", "327.30406", "349.63722", "363.9175"],
+          "dataTime": 1574667658000,
+          "inputCountValue": ["0.22387", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
+          "outputCountValue": ["0.34426", "0.95355", "1.31815", "0.78949", "0.97270"],
+          "actualOutput": null,
+          "actualOutputCV": [],
+          "collectTime": null,
+          "limsOutput": ["15", "233", "23"]
+        }
+      ]//用于假数据
+    }
+  },
+  created () {
+    this._initForecastParameter();
+    this.$nextTick(_ => {
+      this.$refs.viewOrgComRef._getUserRoleOrgTreeByFeatures();
+    })
+  },
+  mounted () {
+    //初始化输出参数
+    this._initOutPutParam();
+    //初始化输入参数
+    this._initInputParam();
+    //初始化输入输出差值折线图
+    this._initInputOutParamDiff();
+    //初始化输入输出仪表关系比对
+    this._initInputOutRelationMeter();
+
+  },
+  beforeDestroy(){
+    clearInterval(this.timingTask);
+  },
+  methods: {
+    _getToolTip (params) {
+      return '' + params[0].axisValue + '<br/>预测输出值:' + params[0].data.name + ' <br/>归一化预测输出值: ' + params[0].data.value + '';
+    },
+    _getToolTipByDiff (params) {
+      return '' + params[0].axisValue + '<br/>输入值:' + params[0].data.value + ' <br/>上一次输入值: ' + params[1].data.value + ' <br/> 正差: '+ params[0].data.name +' <br/> 负差: '+ params[1].data.name +'';
+    },
+    _initOutPutParam () {
+      if (this.inputOutRelation.relationList_B.length > 0) {
+        let xAxisData = [];
+        let seriesData_1 = [];
+        let seriesData_2 = [];
+        this.inputOutRelation.relationList_B.forEach((item, index) => {
+          xAxisData.push(item.name);
+          seriesData_1.push({
+            value: item.outputCountValue,
+            name: item.output
+          })
+          seriesData_2.push({
+            value: item.limsOutput,
+          })
+        });
+
+        this.inputOutRelation.outPutOption.xAxis[0].data = xAxisData;
+        this.inputOutRelation.outPutOption.series[0].data = seriesData_1;
+        this.inputOutRelation.outPutOption.series[1].data = seriesData_2;
       }
+      let OutPutChart = echarts.init(document.getElementById('outPutParam'));
+      OutPutChart.setOption(this.inputOutRelation.outPutOption, true);
     },
-    created () {
-      this._initForecastParameter();
-      this.$nextTick(_ => {
-        this.$refs.viewOrgComRef._getUserRoleOrgTree();
-      })
+    _initInputParam () {
+      if (this.inputOutRelation.relationList_A.length > 0) {
+        this.inputOutRelation.relationList_A.forEach((item, index) => {
+          if (index == 0) {
+            this.inputOutRelation.inputOption.series[0].data[0].value = item.inputCountValue;
+            this.inputOutRelation.inputOption.series[0].data[0].name = item.input;
+
+            if (item.name.indexOf('-') > 0) {
+              this.inputOutRelation.inputOption.series[0].name = item.name.substring(0, item.name.indexOf('-'));
+              this.inputOutRelation.inputMeterName_1 = item.name.substring(0, item.name.indexOf('-'));
+            } else {
+              this.inputOutRelation.inputOption.series[0].name = item.name;
+              this.inputOutRelation.inputMeterName_1 = item.name
+            }
+          } else if (index == 1) {
+            this.inputOutRelation.inputOption.series[1].data[0].value = item.inputCountValue;
+            this.inputOutRelation.inputOption.series[1].data[0].name = item.input;
+
+            if (item.name.indexOf('-') > 0) {
+              this.inputOutRelation.inputOption.series[1].name = item.name.substring(0, item.name.indexOf('-'));
+              this.inputOutRelation.inputMeterName_2 = item.name.substring(0, item.name.indexOf('-'));
+            } else {
+              this.inputOutRelation.inputOption.series[1].name = item.name;
+              this.inputOutRelation.inputMeterName_2 = item.name;
+            }
+          } else if (index == 2) {
+            this.inputOutRelation.inputOption.series[2].data[0].value = item.inputCountValue;
+            this.inputOutRelation.inputOption.series[2].data[0].name = item.input;
+
+            if (item.name.indexOf('-') > 0) {
+              this.inputOutRelation.inputOption.series[2].name = item.name.substring(0, item.name.indexOf('-'));
+              this.inputOutRelation.inputMeterName_3 = item.name.substring(0, item.name.indexOf('-'));
+            } else {
+              this.inputOutRelation.inputOption.series[2].name = item.name;
+              this.inputOutRelation.inputMeterName_3 = item.name;
+            }
+          } else if (index == 3) {
+            this.inputOutRelation.inputOption.series[3].data[0].value = item.inputCountValue;
+            this.inputOutRelation.inputOption.series[3].data[0].name = item.input;
+
+            if (item.name.indexOf('-') > 0) {
+              this.inputOutRelation.inputOption.series[3].name = item.name.substring(0, item.name.indexOf('-'));
+              this.inputOutRelation.inputMeterName_4 = item.name.substring(0, item.name.indexOf('-'));
+            } else {
+              this.inputOutRelation.inputOption.series[3].name = item.name;
+              this.inputOutRelation.inputMeterName_4 = item.name;
+            }
+          }
+          else {
+            return;
+          }
+
+
+        });
+      }
+      let inputChart = echarts.init(document.getElementById('inputParam'));
+      inputChart.setOption(this.inputOutRelation.inputOption, true);
     },
-    mounted () {
-      //初始化输出参数
+    _initInputOutParamDiff () {
+      if (this.inputOutRelation.relationList_A.length > 0) {
+        let xAxisData = [];
+        let seriesData_1 = [];
+        let seriesData_2 = [];
+        this.inputOutRelation.relationList_A.forEach((item, index) => {
+          if (item.name.indexOf('-') > 0) {
+            xAxisData.push(item.name.substring(0, item.name.indexOf('-')));
+          } else {
+            xAxisData.push(item.name);
+          }
+
+          let differ = item.input - this.inputOutRelation.relationListBefore_A[index].input;
+          let differPlus = 0;
+          let differMinus = 0;
+
+          if (differ > 0) {
+            differPlus = differ;
+          } else {
+            differMinus = differ;
+          }
+
+          seriesData_1.push({
+            value: item.input,
+            name: differPlus
+          });
+          seriesData_2.push({
+            value: this.inputOutRelation.relationListBefore_A[index].input,
+            name: differMinus
+          });
+        });
+
+        if (xAxisData.length > 0) {
+          this.inputOutRelation.inputOutParamDiffOption.dataZoom[0].startValue = xAxisData[0];
+          if (xAxisData.length >= 5) {
+            this.inputOutRelation.inputOutParamDiffOption.dataZoom[0].endValue = xAxisData[4];
+          } else {
+            this.inputOutRelation.inputOutParamDiffOption.dataZoom[0].endValue = xAxisData[xAxisData.length - 1];
+          }
+        }
+
+        this.inputOutRelation.inputOutParamDiffOption.xAxis.data = xAxisData;
+        this.inputOutRelation.inputOutParamDiffOption.series[0].data = seriesData_1;
+        this.inputOutRelation.inputOutParamDiffOption.series[1].data = seriesData_2;
+      }
+
+
+      let inputOutParamDiffChart = echarts.init(document.getElementById('inputOutParamDiff'));
+      inputOutParamDiffChart.setOption(this.inputOutRelation.inputOutParamDiffOption, true);
+    },
+    _initInputOutRelationMeter () {
+      let myChart_A = echarts.init(document.getElementById('inputOutRelationMeter_A'));
+      myChart_A.setOption(this.inputOutRelation.option_A, true);
+
+      let myChart_B = echarts.init(document.getElementById('inputOutRelationMeter_B'));
+      myChart_B.setOption(this.inputOutRelation.option_B, true);
+    },
+    _initForecastParameter () {
+      this.orgTreeStyle.height = window.innerHeight - 110 + 'px'
+      this.contentDivStyle.height = window.innerHeight - 110 + 'px'
+    },
+    async _handleOnClickOrg (args) {
+      const ogId = args[1];
+      const orgLevel = args[2];
+      const ogName = args[4];
+      clearInterval(this.timingTask);
+      this._refresh();
+      if (orgLevel == 5) {
+        this._setTitle(ogName);
+        await this._selectModelParamList(ogId);
+        await this._selectNewestParameter(ogId, this.tempList[0]);
+        this._selectOutputTable();
+        this._timingTask();
+      }
+
       this._initOutPutParam();
-      //初始化输入参数
       this._initInputParam();
-      //初始化输入输出差值折线图
       this._initInputOutParamDiff();
-      //初始化输入输出仪表关系比对
       this._initInputOutRelationMeter();
 
+
     },
-    beforeDestroy(){
-      clearInterval(this.timingTask);
+    _selectOutputTable(){
+
     },
-    methods: {
-      _getToolTip (params) {
-        return '' + params[0].axisValue + '<br/>预测输出值:' + params[0].data.name + ' <br/>归一化预测输出值: ' + params[0].data.value + '';
-      },
-      _getToolTipByDiff (params) {
-        return '' + params[0].axisValue + '<br/>输入值:' + params[0].data.value + ' <br/>上一次输入值: ' + params[1].data.value + ' <br/> 正差: '+ params[0].data.name +' <br/> 负差: '+ params[1].data.name +'';
-      },
-      _initOutPutParam () {
-        if (this.inputOutRelation.relationList_B.length > 0) {
-          let xAxisData = [];
-          let seriesData_1 = [];
-          let seriesData_2 = [];
-          this.inputOutRelation.relationList_B.forEach((item, index) => {
-            xAxisData.push(item.name);
-            seriesData_1.push({
-              value: item.outputCountValue,
-              name: item.output
-            })
-            seriesData_2.push({
-              value: item.limsOutput,
-            })
-          });
-
-          this.inputOutRelation.outPutOption.xAxis[0].data = xAxisData;
-          this.inputOutRelation.outPutOption.series[0].data = seriesData_1;
-          this.inputOutRelation.outPutOption.series[1].data = seriesData_2;
+    _timingTask () {
+      let index = 0;
+      let that = this;
+      this.timingTask =  setInterval(function () {
+        index++;
+        console.log(index);
+        if (index == 5) {
+          index = 0
         }
-        let OutPutChart = echarts.init(document.getElementById('outPutParam'));
-        OutPutChart.setOption(this.inputOutRelation.outPutOption, true);
-      },
-      _initInputParam () {
-        if (this.inputOutRelation.relationList_A.length > 0) {
-          this.inputOutRelation.relationList_A.forEach((item, index) => {
-            if (index == 0) {
-              this.inputOutRelation.inputOption.series[0].data[0].value = item.inputCountValue;
-              this.inputOutRelation.inputOption.series[0].data[0].name = item.input;
-
-              if (item.name.indexOf('-') > 0) {
-                this.inputOutRelation.inputOption.series[0].name = item.name.substring(0, item.name.indexOf('-'));
-                this.inputOutRelation.inputMeterName_1 = item.name.substring(0, item.name.indexOf('-'));
-              } else {
-                this.inputOutRelation.inputOption.series[0].name = item.name;
-                this.inputOutRelation.inputMeterName_1 = item.name
-              }
-            } else if (index == 1) {
-              this.inputOutRelation.inputOption.series[1].data[0].value = item.inputCountValue;
-              this.inputOutRelation.inputOption.series[1].data[0].name = item.input;
-
-              if (item.name.indexOf('-') > 0) {
-                this.inputOutRelation.inputOption.series[1].name = item.name.substring(0, item.name.indexOf('-'));
-                this.inputOutRelation.inputMeterName_2 = item.name.substring(0, item.name.indexOf('-'));
-              } else {
-                this.inputOutRelation.inputOption.series[1].name = item.name;
-                this.inputOutRelation.inputMeterName_2 = item.name;
-              }
-            } else if (index == 2) {
-              this.inputOutRelation.inputOption.series[2].data[0].value = item.inputCountValue;
-              this.inputOutRelation.inputOption.series[2].data[0].name = item.input;
-
-              if (item.name.indexOf('-') > 0) {
-                this.inputOutRelation.inputOption.series[2].name = item.name.substring(0, item.name.indexOf('-'));
-                this.inputOutRelation.inputMeterName_3 = item.name.substring(0, item.name.indexOf('-'));
-              } else {
-                this.inputOutRelation.inputOption.series[2].name = item.name;
-                this.inputOutRelation.inputMeterName_3 = item.name;
-              }
-            } else if (index == 3) {
-              this.inputOutRelation.inputOption.series[3].data[0].value = item.inputCountValue;
-              this.inputOutRelation.inputOption.series[3].data[0].name = item.input;
-
-              if (item.name.indexOf('-') > 0) {
-                this.inputOutRelation.inputOption.series[3].name = item.name.substring(0, item.name.indexOf('-'));
-                this.inputOutRelation.inputMeterName_4 = item.name.substring(0, item.name.indexOf('-'));
-              } else {
-                this.inputOutRelation.inputOption.series[3].name = item.name;
-                this.inputOutRelation.inputMeterName_4 = item.name;
-              }
+        let node = that.$refs.viewOrgComRef._getCurrentNode();
+        that.inputOutRelation.relationListBefore_A = JSON.parse(JSON.stringify(that.inputOutRelation.relationList_A));
+        that.inputOutRelation.relationListBefore_B = JSON.parse(JSON.stringify(that.inputOutRelation.relationList_B));
+        that._selectNewestParameter(node.ogId, that.tempList[index]);
+        //目前只能模拟定时器传假数据
+      }, 5000);
+    },
+    _onMeterAChange (id) {
+      if(id != ''){
+        for (let i = 0; i < this.inputOutRelation.relationList_A.length; i++) {
+          if (id == this.inputOutRelation.relationList_A[i].id) {
+            let name = this.inputOutRelation.relationList_A[i].name;
+            if (name.indexOf('-') > 0) {
+              name = name.indexOf('-');
             }
-            else {
-              return;
-            }
-
-
-          });
-        }
-        let inputChart = echarts.init(document.getElementById('inputParam'));
-        inputChart.setOption(this.inputOutRelation.inputOption, true);
-      },
-      _initInputOutParamDiff () {
-        if (this.inputOutRelation.relationList_A.length > 0) {
-          let xAxisData = [];
-          let seriesData_1 = [];
-          let seriesData_2 = [];
-          this.inputOutRelation.relationList_A.forEach((item, index) => {
-            if (item.name.indexOf('-') > 0) {
-              xAxisData.push(item.name.substring(0, item.name.indexOf('-')));
-            } else {
-              xAxisData.push(item.name);
-            }
-
-            let differ = item.input - this.inputOutRelation.relationListBefore_A[index].input;
-            let differPlus = 0;
-            let differMinus = 0;
-
-            if (differ > 0) {
-              differPlus = differ;
-            } else {
-              differMinus = differ;
-            }
-
-            seriesData_1.push({
-              value: item.input,
-              name: differPlus
-            });
-            seriesData_2.push({
-              value: this.inputOutRelation.relationListBefore_A[index].input,
-              name: differMinus
-            });
-          });
-
-          if (xAxisData.length > 0) {
-            this.inputOutRelation.inputOutParamDiffOption.dataZoom[0].startValue = xAxisData[0];
-            if (xAxisData.length >= 5) {
-              this.inputOutRelation.inputOutParamDiffOption.dataZoom[0].endValue = xAxisData[4];
-            } else {
-              this.inputOutRelation.inputOutParamDiffOption.dataZoom[0].endValue = xAxisData[xAxisData.length - 1];
-            }
-          }
-
-          this.inputOutRelation.inputOutParamDiffOption.xAxis.data = xAxisData;
-          this.inputOutRelation.inputOutParamDiffOption.series[0].data = seriesData_1;
-          this.inputOutRelation.inputOutParamDiffOption.series[1].data = seriesData_2;
-        }
-
-
-        let inputOutParamDiffChart = echarts.init(document.getElementById('inputOutParamDiff'));
-        inputOutParamDiffChart.setOption(this.inputOutRelation.inputOutParamDiffOption, true);
-      },
-      _initInputOutRelationMeter () {
-        let myChart_A = echarts.init(document.getElementById('inputOutRelationMeter_A'));
-        myChart_A.setOption(this.inputOutRelation.option_A, true);
-
-        let myChart_B = echarts.init(document.getElementById('inputOutRelationMeter_B'));
-        myChart_B.setOption(this.inputOutRelation.option_B, true);
-      },
-      _initForecastParameter () {
-        this.orgTreeStyle.height = window.innerHeight - 110 + 'px'
-        this.contentDivStyle.height = window.innerHeight - 110 + 'px'
-      },
-      async _handleOnClickOrg (args) {
-        const ogId = args[1];
-        const orgLevel = args[2];
-        const ogName = args[4];
-        clearInterval(this.timingTask);
-        this._refresh();
-        if (orgLevel == 5) {
-          this._setTitle(ogName);
-          await this._selectModelParamList(ogId);
-          await this._selectNewestParameter(ogId, this.tempList[0]);
-          this._selectOutputTable();
-          this._timingTask();
-        }
-
-        this._initOutPutParam();
-        this._initInputParam();
-        this._initInputOutParamDiff();
-        this._initInputOutRelationMeter();
-
-
-      },
-      _selectOutputTable(){
-
-      },
-      _timingTask () {
-        let index = 0;
-        let that = this;
-        this.timingTask =  setInterval(function () {
-          index++;
-          console.log(index);
-          if (index == 5) {
-            index = 0
-          }
-          let node = that.$refs.viewOrgComRef._getCurrentNode();
-          that.inputOutRelation.relationListBefore_A = JSON.parse(JSON.stringify(that.inputOutRelation.relationList_A));
-          that.inputOutRelation.relationListBefore_B = JSON.parse(JSON.stringify(that.inputOutRelation.relationList_B));
-          that._selectNewestParameter(node.ogId, that.tempList[index]);
-          //目前只能模拟定时器传假数据
-        }, 5000);
-      },
-      _onMeterAChange (id) {
-        if(id != ''){
-          for (let i = 0; i < this.inputOutRelation.relationList_A.length; i++) {
-            if (id == this.inputOutRelation.relationList_A[i].id) {
-              let name = this.inputOutRelation.relationList_A[i].name;
-              if (name.indexOf('-') > 0) {
-                name = name.indexOf('-');
-              }
-              this._setMerter_A(this.inputOutRelation.relationList_A[i].input, this.inputOutRelation.relationList_A[i].inputCountValue, name);
-              return;
-            }
+            this._setMerter_A(this.inputOutRelation.relationList_A[i].input, this.inputOutRelation.relationList_A[i].inputCountValue, name);
+            return;
           }
         }
-      },
-      _onMeterBChange (id) {
-        if(id != ''){
-          for (let i = 0; i < this.inputOutRelation.relationList_B.length; i++) {
-            if (id == this.inputOutRelation.relationList_B[i].id) {
-              this._setMerter_B(this.inputOutRelation.relationList_B[i].output, this.inputOutRelation.relationList_B[i].outputCountValue, this.inputOutRelation.relationList_B[i].name);
-              return;
-            }
-          }
-        }
-      },
-      _setMerter_A (input, inputCountValue, name) {
-        let myChart_A = echarts.init(document.getElementById('inputOutRelationMeter_A'));
-        this.inputOutRelation.option_A.series[0].data[0].value = inputCountValue;
-        this.inputOutRelation.option_A.series[0].data[0].name = input;
-        this.inputOutRelation.option_A.series[0].name = name;
-        myChart_A.setOption(this.inputOutRelation.option_A, true);
-      },
-      _setMerter_B (input, inputCountValue, name) {
-        let myChart_B = echarts.init(document.getElementById('inputOutRelationMeter_B'));
-        this.inputOutRelation.option_B.series[0].data[0].value = inputCountValue;
-        this.inputOutRelation.option_B.series[0].data[0].name = input;
-        this.inputOutRelation.option_B.series[0].name = name;
-        myChart_B.setOption(this.inputOutRelation.option_B, true);
-      },
-      _refresh () {
-        this._setTitle('预测参数');
-        this.inputOutRelation.code_a = '';
-        this.inputOutRelation.code_b = '';
-        this.inputOutRelation.relationList_A = [];
-        this.inputOutRelation.relationList_B = [];
-        this.inputOutRelation.newestParameterList = [];
-
-        this.inputOutRelation.option_A.series[0].name = '';
-        this.inputOutRelation.option_A.series[0].data[0].value = 0;
-        this.inputOutRelation.option_A.series[0].data[0].name = '0';
-        this.inputOutRelation.option_B.series[0].name = '';
-        this.inputOutRelation.option_B.series[0].data[0].value = 0;
-        this.inputOutRelation.option_B.series[0].data[0].name = '0';
-
-        this.inputOutRelation.outPutOption.xAxis[0].data = [];
-        this.inputOutRelation.outPutOption.series[0].data = [];
-        this.inputOutRelation.outPutOption.series[1].data = [];
-
-        this.inputOutRelation.inputOption.series[0].data[0].value = 0;
-        this.inputOutRelation.inputOption.series[0].data[0].name = '0';
-        this.inputOutRelation.inputOption.series[0].name = '';
-        this.inputOutRelation.inputMeterName_1 = '';
-        this.inputOutRelation.inputOption.series[1].data[0].value = 0;
-        this.inputOutRelation.inputOption.series[1].data[0].name = '0';
-        this.inputOutRelation.inputOption.series[1].name = '';
-        this.inputOutRelation.inputMeterName_2 = '';
-        this.inputOutRelation.inputOption.series[2].data[0].value = 0;
-        this.inputOutRelation.inputOption.series[2].data[0].name = '0';
-        this.inputOutRelation.inputOption.series[2].name = '';
-        this.inputOutRelation.inputMeterName_3 = '';
-        this.inputOutRelation.inputOption.series[3].data[0].value = 0;
-        this.inputOutRelation.inputOption.series[3].data[0].name = '0';
-        this.inputOutRelation.inputOption.series[3].name = '';
-        this.inputOutRelation.inputMeterName_4 = '';
-
-        this.inputOutRelation.inputOutParamDiffOption.xAxis.data = [];
-        this.inputOutRelation.inputOutParamDiffOption.series[0].data = [];
-        this.inputOutRelation.inputOutParamDiffOption.series[1].data = [];
-        this.inputOutRelation.inputOutParamDiffOption.dataZoom[0].startValue = '';
-        this.inputOutRelation.inputOutParamDiffOption.dataZoom[0].endValue = '';
-
-        this.forecastParameterTable.forecastParameterTablePageList = [];
-      },
-      _setTitle (ogName) {
-        this.forecastParameter.title = ogName;
-      },
-      async _selectModelParamList (ogId) {
-        await this.$http({
-          url: '/api/api/modelFeatures/getModelFeaturesList?modelId=' + ogId + '',
-          "content-type": "application/json",
-          method: 'get',
-          /*headers: {Authorization: token},*/
-        }).then(res => {
-          if (res.data.status == 1) {
-            const dataList = res.data.result;
-
-            let relationList_A = [];
-            let relationList_B = [];
-
-            dataList.forEach((item, index) => {
-              if (item.type == '1') {
-                relationList_A.push(item);
-              } else if (item.type == '2') {
-                relationList_B.push(item);
-              }
-            });
-
-            this.inputOutRelation.relationList_A = relationList_A;
-            this.inputOutRelation.relationList_B = relationList_B;
-
-          } else {
-            this.$message({message: res.data.msg, type: 'error'});
-          }
-        })
-      },
-      async _selectNewestParameter (ogId, list) {
-        await this.$http({
-          url: '/api/api/preHistory/getNewestFeatures?modelId=' + ogId + '',
-          "content-type": "application/json",
-          method: 'get',
-          /*headers: {Authorization: token},*/
-        }).then(res => {
-          if (res.data.status == 1) {
-            //const list = res.data.result;
-            //假数据011104010104查询结果
-            /*const list = {
-              "input": ["48.3168830872", "373.334106445", "327.420837402", "4.93264341354", "282.301818848", "309.436004639", "315.953674316", "57.1867294312", "68.1822967529"],
-              "output": ["219.00644", "295.51526", "327.30406", "349.63722", "363.9175"],
-              "dataTime": 1574667658000,
-              "inputCountValue": ["0.22387", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
-              "outputCountValue": ["0.34426", "0.95355", "1.31815", "0.78949", "0.97270"],
-              "actualOutput": null,
-              "actualOutputCV": [],
-              "collectTime": null,
-              "limsOutput": ["99.8", "0.02", "0.10"]
-            };*/
-
-            this.inputOutRelation.newestParameterList = list;
-
-            for (let i = 0; i < this.inputOutRelation.relationList_A.length; i++) {
-              this.inputOutRelation.relationList_A[i].input = list.input[i];
-              this.inputOutRelation.relationList_A[i].inputCountValue = list.inputCountValue[i];
-            }
-
-            for (let i = 0; i < this.inputOutRelation.relationList_B.length; i++) {
-              this.inputOutRelation.relationList_B[i].output = list.output[i];
-              this.inputOutRelation.relationList_B[i].outputCountValue = list.outputCountValue[i];
-              if (list.limsOutput.length - 1 > i) {
-                const limsOutput = (list.limsOutput[i] - this.inputOutRelation.relationList_B[i].minValue) / (this.inputOutRelation.relationList_B[i].maxValue - this.inputOutRelation.relationList_B[i].minValue);
-                this.inputOutRelation.relationList_B[i].limsOutput = limsOutput;
-              } else {
-                this.inputOutRelation.relationList_B[i].limsOutput = 0;
-              }
-            }
-
-            //第一遍正常进入进行赋值
-            if (this.inputOutRelation.relationListBefore_A.length <= 0) {
-              this.inputOutRelation.relationListBefore_A = JSON.parse(JSON.stringify(this.inputOutRelation.relationList_A));
-              this.inputOutRelation.relationListBefore_B = JSON.parse(JSON.stringify(this.inputOutRelation.relationList_B));
-            }
-
-            this.forecastParameterTable.forecastParameterTablePageList = JSON.parse(JSON.stringify(this.inputOutRelation.relationList_B));
-            this._initOutPutParam();
-            this._initInputParam();
-            this._initInputOutParamDiff();
-            this._onMeterAChange(this.inputOutRelation.code_a);
-            this._onMeterBChange(this.inputOutRelation.code_b);
-          } else {
-            this.$message({message: res.data.msg, type: 'error'});
-          }
-        })
       }
+    },
+    _onMeterBChange (id) {
+      if(id != ''){
+        for (let i = 0; i < this.inputOutRelation.relationList_B.length; i++) {
+          if (id == this.inputOutRelation.relationList_B[i].id) {
+            this._setMerter_B(this.inputOutRelation.relationList_B[i].output, this.inputOutRelation.relationList_B[i].outputCountValue, this.inputOutRelation.relationList_B[i].name);
+            return;
+          }
+        }
+      }
+    },
+    _setMerter_A (input, inputCountValue, name) {
+      let myChart_A = echarts.init(document.getElementById('inputOutRelationMeter_A'));
+      this.inputOutRelation.option_A.series[0].data[0].value = inputCountValue;
+      this.inputOutRelation.option_A.series[0].data[0].name = input;
+      this.inputOutRelation.option_A.series[0].name = name;
+      myChart_A.setOption(this.inputOutRelation.option_A, true);
+    },
+    _setMerter_B (input, inputCountValue, name) {
+      let myChart_B = echarts.init(document.getElementById('inputOutRelationMeter_B'));
+      this.inputOutRelation.option_B.series[0].data[0].value = inputCountValue;
+      this.inputOutRelation.option_B.series[0].data[0].name = input;
+      this.inputOutRelation.option_B.series[0].name = name;
+      myChart_B.setOption(this.inputOutRelation.option_B, true);
+    },
+    _refresh () {
+      this._setTitle('预测参数');
+      this.inputOutRelation.code_a = '';
+      this.inputOutRelation.code_b = '';
+      this.inputOutRelation.relationList_A = [];
+      this.inputOutRelation.relationList_B = [];
+      this.inputOutRelation.newestParameterList = [];
+
+      this.inputOutRelation.option_A.series[0].name = '';
+      this.inputOutRelation.option_A.series[0].data[0].value = 0;
+      this.inputOutRelation.option_A.series[0].data[0].name = '0';
+      this.inputOutRelation.option_B.series[0].name = '';
+      this.inputOutRelation.option_B.series[0].data[0].value = 0;
+      this.inputOutRelation.option_B.series[0].data[0].name = '0';
+
+      this.inputOutRelation.outPutOption.xAxis[0].data = [];
+      this.inputOutRelation.outPutOption.series[0].data = [];
+      this.inputOutRelation.outPutOption.series[1].data = [];
+
+      this.inputOutRelation.inputOption.series[0].data[0].value = 0;
+      this.inputOutRelation.inputOption.series[0].data[0].name = '0';
+      this.inputOutRelation.inputOption.series[0].name = '';
+      this.inputOutRelation.inputMeterName_1 = '';
+      this.inputOutRelation.inputOption.series[1].data[0].value = 0;
+      this.inputOutRelation.inputOption.series[1].data[0].name = '0';
+      this.inputOutRelation.inputOption.series[1].name = '';
+      this.inputOutRelation.inputMeterName_2 = '';
+      this.inputOutRelation.inputOption.series[2].data[0].value = 0;
+      this.inputOutRelation.inputOption.series[2].data[0].name = '0';
+      this.inputOutRelation.inputOption.series[2].name = '';
+      this.inputOutRelation.inputMeterName_3 = '';
+      this.inputOutRelation.inputOption.series[3].data[0].value = 0;
+      this.inputOutRelation.inputOption.series[3].data[0].name = '0';
+      this.inputOutRelation.inputOption.series[3].name = '';
+      this.inputOutRelation.inputMeterName_4 = '';
+
+      this.inputOutRelation.inputOutParamDiffOption.xAxis.data = [];
+      this.inputOutRelation.inputOutParamDiffOption.series[0].data = [];
+      this.inputOutRelation.inputOutParamDiffOption.series[1].data = [];
+      this.inputOutRelation.inputOutParamDiffOption.dataZoom[0].startValue = '';
+      this.inputOutRelation.inputOutParamDiffOption.dataZoom[0].endValue = '';
+
+      this.forecastParameterTable.forecastParameterTablePageList = [];
+    },
+    _setTitle (ogName) {
+      this.forecastParameter.title = ogName;
+    },
+    async _selectModelParamList (ogId) {
+      await this.$http({
+        url: '/api/api/modelFeatures/getModelFeaturesList?modelId=' + ogId + '',
+        "content-type": "application/json",
+        method: 'get',
+        /*headers: {Authorization: token},*/
+      }).then(res => {
+        if (res.data.status == 1) {
+          const dataList = res.data.result;
+
+          let relationList_A = [];
+          let relationList_B = [];
+
+          dataList.forEach((item, index) => {
+            if (item.type == '1') {
+              relationList_A.push(item);
+            } else if (item.type == '2') {
+              relationList_B.push(item);
+            }
+          });
+
+          this.inputOutRelation.relationList_A = relationList_A;
+          this.inputOutRelation.relationList_B = relationList_B;
+
+        } else {
+          this.$message({message: res.data.msg, type: 'error'});
+        }
+      })
+    },
+    async _selectNewestParameter (ogId, list) {
+      await this.$http({
+        url: '/api/api/preHistory/getNewestFeatures?modelId=' + ogId + '',
+        "content-type": "application/json",
+        method: 'get',
+        /*headers: {Authorization: token},*/
+      }).then(res => {
+        if (res.data.status == 1) {
+          //const list = res.data.result;
+          //假数据011104010104查询结果
+          /*const list = {
+            "input": ["48.3168830872", "373.334106445", "327.420837402", "4.93264341354", "282.301818848", "309.436004639", "315.953674316", "57.1867294312", "68.1822967529"],
+            "output": ["219.00644", "295.51526", "327.30406", "349.63722", "363.9175"],
+            "dataTime": 1574667658000,
+            "inputCountValue": ["0.22387", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
+            "outputCountValue": ["0.34426", "0.95355", "1.31815", "0.78949", "0.97270"],
+            "actualOutput": null,
+            "actualOutputCV": [],
+            "collectTime": null,
+            "limsOutput": ["99.8", "0.02", "0.10"]
+          };*/
+
+          this.inputOutRelation.newestParameterList = list;
+
+          for (let i = 0; i < this.inputOutRelation.relationList_A.length; i++) {
+            this.inputOutRelation.relationList_A[i].input = list.input[i];
+            this.inputOutRelation.relationList_A[i].inputCountValue = list.inputCountValue[i];
+          }
+
+          for (let i = 0; i < this.inputOutRelation.relationList_B.length; i++) {
+            this.inputOutRelation.relationList_B[i].output = list.output[i];
+            this.inputOutRelation.relationList_B[i].outputCountValue = list.outputCountValue[i];
+            if (list.limsOutput.length - 1 > i) {
+              const limsOutput = (list.limsOutput[i] - this.inputOutRelation.relationList_B[i].minValue) / (this.inputOutRelation.relationList_B[i].maxValue - this.inputOutRelation.relationList_B[i].minValue);
+              this.inputOutRelation.relationList_B[i].limsOutput = limsOutput;
+            } else {
+              this.inputOutRelation.relationList_B[i].limsOutput = 0;
+            }
+          }
+
+          //第一遍正常进入进行赋值
+          if (this.inputOutRelation.relationListBefore_A.length <= 0) {
+            this.inputOutRelation.relationListBefore_A = JSON.parse(JSON.stringify(this.inputOutRelation.relationList_A));
+            this.inputOutRelation.relationListBefore_B = JSON.parse(JSON.stringify(this.inputOutRelation.relationList_B));
+          }
+
+          this.forecastParameterTable.forecastParameterTablePageList = JSON.parse(JSON.stringify(this.inputOutRelation.relationList_B));
+          this._initOutPutParam();
+          this._initInputParam();
+          this._initInputOutParamDiff();
+          this._onMeterAChange(this.inputOutRelation.code_a);
+          this._onMeterBChange(this.inputOutRelation.code_b);
+        } else {
+          this.$message({message: res.data.msg, type: 'error'});
+        }
+      })
     }
   }
+}
 </script>
 
 <style lang="less" scoped>
