@@ -5,7 +5,7 @@
         :data="data"
         ref="tree"
         node-key="id"
-        default-expand-all
+        default-expanded-keys="[1,6]"
         highlight-current
         :props="defaultProps"
         @node-click="handleNodeClick"

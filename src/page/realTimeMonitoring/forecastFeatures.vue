@@ -297,7 +297,7 @@ export default {
         },
         option_B: {
           tooltip: {
-            formatter: '{a} <br/>输出值:{b} ',
+            formatter: '{a} <br/>特征值:{b} ',
           },
           toolbox: {
             feature: {
