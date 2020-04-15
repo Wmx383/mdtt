@@ -197,7 +197,7 @@ export default {
         newestParameterList: [],
         option_A: {
           tooltip: {
-            formatter: '{a} <br/>输入值:{b}'
+            formatter: '{a} <br/>输入值:{b} <br/>归一化输入值: {c}'
           },
           toolbox: {
             feature: {
@@ -297,7 +297,7 @@ export default {
         },
         option_B: {
           tooltip: {
-            formatter: '{a} <br/>输出值:{b} <br/>归一化输出值: {c}',
+            formatter: '{a} <br/>输出值:{b} ',
           },
           toolbox: {
             feature: {
