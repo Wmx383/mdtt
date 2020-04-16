@@ -204,7 +204,7 @@ export default {
         pagination: {
           page_index: 1,  // 当前位于哪页
           total: 0,        // 总数
-          page_size: 5,   // 1页显示多少条
+          page_size: 20,   // 1页显示多少条
           page_sizes: [5, 10, 15, 20],  //每页显示多少条
           layout: "total, sizes, prev, pager, next, jumper"   // 翻页属性
         },
@@ -344,9 +344,9 @@ export default {
       this.exceptionHistory.gridLoading = false;
     },
     async _onChangeDate () {
-      this.$message({message: '此功能敬请开发', type: 'warning'});
-      //await this._selectExceptionHistory();
-      //this._initExceptionHistoryEcharts();
+      //this.$message({message: '此功能敬请开发', type: 'warning'});
+      await this._selectExceptionHistory();
+      this._initExceptionHistoryEcharts();
     },
     async _selectExceptionHistory () {
       this.exceptionHistory.exceptionHistoryAllList = [];
@@ -368,12 +368,12 @@ export default {
     },
     // 每页多少条切换
     _handleSizeChange (page_size) {
-      this.exceptionHistory.exceptionHistoryList.pagination.page_size = page_size;
+      this.exceptionHistory.pagination.page_size = page_size;
       this._selectExceptionHistoryByPaging()
     },
     // 上下分页
     _handleCurrentChange (page) {
-      this.exceptionHistory.exceptionHistoryList.pagination.page_index = page;
+      this.exceptionHistory.pagination.page_index = page;
       this._selectExceptionHistoryByPaging()
     },
   }
