@@ -1,0 +1,777 @@
+<template>
+  <div>
+    <div style="margin-left: 5px; margin-top: 5px">
+      <el-form
+        :inline="true"
+        class="demo-form-inline search-form">
+
+        <el-form-item>
+          <span>选择日期:&nbsp;&nbsp;&nbsp;</span>
+          <el-date-picker
+            v-model="forecastParameterHistoryForm.date"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            unlink-panels
+            value-format="yyyy-MM-dd"
+            @change="_onChangeDate"
+          >
+          </el-date-picker>
+        </el-form-item>
+      </el-form>
+    </div>
+
+    <div id="forecastParameterHistoryEcharts">
+
+    </div>
+
+    <div class="table_container">
+      <el-table
+        v-loading="forecastParameterHistory.gridLoading"
+        :data="forecastParameterHistory.forecastParameterHistoryList"
+        :style="forecastParameterHistory.gridTableStyle"
+        :height="forecastParameterHistory.gridTableStyle.height"
+        align='center'
+        ref="forecastParameterHistoryTable"
+        highlight-current-row
+      >
+        <el-table-column
+          prop="name"
+          label="参数"
+          align='left'
+          min-width="200"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="date"
+          label="时间"
+          align='left'
+          min-width="200"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="data"
+          :label="forecastParameterHistory.columnName"
+          align='left'
+          min-width="200"
+        >
+        </el-table-column>
+      </el-table>
+    </div>
+    <footer class="text_right">
+      <el-button type="primary" size="small" @click="_closeForecastParameterHistoryViewDialog">取消</el-button>
+    </footer>
+  </div>
+
+</template>
+
+<script>
+import moment from 'moment';
+import echarts from 'echarts';
+
+export default {
+  name: "viewForecastParameterHistoryHistory",
+  data () {
+    return {
+      forecastParameterHistoryForm: {
+        date: []
+      },
+      oid: '',
+      forecastParameterHistory: {
+        columnName: '',
+        dataList: [],
+        option: {
+          title: {
+            text: ''
+          },
+          grid: {},
+          tooltip: {
+            formatter: this._getToolTip,
+            trigger: 'axis',
+            axisPointer: {
+              type: 'cross',
+              crossStyle: {
+                color: '#999'
+              }
+            }
+          },
+          toolbox: {
+            feature: {
+              magicType: {show: true, type: ['line', 'bar']},
+              saveAsImage: {show: true}
+            }
+          },
+          legend: {
+            show: true,
+            data: [],
+            top: 20,
+          },
+          dataZoom: [{
+            type: 'inside',
+            start: 0,
+            end: 40,
+          }, {
+            handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+            handleSize: '80%',
+            handleStyle: {
+              color: '#fff',
+              shadowBlur: 3,
+              shadowColor: 'rgba(0, 0, 0, 0.6)',
+              shadowOffsetX: 2,
+              shadowOffsetY: 2
+            }
+          }],
+          xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: []
+          },
+          yAxis: {
+            type: 'value'
+          },
+          series: []
+        },
+        sortNum: 0,
+        gridLoading: false,
+        forecastParameterHistoryAllList: [],
+        forecastParameterHistoryPageList: [],
+        forecastParameterHistoryList: [],
+        gridTableStyle: {
+          width: '100%',
+          height: '100px'
+        },
+        pagination: {
+          page_index: 1,  // 当前位于哪页
+          total: 0,        // 总数
+          page_size: 100,   // 1页显示多少条
+          page_sizes: [20, 50, 100, 150],  //每页显示多少条
+          layout: "total, sizes, prev, pager, next, jumper"   // 翻页属性
+        },
+        selectedDate: [],
+      },
+      modelFeaturesList: [],
+      flag: true,
+      modelId: '',
+      type: ''
+    }
+  },
+  methods: {
+    _getToolTip (params) {
+      let result = '';
+      params.forEach((item, index) => {
+        result += '' + item.seriesName + ':' + item.value + '<br/>';
+      });
+      return result;
+    },
+    async _onChangeDate () {
+      if (this.forecastParameterHistoryForm.date != null) {
+        if (this.type == 'diff') {
+          await this._getInputFeaturesStatistics();
+        } else {
+          await this._selectForecastParameterHistory();
+        }
+
+
+      } else {
+        this._clearEcharts()
+      }
+    },
+    _initForecastParameterHistoryEchartsByOutput () {
+      this.forecastParameterHistory.option.title.text = '输出历史查询';
+      this.forecastParameterHistory.option.xAxis.data = [];
+      this.forecastParameterHistory.option.legend.data = [];
+      this.forecastParameterHistory.option.series = [];
+      //this.forecastParameterHistory.option.series[0].data = [];
+
+      if (this.modelFeaturesList.length > 0) {
+        let legendData = [];
+        this.modelFeaturesList.forEach((item, index) => {
+          if (item.type == '2') {
+            legendData.push(item.name);
+            this.forecastParameterHistory.option.series.push({
+              name: item.name,
+              data: [],
+              type: 'line',
+              smooth: true
+            });
+          }
+        });
+        this.forecastParameterHistory.option.legend.data = legendData;
+      }
+
+      if (this.forecastParameterHistory.dataList.length > 0) {
+
+        let seriesData_0 = [];
+        let xAxisData = [];
+        this.forecastParameterHistory.dataList.forEach((item, index) => {
+          xAxisData.push(index + 1);
+          seriesData_0.push({
+            value: item[1],
+            name: moment(parseInt(item[0])).format('YYYY-MM-DD HH:mm:ss')
+          })
+        });
+
+        this.forecastParameterHistory.option.xAxis.data = xAxisData;
+        this.forecastParameterHistory.option.series[0].data = seriesData_0;
+      }
+
+      let forecastParameterHistoryEcharts = echarts.init(document.getElementById('forecastParameterHistoryEcharts'));
+      forecastParameterHistoryEcharts.setOption(this.forecastParameterHistory.option, true);
+
+      let that = this;
+      forecastParameterHistoryEcharts.on('click', function (params) {
+        that._handleOnclickByOutput(params);
+      })
+    },
+    _initForecastParameterHistoryEchartsByInput () {
+      this.forecastParameterHistory.option.title.text = '输入历史查询';
+      this.forecastParameterHistory.option.xAxis.data = [];
+      this.forecastParameterHistory.option.legend.data = [];
+      this.forecastParameterHistory.option.series = [];
+
+      if (this.modelFeaturesList.length > 0) {
+        let legendData = [];
+        let tooltipText = '';
+        this.modelFeaturesList.forEach((item, index) => {
+          if (item.type == '1') {
+            legendData.push(item.name);
+            this.forecastParameterHistory.option.series.push({
+              name: item.name,
+              data: [],
+              type: 'line',
+              smooth: true
+            });
+          }
+
+
+        });
+        //this.forecastParameterHistory.option.tooltip.formatter = tooltipText;
+        this.forecastParameterHistory.option.legend.data = legendData;
+      }
+
+      if (this.forecastParameterHistory.dataList.length > 0) {
+        let xAxisData = [];
+        this.forecastParameterHistory.dataList.forEach((itemList, index) => {
+          xAxisData.push(index + 1);
+          for (let j = 0; j < this.forecastParameterHistory.option.series.length; j++) {
+            this.forecastParameterHistory.option.series[j].data.push({
+              value: itemList[j + 1],
+              name: moment(parseInt(itemList[0])).format('YYYY-MM-DD HH:mm:ss')
+            });
+          }
+        });
+        this.forecastParameterHistory.option.xAxis.data = xAxisData;
+      }
+
+      let forecastParameterHistoryEcharts = echarts.init(document.getElementById('forecastParameterHistoryEcharts'));
+      forecastParameterHistoryEcharts.setOption(this.forecastParameterHistory.option, true);
+
+      let that = this;
+      forecastParameterHistoryEcharts.on('click', function (params) {
+        that._handleOnclickByOutput(params);
+      })
+    },
+    _initForecastParameterHistoryEchartsByDiff () {
+      this.forecastParameterHistory.option.title.text = '输入差值历史查询';
+      this.forecastParameterHistory.option.xAxis.data = [];
+      this.forecastParameterHistory.option.legend.data = [];
+      this.forecastParameterHistory.option.series = [];
+
+      if (this.modelFeaturesList.length > 0) {
+        let legendData = [];
+        let tooltipText = '';
+        this.modelFeaturesList.forEach((item, index) => {
+          if (item.type == '1') {
+            legendData.push(item.name);
+            this.forecastParameterHistory.option.series.push({
+              name: item.name,
+              data: [],
+              type: 'line',
+              smooth: true
+            });
+          }
+        });
+        this.forecastParameterHistory.option.legend.data = legendData;
+      }
+
+      if (this.forecastParameterHistory.dataList.length > 0) {
+        let xAxisData = [];
+        this.forecastParameterHistory.dataList.forEach((itemList, index) => {
+          xAxisData.push(index + 1);
+          for (let j = 0; j < this.forecastParameterHistory.option.series.length; j++) {
+            this.forecastParameterHistory.option.series[j].data.push({
+              value: itemList[j + 1],
+              name: moment(parseInt(itemList[0])).format('YYYY-MM-DD HH:mm:ss')
+            });
+          }
+        });
+        this.forecastParameterHistory.option.xAxis.data = xAxisData;
+      }
+
+      let forecastParameterHistoryEcharts = echarts.init(document.getElementById('forecastParameterHistoryEcharts'));
+      forecastParameterHistoryEcharts.setOption(this.forecastParameterHistory.option, true);
+
+      let that = this;
+      forecastParameterHistoryEcharts.on('click', function (params) {
+        that._handleOnclickByOutput(params);
+      })
+    },
+    _handleOnclickByOutput (params) {
+      this.forecastParameterHistory.forecastParameterHistoryList = [
+        {
+          name: params.seriesName,
+          date: params.name,
+          data: params.value
+        }
+      ];
+    },
+    async _getModelFeaturesList (modelId, type) {
+      this.modelId = modelId;
+      this.type = type;
+      this.forecastParameterHistory.forecastParameterHistoryAllList = [];
+      await this.$http({
+        url: '/api/api/modelParam/getModelParamList?modelId=' + modelId + '',
+        "content-type": "application/json",
+        method: 'get',
+      }).then(res => {
+        if (res.data.status == 1) {
+          this.modelFeaturesList = res.data.result;
+          if (type == 'output') {
+            this._initForecastParameterHistoryEchartsByOutput();
+          } else if (type == 'input') {
+            this._initForecastParameterHistoryEchartsByInput();
+          } else if (type == 'diff') {
+            this._initForecastParameterHistoryEchartsByDiff();
+          }
+
+        } else {
+          this.$message({message: res.data.msg, type: 'error'});
+        }
+      })
+    },
+    _getDate () {
+      let lastDay = new Date();
+      let seperator1 = '-'
+      lastDay.setTime(lastDay.getTime() - 24 * 60 * 60 * 1000);
+      let lastYear = lastDay.getFullYear();
+      let lastMonth = lastDay.getMonth() + 1
+      let lastStrDate = lastDay.getDate();
+
+      if (lastMonth >= 1 && lastMonth <= 9) {
+        lastMonth = '0' + lastMonth
+      }
+      if (lastStrDate >= 0 && lastStrDate <= 9) {
+        lastStrDate = '0' + lastStrDate
+      }
+
+      let lastDayFormat = lastYear + seperator1 + lastMonth + seperator1 + lastStrDate;
+
+      let date = new Date()
+      let year = date.getFullYear()
+      let month = date.getMonth() + 1
+      let strDate = date.getDate()
+      if (month >= 1 && month <= 9) {
+        month = '0' + month
+      }
+      if (strDate >= 0 && strDate <= 9) {
+        strDate = '0' + strDate
+      }
+      let nowData = year + seperator1 + month + seperator1 + strDate
+      this.forecastParameterHistoryForm.date = [lastDayFormat, nowData]  // 默认赋值一年时间
+    },
+    _getHistoryAlarmInfoListByOrgId (orgId) {
+
+      alert('你点击到了我');
+      /*if(this.flag){
+        this.flag = false;
+
+        this.forecastParameterHistory.gridLoading = true;
+        this.forecastParameterHistory.forecastParameterHistoryPageList = [];
+        this.forecastParameterHistory.forecastParameterHistoryList = [];
+
+        this.$http({
+          url: '/api/api/alarm/getHistoryAlarmInfoListByOrgId?orgId=' + orgId + '&fromTime=' + parseInt(moment((this.forecastParameterHistoryForm.date[0])).format('X') + '000') + '&toTime=' + parseInt(moment((this.forecastParameterHistoryForm.date[1])).format('X') + '000') + '',
+          "content-type": "application/json",
+          method: 'get',
+        }).then(res => {
+          if (res.data.status == 1) {
+            const resultList = res.data.result;
+            let list = [];
+            for (let i = 0; i < resultList.length; i++) {
+              const limit = resultList[i].lowerLimit + "-" + resultList[i].upperLimit;
+              const tableItem = {
+                alarmVal: resultList[i].value,
+                modelName: resultList[i].modelName,
+                alarmType: resultList[i].type == 0 ? '参数异常' : '特征异常',
+                limit: limit,
+                parent: resultList[i].value,
+                alarmDate: moment(resultList[i].dataTime).format('YYYY-MM-DD HH:mm:ss'),
+                status: resultList[i].status,
+                confirmTime: resultList[i].confirmTime == null ? "未确认" : moment(resultList[i].confirmTime).format('YYYY-MM-DD HH:mm:ss'),
+                description: resultList[i].description,
+                reason: resultList[i].reason,
+                id: resultList[i].id,
+                key: resultList[i].id
+              }
+              list.push(tableItem)
+            }
+            this.forecastParameterHistory.forecastParameterHistoryList = list;
+            //模拟分页
+            this._selectForecastParameterHistoryByPaging();
+            this.flag = true;
+          } else {
+            this.$message({message: res.data.msg, type: 'error'});
+            this.flag = true;
+          }
+        })
+      }*/
+
+    },
+    _selectForecastParameterHistoryByPaging () {
+      this.forecastParameterHistory.forecastParameterHistoryPageList = this.forecastParameterHistory.forecastParameterHistoryList.filter((item, index) =>
+        index < this.forecastParameterHistory.pagination.page_index * this.forecastParameterHistory.pagination.page_size && index >= this.forecastParameterHistory.pagination.page_size * (this.forecastParameterHistory.pagination.page_index - 1)
+      );
+      this.forecastParameterHistory.pagination.total = this.forecastParameterHistory.forecastParameterHistoryList.length;
+
+      this.forecastParameterHistory.gridLoading = false;
+    },
+    _clearEcharts () {
+      this.forecastParameterHistory.forecastParameterHistoryList = [];
+      this.forecastParameterHistory.dataList = [];
+      if (this.type == 'output') {
+        this._initForecastParameterHistoryEchartsByOutput();
+      } else if (this.type == 'input') {
+        this._initForecastParameterHistoryEchartsByInput();
+      }else if (this.type == 'diff') {
+        this._initForecastParameterHistoryEchartsByDiff();
+      }
+    },
+    async _selectForecastParameterHistory () {
+      this.forecastParameterHistory.dataList = [];
+      await this.$http({
+        url: '/api/api/preHistory/getFeaturesHistoryListByTime?modelId=' + this.modelId + '&fromTime=' + parseInt(moment((this.forecastParameterHistoryForm.date[0])).format('X') + '000') + '&toTime=' + parseInt(moment((this.forecastParameterHistoryForm.date[1])).format('X') + '000') + '&type=1',
+        "content-type": "application/json",
+        method: 'get',
+      }).then(res => {
+        if (res.data.status == 1) {
+          let dataList = res.data.result.outputData;
+          dataList = {
+            inputData: [
+              ["1565254804000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+              ["1565254819000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+              ["1565254834000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+              ["1565254849000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+              ["1565254864000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+              ["1565254879000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+              ["1565254894000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+              ["1565254909000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+              ["1565254924000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+              ["1565254939000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+              ["1565254954000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565254969000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565254984000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565254999000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255014000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255029000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255044000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255059000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255074000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255089000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255104000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255119000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255134000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255149000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255164000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255179000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255194000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255209000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255224000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255239000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255254000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255269000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255284000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255299000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255314000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255329000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255344000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255359000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255374000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255389000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255404000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255419000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255434000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255449000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255464000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255479000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255494000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+              ["1565255509000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+              ["1565255524000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+              ["1565255539000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+              ["1565255554000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+              ["1565255569000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+              ["1565255584000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+              ["1565255599000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+              ["1565255614000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"]
+
+            ],
+            outputData: [
+              ["1565254804000", "7"],
+              ["1565254819000", "7"],
+              ["1565254834000", "7"],
+              ["1565254849000", "7"],
+              ["1565254864000", "7"],
+              ["1565254879000", "7"],
+              ["1565254894000", "7"],
+              ["1565254909000", "7"],
+              ["1565254924000", "7"],
+              ["1565254939000", "7"],
+              ["1565254954000", "7"],
+              ["1565254969000", "5"],
+              ["1565254984000", "5"],
+              ["1565254999000", "5"],
+              ["1565255014000", "5"],
+              ["1565255029000", "5"],
+              ["1565255044000", "5"],
+              ["1565255059000", "5"],
+              ["1565255074000", "5"],
+              ["1565255089000", "5"],
+              ["1565255104000", "5"],
+              ["1565255119000", "5"],
+              ["1565255134000", "5"],
+              ["1565255149000", "5"],
+              ["1565255164000", "5"],
+              ["1565255179000", "5"],
+              ["1565255194000", "5"],
+              ["1565255209000", "5"],
+              ["1565255224000", "5"],
+              ["1565255239000", "5"],
+              ["1565255254000", "5"],
+              ["1565255269000", "5"],
+              ["1565255284000", "5"],
+              ["1565255299000", "5"],
+              ["1565255314000", "5"],
+              ["1565255329000", "5"],
+              ["1565255344000", "5"],
+              ["1565255359000", "5"],
+              ["1565255374000", "5"],
+              ["1565255389000", "5"],
+              ["1565255404000", "5"],
+              ["1565255419000", "5"],
+              ["1565255434000", "5"],
+              ["1565255449000", "5"],
+              ["1565255464000", "5"],
+              ["1565255479000", "5"],
+              ["1565255494000", "5"],
+              ["1565255509000", "7"],
+              ["1565255524000", "7"],
+              ["1565255539000", "7"],
+              ["1565255554000", "7"],
+              ["1565255569000", "7"],
+              ["1565255584000", "7"],
+              ["1565255599000", "7"],
+              ["1565255614000", "7"],
+              ["1565255629000", "7"],
+              ["1565255644000", "7"],
+              ["1565255659000", "7"],
+              ["1565255674000", "7"],
+              ["1565255689000", "7"],
+              ["1565255704000", "7"],
+              ["1565255719000", "7"],
+              ["1565255734000", "7"],
+              ["1565255749000", "7"],
+              ["1565255764000", "7"],
+              ["1565255779000", "7"],
+              ["1565255794000", "7"],
+              ["1565255809000", "7"],
+              ["1565255824000", "7"],
+              ["1565255839000", "7"],
+              ["1565255854000", "7"],
+              ["1565255869000", "7"],
+              ["1565255884000", "7"],
+              ["1565255899000", "7"],
+              ["1565255914000", "7"],
+              ["1565255929000", "7"],
+              ["1565255944000", "7"],
+              ["1565255959000", "7"],
+              ["1565255974000", "7"],
+              ["1565255989000", "7"],
+              ["1565256004000", "7"],
+              ["1565256019000", "7"],
+              ["1565256034000", "7"],
+              ["1565256049000", "5"],
+              ["1565256064000", "5"],
+              ["1565256079000", "5"],
+              ["1565256094000", "5"],
+              ["1565256109000", "5"],
+              ["1565256124000", "5"],
+              ["1565256139000", "5"],
+              ["1565256154000", "5"],
+              ["1565256169000", "5"],
+              ["1565256184000", "5"],
+              ["1565256199000", "5"],
+              ["1565256214000", "5"],
+              ["1565256229000", "7"],
+              ["1565256244000", "7"],
+              ["1565256259000", "7"],
+              ["1565256274000", "7"],
+              ["1565256289000", "7"],
+              ["1565256304000", "7"],
+              ["1565256319000", "7"],
+              ["1565256334000", "7"],
+              ["1565256349000", "7"],
+              ["1565256364000", "7"],
+              ["1565256379000", "7"],
+              ["1565256394000", "7"],
+              ["1565256409000", "5"],
+              ["1565256424000", "5"],
+              ["1565256439000", "5"],
+              ["1565256454000", "5"],
+              ["1565256469000", "5"],
+              ["1565256484000", "5"],
+              ["1565256499000", "5"],
+              ["1565256514000", "5"],
+              ["1565256529000", "5"],
+              ["1565256544000", "5"],
+              ["1565256559000", "5"],
+              ["1565256574000", "5"],
+              ["1565256589000", "5"],
+              ["1565256604000", "5"],
+              ["1565256619000", "5"],
+              ["1565256634000", "5"],
+              ["1565256649000", "5"],
+              ["1565256664000", "5"],
+              ["1565256679000", "5"],
+              ["1565256694000", "5"],
+              ["1565256709000", "5"],
+              ["1565256724000", "5"],
+              ["1565256739000", "5"],
+              ["1565256754000", "5"],
+              ["1565256769000", "7"],
+              ["1565256784000", "7"],
+              ["1565256799000", "7"],
+              ["1565256814000", "7"],
+              ["1565256829000", "7"],
+              ["1565256844000", "7"],
+              ["1565256859000", "7"],
+              ["1565256874000", "7"],
+              ["1565256889000", "7"],
+              ["1565256904000", "7"],
+              ["1565256919000", "7"],
+              ["1565256934000", "7"],
+              ["1565256949000", "7"],
+              ["1565256964000", "7"],
+              ["1565256979000", "7"],
+              ["1565256994000", "7"],
+              ["1565257009000", "7"],
+              ["1565257024000", "7"],
+              ["1565257039000", "7"],
+              ["1565257054000", "7"],
+              ["1565257069000", "7"]
+            ],
+            actualOutputData: [],
+            limsOutputData: []
+          }
+          //假数据
+          if (this.type == 'output') {
+            this.forecastParameterHistory.dataList = dataList.outputData;
+            this._initForecastParameterHistoryEchartsByOutput();
+          } else if (this.type == 'input') {
+            this.forecastParameterHistory.dataList = dataList.inputData;
+            this._initForecastParameterHistoryEchartsByInput();
+          }
+
+
+        } else {
+          this.$message({message: res.data.msg, type: 'error'});
+        }
+      })
+    },
+    async _getInputFeaturesStatistics () {
+      this.forecastParameterHistory.dataList = [];
+      await this.$http({
+        url: '/api/api/featuresHistory/getInputFeaturesStatistics?modelId=' + this.modelId + '&fromTime=' + parseInt(moment((this.forecastParameterHistoryForm.date[0])).format('X') + '000') + '&toTime=' + parseInt(moment((this.forecastParameterHistoryForm.date[1])).format('X') + '000') + '&type=1',
+        "content-type": "application/json",
+        method: 'get',
+      }).then(res => {
+        if (res.data.status == 1) {
+          let dataList = res.data.result.differenctValue;
+          dataList = [["1565254804000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254819000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254834000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254849000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254864000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254879000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254894000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254909000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254924000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254939000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254954000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565254969000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565254984000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565254999000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255014000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255029000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255044000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255059000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255074000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255089000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255104000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255119000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255134000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255149000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255164000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255179000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255194000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255209000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255224000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255239000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255254000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255269000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255284000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255299000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255314000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255329000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255344000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255359000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255374000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255389000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255404000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255419000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255434000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255449000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255464000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255479000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255494000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255509000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565255524000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565255539000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565255554000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565255569000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565255584000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565255599000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565255614000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"]];
+          this.forecastParameterHistory.dataList = dataList;
+          this._initForecastParameterHistoryEchartsByDiff();
+        } else {
+          this.$message({message: res.data.msg, type: 'error'});
+        }
+      })
+    },
+    _closeForecastParameterHistoryViewDialog () {
+      this.$emit('_closeForecastParameterHistoryViewDialog');
+    }
+  }
+}
+</script>
+
+<style scoped>
+  .text_right {
+    text-align: right;
+  }
+
+  #forecastParameterHistoryEcharts {
+    height: 380px;
+    width: 100%;
+  }
+</style>
