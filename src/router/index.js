@@ -114,6 +114,12 @@ export default new Router({
           component :() => import('@/page/rate/viewQualityRate')
         },
         {
+          path: '/rate/viewOperationRate',
+          name: '操作合格率',
+          hidden : true,
+          component :() => import('@/page/rate/viewOperationRate')
+        },
+        {
           path: '/org/viewOrg',
           name: '树菜单',
           hidden : true,
