@@ -158,12 +158,24 @@ export default {
   },
   methods: {
     _getToolTip (params) {
-      console.log(params);
       let result = '';
-      params.forEach((item, index) =>{
-        result += ''+ item.seriesName  +':'+ item.value +'<br/>';
+      params.forEach((item, index) => {
+        result += '' + item.seriesName + ':' + item.value + '<br/>';
       });
       return result;
+    },
+    async _onChangeDate () {
+      if (this.forecastFeaturesHistoryForm.date != null) {
+        if (this.type = 'diff') {
+          await this._getInputFeaturesStatistics();
+        } else {
+          await this._selectForecastFeaturesHistory();
+        }
+
+
+      } else {
+        this._clearEcharts()
+      }
     },
     _initForecastFeaturesHistoryEchartsByOutput () {
       this.forecastFeaturesHistory.option.title.text = '输出历史查询';
@@ -221,7 +233,6 @@ export default {
       if (this.modelFeaturesList.length > 0) {
         let legendData = [];
         let tooltipText = '';
-        console.log('初始化');
         this.modelFeaturesList.forEach((item, index) => {
           if (item.type == '1') {
             legendData.push(item.name);
@@ -236,6 +247,51 @@ export default {
 
         });
         //this.forecastFeaturesHistory.option.tooltip.formatter = tooltipText;
+        this.forecastFeaturesHistory.option.legend.data = legendData;
+      }
+
+      if (this.forecastFeaturesHistory.dataList.length > 0) {
+        let xAxisData = [];
+        this.forecastFeaturesHistory.dataList.forEach((itemList, index) => {
+          xAxisData.push(index + 1);
+          for (let j = 0; j < this.forecastFeaturesHistory.option.series.length; j++) {
+            this.forecastFeaturesHistory.option.series[j].data.push({
+              value: itemList[j + 1],
+              name: moment(parseInt(itemList[0])).format('YYYY-MM-DD HH:mm:ss')
+            });
+          }
+        });
+        this.forecastFeaturesHistory.option.xAxis.data = xAxisData;
+      }
+
+      let forecastFeaturesHistoryEcharts = echarts.init(document.getElementById('forecastFeaturesHistoryEcharts'));
+      forecastFeaturesHistoryEcharts.setOption(this.forecastFeaturesHistory.option, true);
+
+      let that = this;
+      forecastFeaturesHistoryEcharts.on('click', function (params) {
+        that._handleOnclickByOutput(params);
+      })
+    },
+    _initForecastFeaturesHistoryEchartsByDiff () {
+      this.forecastFeaturesHistory.option.title.text = '输入差值历史查询';
+      this.forecastFeaturesHistory.option.xAxis.data = [];
+      this.forecastFeaturesHistory.option.legend.data = [];
+      this.forecastFeaturesHistory.option.series = [];
+
+      if (this.modelFeaturesList.length > 0) {
+        let legendData = [];
+        let tooltipText = '';
+        this.modelFeaturesList.forEach((item, index) => {
+          if (item.type == '1') {
+            legendData.push(item.name);
+            this.forecastFeaturesHistory.option.series.push({
+              name: item.name,
+              data: [],
+              type: 'line',
+              smooth: true
+            });
+          }
+        });
         this.forecastFeaturesHistory.option.legend.data = legendData;
       }
 
@@ -285,6 +341,8 @@ export default {
             this._initForecastFeaturesHistoryEchartsByOutput();
           } else if (type == 'input') {
             this._initForecastFeaturesHistoryEchartsByInput();
+          } else if (type == 'diff') {
+            this._initForecastFeaturesHistoryEchartsByDiff();
           }
 
         } else {
@@ -378,13 +436,6 @@ export default {
 
       this.forecastFeaturesHistory.gridLoading = false;
     },
-    async _onChangeDate () {
-      if (this.forecastFeaturesHistoryForm.date != null) {
-        await this._selectForecastFeaturesHistory();
-      } else {
-        this._clearEcharts()
-      }
-    },
     _clearEcharts () {
       this.forecastFeaturesHistory.forecastFeaturesHistoryList = [];
       this.forecastFeaturesHistory.dataList = [];
@@ -392,6 +443,8 @@ export default {
         this._initForecastFeaturesHistoryEchartsByOutput();
       } else if (this.type == 'input') {
         this._initForecastFeaturesHistoryEchartsByInput();
+      }else if (this.type == 'diff') {
+        this._initForecastFeaturesHistoryEchartsByDiff();
       }
     },
     async _selectForecastFeaturesHistory () {
@@ -629,6 +682,77 @@ export default {
           }
 
 
+        } else {
+          this.$message({message: res.data.msg, type: 'error'});
+        }
+      })
+    },
+    async _getInputFeaturesStatistics () {
+      this.forecastFeaturesHistory.dataList = [];
+      await this.$http({
+        url: '/api/api/featuresHistory/getInputFeaturesStatistics?modelId=' + this.modelId + '&fromTime=' + parseInt(moment((this.forecastFeaturesHistoryForm.date[0])).format('X') + '000') + '&toTime=' + parseInt(moment((this.forecastFeaturesHistoryForm.date[1])).format('X') + '000') + '&type=1',
+        "content-type": "application/json",
+        method: 'get',
+      }).then(res => {
+        if (res.data.status == 1) {
+          let dataList = res.data.result.differenctValue;
+          dataList = [["1565254804000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254819000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254834000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254849000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254864000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254879000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254894000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254909000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254924000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254939000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254954000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565254969000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565254984000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565254999000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255014000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255029000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255044000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255059000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255074000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255089000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255104000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255119000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255134000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255149000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255164000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255179000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255194000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255209000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255224000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255239000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255254000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255269000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255284000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255299000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255314000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255329000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255344000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255359000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255374000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255389000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255404000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255419000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255434000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255449000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255464000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255479000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255494000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255509000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565255524000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565255539000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565255554000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565255569000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565255584000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565255599000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565255614000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"]];
+          this.forecastFeaturesHistory.dataList = dataList;
+          this._initForecastFeaturesHistoryEchartsByDiff();
         } else {
           this.$message({message: res.data.msg, type: 'error'});
         }
