@@ -197,8 +197,8 @@ export default {
         dialogVisible: true,
         formLabelWidth: '120px',
         width: '1080px',
-        style : {
-          height : '800px',
+        style: {
+          height: '800px',
         }
       },
       forecastParameterTable: {
@@ -435,8 +435,13 @@ export default {
           toolbox: {
             show: true,
             feature: {
-              restore: {show: true},
-              saveAsImage: {show: true}
+              saveAsImage: {show: true},
+              myTool1: {
+                show: true,
+                title: '查看历史',
+                icon: 'path://M525.4 721.2H330.9c-9 0-18.5-7.7-18.5-18.1V311c0-9 9.3-18.1 18.5-18.1h336.6c9.3 0 18.5 9.1 18.5 18.1v232.7c0 6 8.8 12.1 15 12.1 6.2 0 15-6 15-12.1V311c0-25.6-25.3-48.9-50.1-48.9h-335c-26.2 0-50.1 23.3-50.1 48.9v389.1c0 36.3 20 51.5 50.1 51.5h197.6c6.2 0 9.3-7.5 9.3-15.1 0-6-6.2-15.3-12.4-15.3zM378.8 580.6c-6.2 0-12.3 8.6-12.3 14.6s6.2 14.6 12.3 14.6h141.4c6.2 0 12.3-5.8 12.3-13.4 0.3-9.5-6.2-15.9-12.3-15.9H378.8z m251.6-91.2c0-6-6.2-14.6-12.3-14.6H375.7c-6.2 0-12.4 8.6-12.4 14.6s6.2 14.6 12.4 14.6h240.8c6.2 0.1 13.9-8.5 13.9-14.6z m-9.2-120.5H378.8c-6.2 0-12.3 8.6-12.3 14.6s6.2 14.6 12.3 14.6h240.8c7.7 0 13.9-8.6 13.9-14.6s-6.2-14.6-12.3-14.6z m119.4 376.6L709 714.1c9.2-12 14.6-27 14.6-43.2 0-39.4-32.1-71.4-71.8-71.4-39.7 0-71.8 32-71.8 71.4s32.1 71.4 71.8 71.4c16.3 0 31.3-5.4 43.4-14.5l31.6 31.5c3.8 3.8 10 3.8 13.8 0 3.8-3.8 3.8-10 0-13.8z m-88.8-23.6c-28.3 0-51.3-22.8-51.3-51s23-51 51.3-51c28.3 0 51.3 22.8 51.3 51s-23 51-51.3 51z',
+                onclick: this._viewForecastFeaturesHistoryByInput
+              },
             }
           },
           series: [
@@ -773,7 +778,7 @@ export default {
               myTool1: {
                 show: true,
                 title: '查看历史',
-                icon:'path://M525.4 721.2H330.9c-9 0-18.5-7.7-18.5-18.1V311c0-9 9.3-18.1 18.5-18.1h336.6c9.3 0 18.5 9.1 18.5 18.1v232.7c0 6 8.8 12.1 15 12.1 6.2 0 15-6 15-12.1V311c0-25.6-25.3-48.9-50.1-48.9h-335c-26.2 0-50.1 23.3-50.1 48.9v389.1c0 36.3 20 51.5 50.1 51.5h197.6c6.2 0 9.3-7.5 9.3-15.1 0-6-6.2-15.3-12.4-15.3zM378.8 580.6c-6.2 0-12.3 8.6-12.3 14.6s6.2 14.6 12.3 14.6h141.4c6.2 0 12.3-5.8 12.3-13.4 0.3-9.5-6.2-15.9-12.3-15.9H378.8z m251.6-91.2c0-6-6.2-14.6-12.3-14.6H375.7c-6.2 0-12.4 8.6-12.4 14.6s6.2 14.6 12.4 14.6h240.8c6.2 0.1 13.9-8.5 13.9-14.6z m-9.2-120.5H378.8c-6.2 0-12.3 8.6-12.3 14.6s6.2 14.6 12.3 14.6h240.8c7.7 0 13.9-8.6 13.9-14.6s-6.2-14.6-12.3-14.6z m119.4 376.6L709 714.1c9.2-12 14.6-27 14.6-43.2 0-39.4-32.1-71.4-71.8-71.4-39.7 0-71.8 32-71.8 71.4s32.1 71.4 71.8 71.4c16.3 0 31.3-5.4 43.4-14.5l31.6 31.5c3.8 3.8 10 3.8 13.8 0 3.8-3.8 3.8-10 0-13.8z m-88.8-23.6c-28.3 0-51.3-22.8-51.3-51s23-51 51.3-51c28.3 0 51.3 22.8 51.3 51s-23 51-51.3 51z',
+                icon: 'path://M525.4 721.2H330.9c-9 0-18.5-7.7-18.5-18.1V311c0-9 9.3-18.1 18.5-18.1h336.6c9.3 0 18.5 9.1 18.5 18.1v232.7c0 6 8.8 12.1 15 12.1 6.2 0 15-6 15-12.1V311c0-25.6-25.3-48.9-50.1-48.9h-335c-26.2 0-50.1 23.3-50.1 48.9v389.1c0 36.3 20 51.5 50.1 51.5h197.6c6.2 0 9.3-7.5 9.3-15.1 0-6-6.2-15.3-12.4-15.3zM378.8 580.6c-6.2 0-12.3 8.6-12.3 14.6s6.2 14.6 12.3 14.6h141.4c6.2 0 12.3-5.8 12.3-13.4 0.3-9.5-6.2-15.9-12.3-15.9H378.8z m251.6-91.2c0-6-6.2-14.6-12.3-14.6H375.7c-6.2 0-12.4 8.6-12.4 14.6s6.2 14.6 12.4 14.6h240.8c6.2 0.1 13.9-8.5 13.9-14.6z m-9.2-120.5H378.8c-6.2 0-12.3 8.6-12.3 14.6s6.2 14.6 12.3 14.6h240.8c7.7 0 13.9-8.6 13.9-14.6s-6.2-14.6-12.3-14.6z m119.4 376.6L709 714.1c9.2-12 14.6-27 14.6-43.2 0-39.4-32.1-71.4-71.8-71.4-39.7 0-71.8 32-71.8 71.4s32.1 71.4 71.8 71.4c16.3 0 31.3-5.4 43.4-14.5l31.6 31.5c3.8 3.8 10 3.8 13.8 0 3.8-3.8 3.8-10 0-13.8z m-88.8-23.6c-28.3 0-51.3-22.8-51.3-51s23-51 51.3-51c28.3 0 51.3 22.8 51.3 51s-23 51-51.3 51z',
                 onclick: this._viewForecastFeaturesHistoryByOutput
               },
             }
@@ -861,7 +866,7 @@ export default {
             data: [],
             type: 'line',
             areaStyle: {
-              color:'#fff546'
+              color: '#fff546'
             },
             smooth: true
           }, {
@@ -869,7 +874,7 @@ export default {
             data: [],
             type: 'line',
             areaStyle: {
-              color:'#bec4ff'
+              color: '#bec4ff'
             },
             smooth: true
           }]
@@ -939,9 +944,9 @@ export default {
         viewForecastFeaturesLoading: false,
         dialogVisible: true,
         formLabelWidth: '120px',
-        width: window.innerWidth /  3 * 2+ 'px',
-        style : {
-          height : window.innerHeight - 200+ 'px',
+        width: window.innerWidth / 3 * 2 + 'px',
+        style: {
+          height: window.innerHeight - 200 + 'px',
         }
       },
     }
@@ -963,7 +968,7 @@ export default {
     this._initInputOutRelationMeter();
 
   },
-  beforeDestroy(){
+  beforeDestroy () {
     clearInterval(this.timingTask);
   },
   methods: {
@@ -971,7 +976,7 @@ export default {
       return '' + params[0].axisValue + '<br/>预测输出值:' + params[0].data.name + ' <br/>归一化预测输出值: ' + params[0].data.value + '';
     },
     _getToolTipByDiff (params) {
-      return '' + params[0].axisValue + '<br/>输入值:' + params[0].data.value + ' <br/>上一次输入值: ' + params[1].data.value + ' <br/> 正差: '+ params[0].data.name +' <br/> 负差: '+ params[1].data.name +'';
+      return '' + params[0].axisValue + '<br/>输入值:' + params[0].data.value + ' <br/>上一次输入值: ' + params[1].data.value + ' <br/> 正差: ' + params[0].data.name + ' <br/> 负差: ' + params[1].data.name + '';
     },
     _initOutPutParam () {
       if (this.inputOutRelation.relationList_B.length > 0) {
@@ -1136,15 +1141,14 @@ export default {
 
 
     },
-    _selectOutputTable(){
+    _selectOutputTable () {
 
     },
     _timingTask () {
       let index = 0;
       let that = this;
-      this.timingTask =  setInterval(function () {
+      this.timingTask = setInterval(function () {
         index++;
-        console.log(index);
         if (index == 5) {
           index = 0
         }
@@ -1322,7 +1326,7 @@ export default {
         }
       })
     },
-    _viewForecastFeaturesHistoryByOutput(){
+    _viewForecastFeaturesHistoryByOutput () {
       const node = this.$refs.viewOrgComRef._getCurrentNode();
       if (node == null || node.level != 5) {
         this.$message({message: '请选择最底层模型', type: 'warning'});
@@ -1333,11 +1337,26 @@ export default {
       this.viewForecastFeaturesHistory.dialogVisible = true;
       this.$nextTick(_ => {
         //this.$refs.viewForecastFeaturesHistoryRef.getData();
+        this.$refs.viewForecastFeaturesHistoryRef.forecastFeaturesHistory.columnName = '预测输出值';
         this.$refs.viewForecastFeaturesHistoryRef._getModelFeaturesList(node.ogId, 'output');
       });
-
     },
-    _closeForecastFeaturesHistoryViewDialog(){
+    _viewForecastFeaturesHistoryByInput(){
+      const node = this.$refs.viewOrgComRef._getCurrentNode();
+      if (node == null || node.level != 5) {
+        this.$message({message: '请选择最底层模型', type: 'warning'});
+        return;
+      }
+
+      this.viewForecastFeaturesHistory.show = true;
+      this.viewForecastFeaturesHistory.dialogVisible = true;
+      this.$nextTick(_ => {
+        //this.$refs.viewForecastFeaturesHistoryRef.getData();
+        this.$refs.viewForecastFeaturesHistoryRef.forecastFeaturesHistory.columnName = '输入值';
+        this.$refs.viewForecastFeaturesHistoryRef._getModelFeaturesList(node.ogId, 'input');
+      });
+    },
+    _closeForecastFeaturesHistoryViewDialog () {
       this.viewForecastFeaturesHistory.dialogVisible = false;
       this.viewForecastFeaturesHistory.show = false;
     }
