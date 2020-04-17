@@ -85,7 +85,7 @@ export default {
             text: ''
           },
           tooltip: {
-            formatter: '{a} <br/>输入值:{b} <br/>归一化输入值: {c}',
+            formatter: '{a} : {c}',
             trigger: 'axis',
             axisPointer: {
               type: 'cross',
