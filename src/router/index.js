@@ -108,10 +108,10 @@ export default new Router({
           component :() => import('@/page/rate/viewYield')
         },
         {
-          path: '/rate/viewPassRate',
-          name: '合格率',
+          path: '/rate/viewQualityRate',
+          name: '质量合格率',
           hidden : true,
-          component :() => import('@/page/rate/viewPassRate')
+          component :() => import('@/page/rate/viewQualityRate')
         },
         {
           path: '/org/viewOrg',
