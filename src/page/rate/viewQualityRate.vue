@@ -9,7 +9,7 @@
 
       <div
         style="border: 1px solid; border-top-style: none; border-left-style: none; border-right-style: none; border-bottom-color: darkgrey;">
-        <h3 style="margin-left: 2%">合格率统计</h3>
+        <h3 style="margin-left: 2%">质量合格率统计</h3>
       </div>
 
       <div class="table_container">
@@ -22,8 +22,6 @@
           ref="multipleTable"
           highlight-current-row
         >
-          <el-table-column type="selection" width="55">
-          </el-table-column>
           <el-table-column
             prop="startTime"
             label="开始时间"

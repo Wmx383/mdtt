@@ -43,6 +43,7 @@
               <template slot="title"><i class="el-icon-s-data"></i>三率统计</template>
               <el-menu-item index="/rate/viewQualityRate"><i class="el-icon-menu"></i>质量合格率</el-menu-item>
               <el-menu-item index="/rate/viewOperationRate"><i class="el-icon-menu"></i>操作合格率</el-menu-item>
+              <el-menu-item index="/rate/viewOperationStableRate"><i class="el-icon-menu"></i>操作平稳率</el-menu-item>
             </el-submenu>
             <el-menu-item index="/"><i class="el-icon-switch-button"></i>退出登录</el-menu-item>
           </el-menu>

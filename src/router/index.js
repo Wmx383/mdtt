@@ -120,6 +120,12 @@ export default new Router({
           component :() => import('@/page/rate/viewOperationRate')
         },
         {
+          path: '/rate/viewOperationStableRate',
+          name: '操作平稳率',
+          hidden : true,
+          component :() => import('@/page/rate/viewOperationStableRate')
+        },
+        {
           path: '/org/viewOrg',
           name: '树菜单',
           hidden : true,

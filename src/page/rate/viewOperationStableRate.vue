@@ -1,4 +1,4 @@
-<!--操作合格率页面-->
+<!--操作平稳率页面-->
 <template>
   <div>
     <div class="orgTree" :style="orgTreeStyle">
@@ -6,18 +6,17 @@
                   @_handleOnClickOrg="_handleOnClickOrg(arguments)"></viewOrgCom>
     </div>
     <div class="contentDiv" :style="contentDivStyle">
-
       <div
         style="border: 1px solid; border-top-style: none; border-left-style: none; border-right-style: none; border-bottom-color: darkgrey;">
-        <h3 style="margin-left: 2%">操作合格率统计</h3>
+        <h3 style="margin-left: 2%">操作平稳率统计</h3>
       </div>
 
       <div class="table_container">
         <el-table
-          v-loading="operationRate.gridLoading"
-          :data="operationRate.operationRatePageList"
-          :style="operationRate.gridTableStyle"
-          :height="operationRate.gridTableStyle.height"
+          v-loading="operationStableRate.gridLoading"
+          :data="operationStableRate.operationStableRatePageList"
+          :style="operationStableRate.gridTableStyle"
+          :height="operationStableRate.gridTableStyle.height"
           align='center'
           ref="multipleTable"
           highlight-current-row
@@ -38,16 +37,8 @@
           >
           </el-table-column>
           <el-table-column
-            prop="excessNum"
-            label="超标点数"
-            align='left'
-            min-width="300"
-            sortable
-          >
-          </el-table-column>
-          <el-table-column
-            prop="totalNum"
-            label="总点数"
+            prop="avg"
+            label="平稳率"
             align='left'
             min-width="200"
           >
@@ -59,23 +50,16 @@
             min-width="200"
           >
           </el-table-column>
-          <el-table-column
-            prop="rate_HG"
-            label="合格率"
-            align='left'
-            min-width="200"
-          >
-          </el-table-column>
         </el-table>
         <el-row>
           <el-col :span="24">
             <div class="pagination">
               <el-pagination
-                :page-sizes="operationRate.pagination.page_sizes"
-                :page-size="operationRate.pagination.page_size"
-                :layout="operationRate.pagination.layout"
-                :total="operationRate.pagination.total"
-                :current-page='operationRate.pagination.page_index'
+                :page-sizes="operationStableRate.pagination.page_sizes"
+                :page-size="operationStableRate.pagination.page_size"
+                :layout="operationStableRate.pagination.layout"
+                :total="operationStableRate.pagination.total"
+                :current-page='operationStableRate.pagination.page_index'
                 @current-change='_handleCurrentChange'
                 @size-change='_handleSizeChange'>
               </el-pagination>
@@ -94,7 +78,7 @@ import viewOrgCom from "../org/viewOrg.vue";
 import moment from 'moment';
 
 export default {
-  name: "viewOperationRate",
+  name: "viewOperationStableRate",
   components: {viewOrgCom},
   data () {
     return {
@@ -107,12 +91,12 @@ export default {
         height: ''
       },
       idFlag: false,
-      operationRate: {
+      operationStableRate: {
         sortNum: 0,
         gridLoading: false,
-        operationRateAllList: [],
-        operationRatePageList: [],
-        operationRateList: [],
+        operationStableRateAllList: [],
+        operationStableRatePageList: [],
+        operationStableRateList: [],
         gridTableStyle: {
           width: '100%',
           height: window.innerHeight - 205+ 'px'
@@ -143,32 +127,32 @@ export default {
       const orgLevel = args[2];
       const modelType = args[3];
       if (orgLevel == 5) {
-        this._selectOperationRate(orgId, modelType);
+        this._selectOperationStableRate(orgId, modelType);
       }
     },
     _initData () {
       this.orgTreeStyle.height = window.innerHeight - 110 + 'px'
       this.contentDivStyle.height = window.innerHeight - 110 + 'px'
     },
-    async _selectOperationRate (ogId, modelType) {
-      this.operationRate.gridLoading = true;
-      this.operationRate.operationRateAllList = [];
-      this.operationRate.operationRatePageList = [];
-      this.operationRate.operationRateList = [];
+    async _selectOperationStableRate (ogId, modelType) {
+      this.operationStableRate.gridLoading = true;
+      this.operationStableRate.operationStableRateAllList = [];
+      this.operationStableRate.operationStableRatePageList = [];
+      this.operationStableRate.operationStableRateList = [];
       let url = '';
       console.log(modelType);
       if(modelType == 3){
         //特征
-        url = 'featuresRate/countModelQualifiedRate';
+        url = 'featuresRate/countModelStableRate';
       }else{
         //参数
-        url = 'paramRate/countModelQualifiedRate';
+        url = 'paramRate/countModelStableRate';
       }
-      await this._getOperationRateList(ogId, url);
+      await this._getOperationStableRateList(ogId, url);
     },
-    async _getOperationRateList (ogId, url) {
+    async _getOperationStableRateList (ogId, url) {
       await this.$http({
-        url: '/api/api/'+ url +'?modelId=' + ogId + '&fromTime=' + this.initStartDate +'&toTime='+ this.initEndDate +'&isAllDuty=false',
+        url: '/api/api/'+ url +'?modelId=' + ogId + '&fromTime=' + this.initStartDate +'&toTime='+ this.initEndDate +'&isAllDuty=true',
         "content-type": "application/json",
         method: 'get',
       }).then(res => {
@@ -179,43 +163,41 @@ export default {
               let item = {
                 startTime : moment(this.initStartDate).format("YYYY-MM-DD HH:mm:ss"),
                 endTime : moment(this.initEndDate).format("YYYY-MM-DD HH:mm:ss"),
-                excessNum : list[i].excessNum,
-                rate : list[i].rate,
-                totalNum : list[i].totalNum,
-                rate_HG : Math.floor(( 1- list[i].excessNum / list[i].totalNum) * 100000) / 100000 + '%'
+                avg : list[i].avg + '%',
+                rate : list[i].rate + '%',
               }
 
-              this.operationRate.operationRateList.push(item);
+              this.operationStableRate.operationStableRateList.push(item);
             }
           }
           //模拟分页
-          this._selectOperationRateByPaging();
+          this._selectOperationStableRateByPaging();
 
         } else {
           this.$message({message: res.data.msg, type: 'error'});
 
-          this.operationRate.gridLoading = false;
+          this.operationStableRate.gridLoading = false;
         }
       })
     },
     //前端分页
-    _selectOperationRateByPaging () {
-      this.operationRate.operationRatePageList = this.operationRate.operationRateList.filter((item, index) =>
-        index < this.operationRate.pagination.page_index * this.operationRate.pagination.page_size && index >= this.operationRate.pagination.page_size * (this.operationRate.pagination.page_index - 1)
+    _selectOperationStableRateByPaging () {
+      this.operationStableRate.operationStableRatePageList = this.operationStableRate.operationStableRateList.filter((item, index) =>
+        index < this.operationStableRate.pagination.page_index * this.operationStableRate.pagination.page_size && index >= this.operationStableRate.pagination.page_size * (this.operationStableRate.pagination.page_index - 1)
       )
-      this.operationRate.pagination.total = this.operationRate.operationRateList.length;
+      this.operationStableRate.pagination.total = this.operationStableRate.operationStableRateList.length;
 
-      this.operationRate.gridLoading = false;
+      this.operationStableRate.gridLoading = false;
     },
     // 每页多少条切换
     _handleSizeChange (page_size) {
-      this.operationRate.pagination.page_size = page_size
-      this._selectOperationRateByPaging()
+      this.operationStableRate.pagination.page_size = page_size
+      this._selectOperationStableRateByPaging()
     },
     // 上下分页
     _handleCurrentChange (page) {
-      this.operationRate.pagination.page_index = page;
-      this._selectOperationRateByPaging()
+      this.operationStableRate.pagination.page_index = page;
+      this._selectOperationStableRateByPaging()
     },
   }
 }
