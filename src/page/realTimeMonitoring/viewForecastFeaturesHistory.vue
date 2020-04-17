@@ -79,7 +79,7 @@ export default {
       },
       oid: '',
       forecastFeaturesHistory: {
-        columnName : '',
+        columnName: '',
         dataList: [],
         option: {
           title: {
@@ -87,7 +87,7 @@ export default {
           },
           grid: {},
           tooltip: {
-            formatter: '{a} : {c}',
+            formatter: this._getToolTip,
             trigger: 'axis',
             axisPointer: {
               type: 'cross',
@@ -106,7 +106,6 @@ export default {
             show: true,
             data: [],
             top: 20,
-            right: '0',
           },
           dataZoom: [{
             type: 'inside',
@@ -158,6 +157,14 @@ export default {
     }
   },
   methods: {
+    _getToolTip (params) {
+      console.log(params);
+      let result = '';
+      params.forEach((item, index) =>{
+        result += ''+ item.seriesName  +':'+ item.value +'<br/>';
+      });
+      return result;
+    },
     _initForecastFeaturesHistoryEchartsByOutput () {
       this.forecastFeaturesHistory.option.title.text = '输出历史查询';
       this.forecastFeaturesHistory.option.xAxis.data = [];
@@ -174,9 +181,6 @@ export default {
               name: item.name,
               data: [],
               type: 'line',
-              areaStyle: {
-                color: '#fff546'
-              },
               smooth: true
             });
           }
@@ -216,6 +220,8 @@ export default {
 
       if (this.modelFeaturesList.length > 0) {
         let legendData = [];
+        let tooltipText = '';
+        console.log('初始化');
         this.modelFeaturesList.forEach((item, index) => {
           if (item.type == '1') {
             legendData.push(item.name);
@@ -223,13 +229,13 @@ export default {
               name: item.name,
               data: [],
               type: 'line',
-              areaStyle: {
-                color: '#fff546'
-              },
               smooth: true
             });
           }
+
+
         });
+        //this.forecastFeaturesHistory.option.tooltip.formatter = tooltipText;
         this.forecastFeaturesHistory.option.legend.data = legendData;
       }
 
@@ -614,10 +620,10 @@ export default {
             limsOutputData: []
           }
           //假数据
-          if(this.type == 'output'){
+          if (this.type == 'output') {
             this.forecastFeaturesHistory.dataList = dataList.outputData;
             this._initForecastFeaturesHistoryEchartsByOutput();
-          }else if(this.type == 'input'){
+          } else if (this.type == 'input') {
             this.forecastFeaturesHistory.dataList = dataList.inputData;
             this._initForecastFeaturesHistoryEchartsByInput();
           }
