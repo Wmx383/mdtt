@@ -199,7 +199,7 @@ export default {
         exceptionHistoryList: [],
         gridTableStyle: {
           width: '100%',
-          height: window.innerHeight - 350 + 'px'
+          height: 300 + 'px'
         },
         pagination: {
           page_index: 1,  // 当前位于哪页

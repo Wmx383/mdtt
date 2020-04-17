@@ -262,9 +262,9 @@ export default {
         viewExceptionHistoryLoading: false,
         dialogVisible: true,
         formLabelWidth: '120px',
-        width: window.innerWidth /  3 * 2+ 'px',
+        width: '1080px',
         style : {
-          height : window.innerHeight - 200+ 'px',
+          height : '800px',
         }
       },
     }

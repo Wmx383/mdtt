@@ -162,7 +162,7 @@
         <viewForecastFeaturesHistoryCom
           ref="viewForecastFeaturesHistoryRef"
           v-if="viewForecastFeaturesHistory.dialogVisible"
-          @_closeForecastFeaturesViewDialog="_closeForecastFeaturesHistoryViewDialog()"
+          @_closeForecastFeaturesHistoryViewDialog="_closeForecastFeaturesHistoryViewDialog()"
         ></viewForecastFeaturesHistoryCom>
       </template>
     </el-dialog>
@@ -196,9 +196,9 @@ export default {
         viewExceptionHistoryLoading: false,
         dialogVisible: true,
         formLabelWidth: '120px',
-        width: window.innerWidth /  3 * 2+ 'px',
+        width: '1080px',
         style : {
-          height : window.innerHeight - 200+ 'px',
+          height : '800px',
         }
       },
       forecastParameterTable: {
@@ -1332,9 +1332,8 @@ export default {
       this.viewForecastFeaturesHistory.show = true;
       this.viewForecastFeaturesHistory.dialogVisible = true;
       this.$nextTick(_ => {
-        this.$refs.viewForecastFeaturesHistoryRef.getData();
-        this.$refs.viewForecastFeaturesHistoryRef._getModelFeaturesList(node.ogId);
-        this.$refs.viewForecastFeaturesHistoryRef._initForecastFeaturesHistoryEchartsByOutput();
+        //this.$refs.viewForecastFeaturesHistoryRef.getData();
+        this.$refs.viewForecastFeaturesHistoryRef._getModelFeaturesList(node.ogId, 'output');
       });
 
     },
