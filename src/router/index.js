@@ -96,10 +96,10 @@ export default new Router({
           component :() => import('@/page/systemManage/manageOptimization')
         },
         {
-          path: '/rate/manageYieldFormula',
+          path: '/rate/manageExpression',
           name: '收率公式管理',
           hidden : true,
-          component :() => import('@/page/rate/manageYieldFormula')
+          component :() => import('@/page/rate/manageExpression')
         },
         {
           path: '/rate/viewYield',

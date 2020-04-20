@@ -159,8 +159,9 @@
         }
       },
       _initData() {
-        this.orgTreeStyle.height = window.innerHeight - 110 + 'px'
-        this.contentDivStyle.height = window.innerHeight - 110 + 'px'
+        this.orgTreeStyle.height = window.innerHeight - 110 + 'px';
+        this.contentDivStyle.height = window.innerHeight - 110 + 'px';
+
       },
       async _selectDataConfig(ogId) {
         this.numbers = [];

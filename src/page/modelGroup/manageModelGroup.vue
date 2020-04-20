@@ -153,7 +153,7 @@
       </template>
     </el-dialog>
 
-    <!--添加模型组-->
+    <!--修改模型组-->
     <el-dialog
       :title="updateModelGroupDialog.title"
       :visible.sync="updateModelGroupDialog.show"
@@ -420,7 +420,7 @@ export default {
       }
 
       this.$http({
-        url: '/api/api/modelGroup/999/relateModel?modelId=' + nodesList[0].data.ogId + '',
+        url: '/api/api/modelGroup/'+ this.chooseModel.modelId[this.chooseModel.modelId.length - 1] +'/relateModel?modelId=' + nodesList[0].data.ogId + '',
         "content-type": "application/json",
         method: 'put',
         /*headers: {Authorization: token},*/

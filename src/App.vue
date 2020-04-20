@@ -66,6 +66,7 @@
   }
 
   .el-scrollbar__wrap{
+    margin-right: 0px !important;
     margin-bottom: 0px !important;
   }
 

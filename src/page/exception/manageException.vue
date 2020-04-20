@@ -273,7 +273,7 @@ export default {
     this._initException();
     this._selectException();
     this.$nextTick(_ => {
-      this.$refs.viewOrgComRef._getUserRoleOrgTreeByException();
+      this.$refs.viewOrgComRef._getUserRoleOrgTreeByThreeLevel();
     })
   },
   mounted () {
@@ -325,6 +325,7 @@ export default {
       const orgLevel = args[2];
       const ogName = args[4];
       const orgDataList = this.$refs.viewOrgComRef.data;
+      console.log(orgDataList);
       this._getCurrenNodeList(id, orgDataList);
 
       if (this.currentNodeList.level == 3) {

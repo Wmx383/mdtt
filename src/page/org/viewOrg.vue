@@ -27,6 +27,7 @@ export default {
   data () {
     return {
       data: [],
+      dataAllList : [],
       featruesData: [],
       defaultProps: {
         children: 'childList',
@@ -58,7 +59,7 @@ export default {
         }
       })
     },
-    _getUserRoleOrgTreeByException () {
+    _getUserRoleOrgTreeByThreeLevel () {
       this.$http({
         url: "/api/api/user/getUserRoleOrgTree",
         "content-type": "application/json",
@@ -67,7 +68,8 @@ export default {
       }).then(res => {
         if (res.data.status == 1) {
           this.loading = false;
-          let dataList = res.data.result;
+          this.dataAllList =  res.data.result;
+          let dataList = JSON.parse(JSON.stringify(this.dataAllList));
           this._handelData(dataList);
           this.data = dataList;
         } else {
