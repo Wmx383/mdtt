@@ -2,9 +2,9 @@
   <div v-loading.fullscreen.lock="fullscreenLoading">
     <header class="indexDiv">
       <div class="headerTitle">
-        <span class="indexH1">
+        <!--<span class="indexH1">
           <b>D.Perspclre</b>
-        </span>
+        </span>-->
         <!--<h5 class="indexSubTitle">
           全球领先的工业大数据展示平台
         </h5>--></div>
@@ -132,10 +132,11 @@
     top: 0;
     left: 0;
     width: 280px;
-    background-color: white;
+    /*background-color: white;*/
     height: 62px;
     border: 1px solid rgba(0, 21, 41, 0.08);
     border-radius: 3px;
+    background: url("../images/logo4.png") no-repeat center;
   }
 
   .headerNavigation {

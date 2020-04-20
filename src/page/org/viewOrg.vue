@@ -20,103 +20,101 @@
 </template>
 
 <script>
-import * as utils from '../../utils/utils'
+  import * as utils from '../../utils/utils'
 
-export default {
-  name: "viewOrg",
-  data () {
-    return {
-      data: [],
-      dataAllList : [],
-      featruesData: [],
-      defaultProps: {
-        children: 'childList',
-        label: 'ogName'
+  export default {
+    name: "viewOrg",
+    data () {
+      return {
+        data: [],
+        featruesData: [],
+        defaultProps: {
+          children: 'childList',
+          label: 'ogName'
+        },
+        loading: true
+      }
+    },
+    methods: {
+      handleNodeClick (data) {
+        this.$emit('_handleOnClickOrg', data.id, data.ogId, data.level, data.modelType, data.ogName);
       },
-      loading: true
-    }
-  },
-  methods: {
-    handleNodeClick (data) {
-      this.$emit('_handleOnClickOrg', data.id, data.ogId, data.level, data.modelType, data.ogName);
-    },
-    _getCurrentNode () {
-      return this.$refs.tree.getCurrentNode();
-    },
-    _getUserRoleOrgTree () {
-      this.$http({
-        url: "/api/api/user/getUserRoleOrgTree",
-        "content-type": "application/json",
-        method: 'get',
-        /*headers: {Authorization: token},*/
-      }).then(res => {
-        if (res.data.status == 1) {
-          this.loading = false;
-          this.data = res.data.result;
-        } else {
-          //TO-DO 临时先这么写提醒吧 哈哈哈哈
-          this.$message({message: res.data.msg, type: 'error'});
-        }
-      })
-    },
-    _getUserRoleOrgTreeByThreeLevel () {
-      this.$http({
-        url: "/api/api/user/getUserRoleOrgTree",
-        "content-type": "application/json",
-        method: 'get',
-        /*headers: {Authorization: token},*/
-      }).then(res => {
-        if (res.data.status == 1) {
-          this.loading = false;
-          this.dataAllList =  res.data.result;
-          let dataList = JSON.parse(JSON.stringify(this.dataAllList));
-          this._handelData(dataList);
-          this.data = dataList;
-        } else {
-          this.$message({message: res.data.msg, type: 'error'});
-        }
-      })
-    },
-    _getUserRoleOrgTreeByFeatures () {
-      this.$http({
-        url: "/api/api/user/getUserRoleOrgTree",
-        "content-type": "application/json",
-        method: 'get',
-        /*headers: {Authorization: token},*/
-      }).then(res => {
-        if (res.data.status == 1) {
-          this.loading = false;
-          let dataList = res.data.result;
-          let forecastFeaturesDataList = [];
-          let features = {};
-          for (let i = 0; i < dataList.length; i++) {
-            features = {
-              id: dataList[i].id,
-              ogName: dataList[i].ogName,
-              parentId: dataList[i].parentId,
-              ogId: dataList[i].ogId,
-              status: dataList[i].status,
-              level: dataList[i].level,
-              modelType: dataList[i].modelType,
-              modelGroupId: dataList[i].modelGroupId,
-              modelGroupName: dataList[i].modelGroupName,
-              childList: []
-            };
-            this._handleForecast(features, dataList[i].childList);
-            forecastFeaturesDataList.push(features);
+      _getCurrentNode () {
+        return this.$refs.tree.getCurrentNode();
+      },
+      _getUserRoleOrgTree () {
+        this.$http({
+          url: "/api/api/user/getUserRoleOrgTree",
+          "content-type": "application/json",
+          method: 'get',
+          /*headers: {Authorization: token},*/
+        }).then(res => {
+          if (res.data.status == 1) {
+            this.loading = false;
+            this.data = res.data.result;
+          } else {
+            //TO-DO 临时先这么写提醒吧 哈哈哈哈
+            this.$message({message: res.data.msg, type: 'error'});
           }
+        })
+      },
+      _getUserRoleOrgTreeByException () {
+        this.$http({
+          url: "/api/api/user/getUserRoleOrgTree",
+          "content-type": "application/json",
+          method: 'get',
+          /*headers: {Authorization: token},*/
+        }).then(res => {
+          if (res.data.status == 1) {
+            this.loading = false;
+            let dataList = res.data.result;
+            this._handelData(dataList);
+            this.data = dataList;
+          } else {
+            this.$message({message: res.data.msg, type: 'error'});
+          }
+        })
+      },
+      _getUserRoleOrgTreeByFeatures () {
+        this.$http({
+          url: "/api/api/user/getUserRoleOrgTree",
+          "content-type": "application/json",
+          method: 'get',
+          /*headers: {Authorization: token},*/
+        }).then(res => {
+          if (res.data.status == 1) {
+            this.loading = false;
+            let dataList = res.data.result;
+            let forecastFeaturesDataList = [];
+            let features = {};
+            for (let i = 0; i < dataList.length; i++) {
+              features = {
+                id: dataList[i].id,
+                ogName: dataList[i].ogName,
+                parentId: dataList[i].parentId,
+                ogId: dataList[i].ogId,
+                status: dataList[i].status,
+                level: dataList[i].level,
+                modelType: dataList[i].modelType,
+                modelGroupId: dataList[i].modelGroupId,
+                modelGroupName: dataList[i].modelGroupName,
+                childList: []
+              };
+              this._handleForecast(features, dataList[i].childList);
+              forecastFeaturesDataList.push(features);
+            }
 
-          this.data = forecastFeaturesDataList;
-        } else {
-          this.$message({message: res.data.msg, type: 'error'});
-        }
-      })
-    },
-    _handleForecast (features, dataList) {
-      let childDataList = [];
-      let childList = {};
-      for (let i = 0; i < dataList.length; i++) {
-        if (dataList[i].level == 5 ) {
+            this.data = forecastFeaturesDataList;
+          } else {
+            this.$message({message: res.data.msg, type: 'error'});
+          }
+        })
+      },
+      _handleForecast (features, dataList) {
+        let childDataList = [];
+        let childList = {};
+        for (let i = 0; i < dataList.length; i++) {
+          if (dataList[i].level == 5 ) {
             if(dataList[i].modelType == 3){
               childList = {
                 id: dataList[i].id,
@@ -131,40 +129,40 @@ export default {
               };
               childDataList.push(childList);
             }
-        }else{
-          childList = {
-            id: dataList[i].id,
-            ogName: dataList[i].ogName,
-            parentId: dataList[i].parentId,
-            ogId: dataList[i].ogId,
-            status: dataList[i].status,
-            level: dataList[i].level,
-            modelType: dataList[i].modelType,
-            modelGroupId: dataList[i].modelGroupId,
-            modelGroupName: dataList[i].modelGroupName,
-            childList: []
-          };
-          if(dataList[i].childList.length > 0){
-            childDataList.push(childList);
-            this._handleForecast(childList, dataList[i].childList);
+          }else{
+            childList = {
+              id: dataList[i].id,
+              ogName: dataList[i].ogName,
+              parentId: dataList[i].parentId,
+              ogId: dataList[i].ogId,
+              status: dataList[i].status,
+              level: dataList[i].level,
+              modelType: dataList[i].modelType,
+              modelGroupId: dataList[i].modelGroupId,
+              modelGroupName: dataList[i].modelGroupName,
+              childList: []
+            };
+            if(dataList[i].childList.length > 0){
+              childDataList.push(childList);
+              this._handleForecast(childList, dataList[i].childList);
+            }
+
           }
+        }
+        features.childList = childDataList;
+      },
+      _handelData (dataList) {
+        for (let i = 0; i < dataList.length; i++) {
+          if (dataList[i].level < 3) {
+            this._handelData(dataList[i].childList);
+          } else if (dataList[i].level == 3) {
+            dataList[i].childList = [];
+          }
+        }
+      },
+    }
 
-        }
-      }
-      features.childList = childDataList;
-    },
-    _handelData (dataList) {
-      for (let i = 0; i < dataList.length; i++) {
-        if (dataList[i].level < 3) {
-          this._handelData(dataList[i].childList);
-        } else if (dataList[i].level == 3) {
-          dataList[i].childList = [];
-        }
-      }
-    },
   }
-
-}
 </script>
 
 <style lang="less" scoped>
