@@ -14,8 +14,8 @@
 
           <el-form-item>
             <el-button type="primary" size="small" @click="_preInsertExpression">添加</el-button>
-            <el-button type="primary" size="small" @click="_handleUpdateModelParamDisplay">修改</el-button>
-            <el-button type="primary" size="small" @click="_handleUpdateModelParamDisplay">删除</el-button>
+            <el-button type="primary" size="small" @click="_preUpdateExpression">修改</el-button>
+            <el-button type="primary" size="small" @click="_deleteExpression">删除</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -29,6 +29,7 @@
           align='center'
           ref="multipleTable"
           highlight-current-row
+          @row-click="_clickRow"
         >
           <el-table-column
             prop="name"
@@ -79,16 +80,35 @@
                              @closeInsertExpressionDialog="closeInsertExpressionDialog()"></insertExpressionCom>
       </template>
     </el-dialog>
+
+    <!--修改公式-->
+    <el-dialog
+      :title="updateExpressionDialog.title"
+      :visible.sync="updateExpressionDialog.show"
+      :close-on-click-modal='false'
+      :close-on-press-escape='false'
+      :modal-append-to-body="false"
+      :modal="false"
+      :width="updateExpressionDialog.width"
+      @close="closeUpdateExpressionDialog"
+    >
+      <template>
+        <updateExpressionCom ref="updateExpressionRef" v-if="updateExpressionDialog.dialogVisible"
+                             @updateExpressionListeners="_completeUpdateExpression"
+                             @closeUpdateExpressionDialog="closeUpdateExpressionDialog()"></updateExpressionCom>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import viewOrgCom from "../org/viewOrg.vue";
 import insertExpressionCom from './preInsertExpression.vue';
+import updateExpressionCom from './preUpdateExpression.vue';
 
 export default {
   name: "manageExpression",
-  components: {viewOrgCom, insertExpressionCom},
+  components: {viewOrgCom, insertExpressionCom, updateExpressionCom},
   data () {
     return {
       idFlag: false,
@@ -133,14 +153,13 @@ export default {
         insertExpressionDialogLoading: false,
         dialogVisible: true,
         formLabelWidth: '120px',
-        width: '500px'
+        width: '800px'
       },
-      currentNodeList : []
+      currentNodeList: []
     }
   },
   created () {
     this._initExpression();
-    this._selectExpression();
     this.$nextTick(_ => {
       this.$refs.viewOrgComRef._getUserRoleOrgTreeByThreeLevel();
     });
@@ -169,10 +188,22 @@ export default {
       this.insertExpressionDialog.show = true;
       this.insertExpressionDialog.dialogVisible = true;
       this.$nextTick(_ => {
-        this.$refs.insertExpressionRef._initInsertExpression( node.ogId, this.currentNodeList);
+        this.$refs.insertExpressionRef._initInsertExpression(node.ogId, this.currentNodeList);
       });
     },
-    _getModelList(id, orgDataList){
+    _preUpdateExpression () {
+      if (JSON.stringify(this.expression.selectedDate) === '{}') {
+        this.$message({message: '请选择一条数据...', type: 'warning'});
+        return;
+      }
+
+      this.updateExpressionDialog.show = true;
+      this.updateExpressionDialog.dialogVisible = true;
+      this.$nextTick(_ => {
+        this.$refs.updateExpressionRef._initUpdateExpression(this.expression.selectedDate);
+      });
+    },
+    _getModelList (id, orgDataList) {
       for (let i = 0; i < orgDataList.length; i++) {
         if (id == orgDataList[i].id) {
           this.currentNodeList.push(orgDataList[i]);
@@ -182,35 +213,32 @@ export default {
         }
       }
     },
-    _setNewModelList(currentNodeList){
-      for(let i = 0; i<currentNodeList.length; i++){
-        if(currentNodeList[i].level == 5){
-          for(let j = 0; j< this.modelParamList.length; j++){
-            if(currentNodeList[i].ogId == this.modelParamList[j].modelId){
-              if(!currentNodeList[i].childList){
+    _setNewModelList (currentNodeList) {
+      for (let i = 0; i < currentNodeList.length; i++) {
+        if (currentNodeList[i].level == 5) {
+          for (let j = 0; j < this.modelParamList.length; j++) {
+            if (currentNodeList[i].ogId == this.modelParamList[j].modelId) {
+              if (!currentNodeList[i].childList) {
                 currentNodeList[i].childList = [];
               }
               currentNodeList[i].childList.push({
-                id : this.modelParamList[j].id,
-                ogId : this.modelParamList[j].id,
-                ogName :  this.modelParamList[j].name,
-                formatIdName : this.modelParamList[j].id + '-' +  this.modelParamList[j].name
+                id: this.modelParamList[j].id,
+                ogId: this.modelParamList[j].id,
+                ogName: this.modelParamList[j].name,
+                formatIdName: this.modelParamList[j].id + '-' + this.modelParamList[j].name
               })
             }
-            if(j == this.modelParamList.length - 1 && currentNodeList[i].childList == null){
+            if (j == this.modelParamList.length - 1 && currentNodeList[i].childList == null) {
               currentNodeList[i].disabled = true;
             }
           }
-        }else{
+        } else {
           this._setNewModelList(currentNodeList[i].childList)
         }
       }
     },
     _selectExpression (ogId) {
       this.expression.gridLoading = true;
-      this.expression.expressionAllList = [];
-      this.expression.expressionPageList = [];
-      this.expression.expressionList = [];
 
       this.$http({
         url: '/api/api/expression/getExpressionList?roomId=' + ogId + '',
@@ -223,6 +251,7 @@ export default {
             let tableItem = {
               id: item.id,
               name: item.name,
+              expressionOld: item.expression,
               expression: this._getExpressionName(item.expression, 1),
               roomId: item.roomId,
               typeId: item.typeId,
@@ -282,6 +311,12 @@ export default {
         this._selectExpression(ogId);
       }
     },
+    _clearData () {
+      this.expression.selectedDate = {};
+      this.expression.expressionAllList = [];
+      this.expression.expressionPageList = [];
+      this.expression.expressionList = [];
+    },
     // 每页多少条切换
     _handleSizeChange (page_size) {
       this.expression.pagination.page_size = page_size
@@ -292,10 +327,30 @@ export default {
       this.expression.pagination.page_index = page;
       this._selectExpressionByPaging()
     },
-    _clearData () {
+    _deleteExpression () {
+      if (JSON.stringify(this.expression.selectedDate) === '{}') {
+        this.$message({message: '请选择一条数据...', type: 'warning'});
+        return;
+      }
 
-    },
-    _handleUpdateModelParamDisplay () {
+      this.$http({
+        url: '/api/api/expression/deleteExpression?id=' + this.expression.selectedDate.id + '',
+        "content-type": "application/json",
+        method: 'DELETE',
+        /*headers: {Authorization: token},*/
+      }).then(res => {
+        if (res.data.status == '1') {
+          this.$message({message: '操作成功', type: 'success'});
+          this._clearData();
+          this._selectExpression(this.$refs.viewOrgComRef._getCurrentNode().ogId);
+
+        } else {
+          this.$message({message: res.data.msg, type: 'error'});
+        }
+      }, error => {
+        this.$message({message: '系统错误', type: 'error'});
+      })
+
 
     },
     _getExpressionName (expression, type) {
@@ -347,8 +402,21 @@ export default {
       this.insertExpressionDialog.show = false;
     },
     _completeInsertExpression () {
+      this._clearData();
       this._selectExpression(this.$refs.viewOrgComRef._getCurrentNode().ogId);
     },
+    closeUpdateExpressionDialog () {
+      this.updateExpressionDialog.dialogVisible = false;
+      this.updateExpressionDialog.show = false;
+    },
+    _completeUpdateExpression () {
+      this._clearData();
+      this._selectExpression(this.$refs.viewOrgComRef._getCurrentNode().ogId);
+    },
+    _clickRow (row) {
+      this.expression.selectedDate = row;
+    },
+
   }
 }
 </script>

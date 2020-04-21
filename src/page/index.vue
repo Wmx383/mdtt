@@ -37,7 +37,7 @@
             <el-submenu index="5">
               <template slot="title"><i class="el-icon-s-promotion"></i>收率</template>
               <el-menu-item index="/rate/manageExpression"><i class="el-icon-menu"></i>收率公式管理</el-menu-item>
-              <el-menu-item index="/rate/viewYield"><i class="el-icon-menu"></i>收率展示</el-menu-item>
+              <el-menu-item index="/rate/viewExpression"><i class="el-icon-menu"></i>收率展示</el-menu-item>
             </el-submenu>
             <el-submenu index="6">
               <template slot="title"><i class="el-icon-s-data"></i>三率统计</template>

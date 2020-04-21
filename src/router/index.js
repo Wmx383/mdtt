@@ -102,10 +102,10 @@ export default new Router({
           component :() => import('@/page/rate/manageExpression')
         },
         {
-          path: '/rate/viewYield',
+          path: '/rate/viewExpression',
           name: '收率展示',
           hidden : true,
-          component :() => import('@/page/rate/viewYield')
+          component :() => import('@/page/rate/viewExpression')
         },
         {
           path: '/rate/viewQualityRate',
