@@ -46,6 +46,7 @@
               :props="defaultProps"
               style="width: 97%"
               filterable
+              :change-on-select="false"
               @change="_onChangeModel(item.id, index)"
             >
             </el-cascader>
@@ -125,7 +126,7 @@ export default {
     },
     _addParam () {
       this.insertExpressionForm.formList.push({
-        id: '',
+        id:  '',
         operator: '',
         isOperator: false //不是运算符
       })
@@ -143,6 +144,9 @@ export default {
     },
     _onChangeModel(a, b){
       this._setFormula();
+      console.log('A');
+      console.log(this.insertExpressionForm.formList);
+      console.log('B');
     },
     _onChangeOperator(){
       this._setFormula();
