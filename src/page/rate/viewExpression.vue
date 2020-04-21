@@ -177,6 +177,8 @@ export default {
 
       if (orgLevel == 3) {
         this._selectExpression(ogId);
+      }else{
+        this._initEcharts ();
       }
     },
     _clearData () {
