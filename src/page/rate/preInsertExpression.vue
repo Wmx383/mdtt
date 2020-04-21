@@ -46,7 +46,6 @@
               :props="defaultProps"
               style="width: 97%"
               filterable
-              :change-on-select="false"
               @change="_onChangeModel(item.id, index)"
             >
             </el-cascader>
@@ -102,7 +101,8 @@ export default {
       defaultProps: {
         children: 'childList',
         label: 'ogName',
-        value: 'formatIdName'
+        value : 'id'
+        //value: 'formatIdName'
       },
       operatorList: [{
         name: '+'
@@ -128,8 +128,14 @@ export default {
       this.insertExpressionForm.formList.push({
         id:  '',
         operator: '',
+        labelName : '',
         isOperator: false //不是运算符
       })
+
+      //假设
+     /* console.log('赋值默认开始');
+      this.insertExpressionForm.formList[0].id = [10, 11, 142, 687];
+      console.log('赋值默认结束');*/
     },
     _addOperator () {
       this.insertExpressionForm.formList.push({
@@ -142,11 +148,23 @@ export default {
       this.insertExpressionForm.formList.splice(index, 1);
       this._setFormula();
     },
-    _onChangeModel(a, b){
+    _onChangeModel(idList, index){
+      this._setLabelNameById(idList[idList.length - 1], index, this.treeDataList);
       this._setFormula();
-      console.log('A');
-      console.log(this.insertExpressionForm.formList);
-      console.log('B');
+    },
+    _setLabelNameById(id, index, dataList){
+      if(dataList){
+        for(let i = 0; i < dataList.length; i++){
+          if(dataList[i].level == 6){
+            if(id == dataList[i].id){
+              this.insertExpressionForm.formList[index].labelName = dataList[i].ogName;
+              return;
+            }
+          }else{
+            this._setLabelNameById(id, index, dataList[i].childList)
+          }
+        }
+      }
     },
     _onChangeOperator(){
       this._setFormula();
@@ -160,11 +178,9 @@ export default {
           expression += this.insertExpressionForm.formList[i].operator;
         }else{
           if(this.insertExpressionForm.formList[i].id != ''){
-            console.log(this.insertExpressionForm.formList[i].id);
             let id = this.insertExpressionForm.formList[i].id[this.insertExpressionForm.formList[i].id.length - 1];
-            let index = id.indexOf('-');
-            let expressionId = 'param' + id.substring(0, index);
-            let name = id.substring(index + 1, id.length);
+            let expressionId = 'param' + id;
+            let name = this.insertExpressionForm.formList[i].labelName;
             formula += name;
             expression += expressionId;
           }

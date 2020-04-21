@@ -91,6 +91,8 @@ export default {
   data () {
     return {
       idFlag: false,
+      tempIdList : [],
+      tempOgName : '',
       updateExpressionForm: {
         id : '',
         name: '',
@@ -104,7 +106,7 @@ export default {
       defaultProps: {
         children: 'childList',
         label: 'ogName',
-        value: 'formatIdName'
+        value: 'id'
       },
       operatorList: [{
         name: '+'
@@ -122,20 +124,96 @@ export default {
     }
   },
   methods: {
-    _initUpdateExpression (data) {
+    _initUpdateExpression (dataList, data) {
+      this.treeDataList = dataList;
+      this.updateExpressionForm.name = data.name;
       this.updateExpressionForm.formula = data.expression;
       this.updateExpressionForm.id = data.id;
-      console.log(data.expression);
-      console.log(data.expressionOld);
       let str = data.expressionOld;
       let result =  str.replace(/param/g, '');
-      console.log(result.length);
-      console.log(result);
+      let strList = this._verifyData(result);
+      this.updateExpressionForm.formList = strList;
+      this._setFormula();
+    },
+    _verifyData(result){
+      let regNum = '^[0-9]*$';
+      let partenNum = new RegExp(regNum);
+      let index = 0;
+      let strList = [];
+      let strIndex = 0;
+      for(let i = 0; i < result.length; i++){
+        if(partenNum.test(result[i])){
+          if(i == result.length - 1){
+            this.tempIdList = [];
+            this.tempOgName = '';
+            this._getLabelNameById([], result.substring(strIndex, i + 1), this.treeDataList);
+            let idList  = JSON.parse(JSON.stringify(this.tempIdList));
+            let item = {
+              id:  idList,
+              operator: '',
+              labelName : this.tempOgName,
+              isOperator: false //不是运算符
+            };
+            strList.push(item);
+          }
+          index++;
+        }else{
+          if(index != 0){
+            this.tempIdList = [];
+            this.tempOgName = '';
+            this._getLabelNameById([], result.substring(strIndex, i), this.treeDataList);
+            let idList  = JSON.parse(JSON.stringify(this.tempIdList));
+            let item = {
+              id:  idList,
+              operator: '',
+              labelName : this.tempOgName,
+              isOperator: false //不是运算符
+            };
+            strIndex = strIndex + index;
+            strList.push(item);
+          }
+          let item = {
+            id:  '',
+            operator: result[i],
+            labelName : '',
+            isOperator: true //是运算符
+          };
+          strIndex++;
+          strList.push(item);
+          index = 0;
+        }
+      }
+
+      return strList;
+
+    },
+    _getLabelNameById(idList, id, dataList){
+      if(dataList){
+        for(let i = 0; i < dataList.length; i++){
+          if(dataList[i].level < 6){
+            idList.push(dataList[i].id);
+          }
+
+          if(dataList[i].level == 6){
+            if(id == dataList[i].id){
+              idList.push(dataList[i].id);
+              this.tempIdList = JSON.parse(JSON.stringify(idList));
+              this.tempOgName = dataList[i].ogName;
+              return;
+            }else if(i == dataList.length - 1){
+              idList = [];
+            }
+          }else{
+            this._getLabelNameById(idList, id,dataList[i].childList)
+          }
+        }
+      }
     },
     _addParam () {
       this.updateExpressionForm.formList.push({
         id: '',
         operator: '',
+        labelName : '',
         isOperator: false //不是运算符
       })
     },
@@ -143,6 +221,7 @@ export default {
       this.updateExpressionForm.formList.push({
         id: '',
         operator: '',
+        labelName : '',
         isOperator: true //是运算符
       })
     },
@@ -150,9 +229,23 @@ export default {
       this.updateExpressionForm.formList.splice(index, 1);
       this._setFormula();
     },
-    _onChangeModel(a, b){
-      console.log(a);
+    _onChangeModel(idList, index){
+      this._setLabelNameById(idList[idList.length - 1], index, this.treeDataList);
       this._setFormula();
+    },
+    _setLabelNameById(id, index, dataList){
+      if(dataList){
+        for(let i = 0; i < dataList.length; i++){
+          if(dataList[i].level == 6){
+            if(id == dataList[i].id){
+              this.updateExpressionForm.formList[index].labelName = dataList[i].ogName;
+              return;
+            }
+          }else{
+            this._setLabelNameById(id, index, dataList[i].childList)
+          }
+        }
+      }
     },
     _onChangeOperator(){
       this._setFormula();
@@ -166,11 +259,9 @@ export default {
           expression += this.updateExpressionForm.formList[i].operator;
         }else{
           if(this.updateExpressionForm.formList[i].id != ''){
-            console.log(this.updateExpressionForm.formList[i].id);
             let id = this.updateExpressionForm.formList[i].id[this.updateExpressionForm.formList[i].id.length - 1];
-            let index = id.indexOf('-');
-            let expressionId = 'param' + id.substring(0, index);
-            let name = id.substring(index + 1, id.length);
+            let expressionId = 'param' + id;
+            let name = this.updateExpressionForm.formList[i].labelName;
             formula += name;
             expression += expressionId;
           }
@@ -197,10 +288,11 @@ export default {
       this.$refs['updateExpressionForm'].validate((valid) => {
         if (valid) {//表单数据验证完成之后，提交数据;
           this.$http({
-            url: '/api/api/expression/createExpression',
+            url: '/api/api/expression/updateExpression',
             "content-type": "application/json",
-            method: 'post',
+            method: 'put',
             data: {
+              id : this.updateExpressionForm.id,
               expression: this.updateExpressionForm.expression,
               name: this.updateExpressionForm.name,
               roomId: this.updateExpressionForm.roomId

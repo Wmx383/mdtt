@@ -196,11 +196,18 @@ export default {
         this.$message({message: '请选择一条数据...', type: 'warning'});
         return;
       }
+      this.currentNodeList = [];
+      const node = this.$refs.viewOrgComRef._getCurrentNode();
+
+      let dataAllList = JSON.parse(JSON.stringify(this.$refs.viewOrgComRef.dataAllList));
+
+      this._getModelList(node.id, dataAllList);
+      this._setNewModelList(this.currentNodeList);
 
       this.updateExpressionDialog.show = true;
       this.updateExpressionDialog.dialogVisible = true;
       this.$nextTick(_ => {
-        this.$refs.updateExpressionRef._initUpdateExpression(this.expression.selectedDate);
+        this.$refs.updateExpressionRef._initUpdateExpression(this.currentNodeList, this.expression.selectedDate);
       });
     },
     _getModelList (id, orgDataList) {
@@ -225,6 +232,7 @@ export default {
                 id: this.modelParamList[j].id,
                 ogId: this.modelParamList[j].id,
                 ogName: this.modelParamList[j].name,
+                level : 6,
                 formatIdName: this.modelParamList[j].id + '-' + this.modelParamList[j].name
               })
             }
