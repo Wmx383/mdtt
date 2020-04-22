@@ -2,12 +2,12 @@
   <div v-loading.fullscreen.lock="fullscreenLoading">
     <header class="indexDiv">
       <div class="headerTitle">
-        <!--<span class="indexH1">
-          <b>D.Perspclre</b>
-        </span>-->
-        <!--<h5 class="indexSubTitle">
-          全球领先的工业大数据展示平台
-        </h5>--></div>
+        <span class="indexH1">
+          <b>数 据 魔 镜</b>
+        </span>
+        <h5 class="indexSubTitle">
+          Qlang D.perspcire
+        </h5></div>
       <div class="headerNavigation"><span class="systemDateSpan">系统时间: {{ this.systemDate }}</span>
         <div class="menuNav">
           <el-menu :default-active="$route.path" class="el-menu-demo" mode="horizontal" @select="_handleSelect" router>
@@ -92,20 +92,20 @@
 <style lang="less" scoped>
   .indexH1 {
     position: absolute;
-    left: 20px;
+    left: 42px;
     top: 0px;
     color: #FF6600;
-    font-size: 50px;
-    font-family: 华文宋体;
+    font-size: 30px;
+    font-family: 宋体;
 
   }
 
   .indexSubTitle {
     position: absolute;
     color: #a679b9;
-    font-size: 12px;
+    font-size: 16px;
     left: 48px;
-    top: 15px;
+    top: 9px;
 
   }
 
@@ -136,7 +136,7 @@
     height: 62px;
     border: 1px solid rgba(0, 21, 41, 0.08);
     border-radius: 3px;
-    background: url("../images/logo4.png") no-repeat center;
+    /*background: url("../images/logo4.png") no-repeat center;*/
   }
 
   .headerNavigation {
