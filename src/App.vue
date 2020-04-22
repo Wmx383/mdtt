@@ -74,4 +74,10 @@
     background-color: ghostwhite;
   }
 
+  .el-checkbox{
+    display: block;
+    margin-left: 3px;
+    font-size: 15px;
+  }
+
 </style>
