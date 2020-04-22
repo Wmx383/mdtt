@@ -294,7 +294,10 @@ export default {
                 name: item.name,
                 data: data,
                 type: 'line',
-                smooth: true
+                smooth: true,
+                itemStyle : {
+                  color : this.colors[this.forecastParameterHistory.option.series.length]
+                }
               });
 
               this.forecastParameterHistory.option.xAxis.data = xAxisData;
@@ -339,7 +342,10 @@ export default {
                 name: item.name,
                 data: data,
                 type: 'line',
-                smooth: true
+                smooth: true,
+                itemStyle : {
+                  color : this.colors[this.forecastParameterHistory.option.series.length]
+                }
               });
 
               this.forecastParameterHistory.option.xAxis.data = xAxisData;
