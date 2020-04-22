@@ -21,14 +21,20 @@
         </el-form-item>
       </el-form>
     </div>
-    <div class="selectedLegend">
-      <el-checkbox-group v-model="modelParamCheckedList" @change="_handleCheckedModelParamChange">
-        <el-checkbox v-for="item in modelParamList" :label="item.name" :key="item.id" :title="item.name"></el-checkbox>
-      </el-checkbox-group>
-    </div>
+    <div class="leftDiv">
+      <div class="forecastParameterHistoryTitle">
+        <span>{{title}}</span>
+      </div>
+      <div class="selectedLegend">
+        <el-checkbox-group v-model="modelParamCheckedList" @change="_handleCheckedModelParamChange">
+          <el-checkbox v-for="item in modelParamList" :label="item.name" :key="item.id"
+                       :title="item.name"></el-checkbox>
+        </el-checkbox-group>
+      </div>
 
-    <div id="forecastParameterHistoryEcharts">
+      <div id="forecastParameterHistoryEcharts">
 
+      </div>
     </div>
 
     <div class="table_container">
@@ -82,16 +88,18 @@ export default {
       forecastParameterHistoryForm: {
         date: []
       },
+      title: '',
       modelParamCheckedList: [],
       modelParamList: [],//每次进来查询的对应输出还是输入的 modelParamList 永恒不变
       oid: '',
       forecastParameterHistory: {
-        allList : [],
+        allList: [],
         columnName: '',
         dataList: [],
         option: {
           title: {
-            text: ''
+            text: '',
+            show: false
           },
           grid: {},
           tooltip: {
@@ -167,12 +175,12 @@ export default {
   methods: {
     _getToolTip (params) {
       let result = '';
-      if(this.type == 'output'){
+      if (this.type == 'output') {
         let index = 0;
         let minValue = 0;
         let maxValue = 0;
-        for(let i = 0; i < this.modelParamList.length; i++){
-          if(params.seriesName == this.modelParamList[i].name){
+        for (let i = 0; i < this.modelParamList.length; i++) {
+          if (params.seriesName == this.modelParamList[i].name) {
             index = i;
             minValue = this.modelParamList[i].minValue;
             maxValue = this.modelParamList[i].maxValue;
@@ -180,12 +188,14 @@ export default {
           }
         }
         let gyz = 0;
-        if(this.forecastParameterHistory.allList.limsOutputData.length > 0){
-          gyz  =((this.forecastParameterHistory.allList.limsOutputData[params.dataIndex][index] - minValue) / (maxValue - minValue)).toFixed(5);
+        if (this.forecastParameterHistory.allList.limsOutputData.length > 0) {
+          gyz = ((this.forecastParameterHistory.allList.limsOutputData[params.dataIndex][index] - minValue) / (maxValue - minValue)).toFixed(5);
         }
-        result = params.seriesName + '<br/>时间:' + params.name + '<br/>预测参数归一值:'+ params.value +'<br/>在线参数归一化:' + this.forecastParameterHistory.allList.actualOutputData[params.dataIndex][index] + '<br/>limis归一值:'+ gyz +'';
-      }else{
-        result = params.seriesName + '<br/>时间:' + params.name + '<br/>输入值:'+ params.value +'<br/>';
+        result = params.seriesName + '<br/>时间:' + params.name + '<br/>预测参数归一值:' + params.value + '<br/>在线参数归一化:' + this.forecastParameterHistory.allList.actualOutputData[params.dataIndex][index] + '<br/>limis归一值:' + gyz + '';
+      } else if (this.type == 'input') {
+        result = params.seriesName + '<br/>时间:' + params.name + '<br/>输入值:' + params.value + '<br/>';
+      } else {
+        result = params.seriesName + '<br/>时间:' + params.name + '<br/>差值:' + params.value + '<br/>';
       }
 
 
@@ -204,7 +214,7 @@ export default {
       }
     },
     _initForecastParameterHistoryEchartsByOutput () {
-      this.forecastParameterHistory.option.title.text = '输出历史查询';
+      this.title = '输出历史查询';
       this.forecastParameterHistory.option.xAxis.data = [];
       this.forecastParameterHistory.option.legend.data = [];
       this.forecastParameterHistory.option.series = [];
@@ -212,8 +222,8 @@ export default {
       if (this.modelParamList.length > 0) {
         let legend = [];
         this.modelParamList.forEach((item, index) => {
-          for(let i = 0; i< this.modelParamCheckedList.length; i++){
-            if(item.name == this.modelParamCheckedList[i]){
+          for (let i = 0; i < this.modelParamCheckedList.length; i++) {
+            if (item.name == this.modelParamCheckedList[i]) {
               legend.push(item.name);
               let xAxisData = [];
               let data = [];
@@ -248,7 +258,7 @@ export default {
       })
     },
     _initForecastParameterHistoryEchartsByInput () {
-      this.forecastParameterHistory.option.title.text = '输入历史查询';
+      this.title = '输入历史查询';
       this.forecastParameterHistory.option.xAxis.data = [];
       this.forecastParameterHistory.option.legend.data = [];
       this.forecastParameterHistory.option.series = [];
@@ -256,8 +266,8 @@ export default {
       if (this.modelParamList.length > 0) {
         let legend = [];
         this.modelParamList.forEach((item, index) => {
-          for(let i = 0; i< this.modelParamCheckedList.length; i++){
-            if(item.name == this.modelParamCheckedList[i]){
+          for (let i = 0; i < this.modelParamCheckedList.length; i++) {
+            if (item.name == this.modelParamCheckedList[i]) {
               legend.push(item.name);
               let xAxisData = [];
               let data = [];
@@ -293,40 +303,40 @@ export default {
       })
     },
     _initForecastParameterHistoryEchartsByDiff () {
-      this.forecastParameterHistory.option.title.text = '输入差值历史查询';
+      this.title = '输入差值历史查询';
       this.forecastParameterHistory.option.xAxis.data = [];
       this.forecastParameterHistory.option.legend.data = [];
       this.forecastParameterHistory.option.series = [];
 
-      if (this.modelFeaturesList.length > 0) {
-        let legendData = [];
-        let tooltipText = '';
-        this.modelFeaturesList.forEach((item, index) => {
-          if (item.type == '1') {
-            legendData.push(item.name);
-            this.forecastParameterHistory.option.series.push({
-              name: item.name,
-              data: [],
-              type: 'line',
-              smooth: true
-            });
-          }
-        });
-        this.forecastParameterHistory.option.legend.data = legendData;
-      }
+      if (this.modelParamList.length > 0) {
+        let legend = [];
+        this.modelParamList.forEach((item, index) => {
+          for (let i = 0; i < this.modelParamCheckedList.length; i++) {
+            if (item.name == this.modelParamCheckedList[i]) {
+              legend.push(item.name);
+              let xAxisData = [];
+              let data = [];
+              this.forecastParameterHistory.dataList.forEach((item2, index2) => {
+                xAxisData.push(index2);
+                data.push({
+                  value: item2[index + 1],
+                  name: moment(parseInt(item2[0])).format('YYYY-MM-DD HH:mm:ss')
+                })
+              });
 
-      if (this.forecastParameterHistory.dataList.length > 0) {
-        let xAxisData = [];
-        this.forecastParameterHistory.dataList.forEach((itemList, index) => {
-          xAxisData.push(index + 1);
-          for (let j = 0; j < this.forecastParameterHistory.option.series.length; j++) {
-            this.forecastParameterHistory.option.series[j].data.push({
-              value: itemList[j + 1],
-              name: moment(parseInt(itemList[0])).format('YYYY-MM-DD HH:mm:ss')
-            });
+              this.forecastParameterHistory.option.series.push({
+                name: item.name,
+                data: data,
+                type: 'line',
+                smooth: true
+              });
+
+              this.forecastParameterHistory.option.xAxis.data = xAxisData;
+            }
           }
+
         });
-        this.forecastParameterHistory.option.xAxis.data = xAxisData;
+        this.forecastParameterHistory.option.legend.data = legend;
       }
 
       let forecastParameterHistoryEcharts = echarts.init(document.getElementById('forecastParameterHistoryEcharts'));
@@ -387,7 +397,19 @@ export default {
             this._getDate();
             this._onChangeDate();
           } else if (type == 'diff') {
+            let modelParamConstList = [];
+            let nameList = [];
+            this.modelFeaturesList.forEach((item, index) => {
+              if (item.type == '1') {
+                nameList.push(item.name);
+                modelParamConstList.push(item);
+              }
+            });
+            this.modelParamCheckedList = nameList;
+            this.modelParamList = JSON.parse(JSON.stringify(modelParamConstList));
             this._initForecastParameterHistoryEchartsByDiff();
+            this._getDate();
+            this._onChangeDate();
           }
 
         } else {
@@ -488,61 +510,61 @@ export default {
           let dataList = res.data.result.outputData;
           dataList = {
             inputData: [
-              ["1565254804000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52","0.65","0.78"],
-              ["1565254819000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52","0.65","0.78"],
-              ["1565254834000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52","0.65","0.78"],
-              ["1565254849000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52","0.65","0.78"],
-              ["1565254864000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52","0.65","0.78"],
-              ["1565254879000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52","0.65","0.78"],
-              ["1565254894000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52","0.65","0.78"],
-              ["1565254909000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52","0.65","0.78"],
-              ["1565254924000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52","0.65","0.78"],
-              ["1565254939000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52","0.65","0.78"],
-              ["1565254954000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565254969000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565254984000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565254999000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255014000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255029000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255044000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255059000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255074000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255089000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255104000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255119000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255134000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255149000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255164000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255179000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255194000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255209000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255224000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255239000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255254000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255269000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255284000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255299000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255314000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255329000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255344000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255359000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255374000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255389000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255404000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255419000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255434000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255449000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255464000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255479000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255494000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12","0.65","0.78"],
-              ["1565255509000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52","0.65","0.78"],
-              ["1565255524000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52","0.65","0.78"],
-              ["1565255539000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52","0.65","0.78"],
-              ["1565255554000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52","0.65","0.78"],
-              ["1565255569000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52","0.65","0.78"],
-              ["1565255584000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52","0.65","0.78"],
-              ["1565255599000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52","0.65","0.78"],
-              ["1565255614000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52","0.65","0.78"]
+              ["1565254804000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565254819000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565254834000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565254849000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565254864000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565254879000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565254894000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565254909000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565254924000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565254939000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565254954000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565254969000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565254984000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565254999000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255014000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255029000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255044000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255059000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255074000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255089000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255104000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255119000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255134000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255149000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255164000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255179000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255194000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255209000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255224000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255239000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255254000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255269000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255284000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255299000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255314000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255329000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255344000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255359000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255374000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255389000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255404000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255419000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255434000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255449000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255464000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255479000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255494000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255509000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565255524000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565255539000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565255554000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565255569000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565255584000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565255599000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565255614000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"]
 
             ],
             outputData: [
@@ -1109,12 +1131,30 @@ export default {
 </script>
 
 <style scoped>
-  .selectedLegend {
-    position: absolute;
-    left: 0px;
+  .leftDiv {
+    position: relative;
     width: 170px;
     height: 380px;
     border: 1px solid rgba(0, 21, 41, 0.08);
+  }
+
+  .forecastParameterHistoryTitle {
+    position: absolute;
+    left: 0;
+    width: 170px;
+    height: 30px;
+    overflow: hidden;
+    font-size: 20px;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .selectedLegend {
+    position: absolute;
+    left: 0px;
+    top: 40px;
+    width: 170px;
+    height: 380px;
     overflow: hidden;
   }
 
