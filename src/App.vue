@@ -78,6 +78,7 @@
     display: block;
     margin-left: 3px;
     font-size: 15px;
+    margin-bottom: 5px;
   }
 
 </style>
