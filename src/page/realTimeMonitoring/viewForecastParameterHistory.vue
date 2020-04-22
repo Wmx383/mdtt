@@ -26,7 +26,7 @@
         <span>{{title}}</span>
       </div>
       <div class="selectedLegend">
-        <el-checkbox-group v-model="modelParamCheckedList" @change="_handleCheckedModelParamChange">
+        <el-checkbox-group v-model="modelParamCheckedList" @change="_handleCheckedModelParamChange" :max="5">
           <el-checkbox v-for="item in modelParamList" :label="item.name" :key="item.id" :style="{color : item.color}"
                        :title="item.name"></el-checkbox>
         </el-checkbox-group>
