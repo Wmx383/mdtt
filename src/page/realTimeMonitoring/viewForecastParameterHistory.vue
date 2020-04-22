@@ -27,7 +27,7 @@
       </div>
       <div class="selectedLegend">
         <el-checkbox-group v-model="modelParamCheckedList" @change="_handleCheckedModelParamChange">
-          <el-checkbox v-for="item in modelParamList" :label="item.name" :key="item.id"
+          <el-checkbox v-for="item in modelParamList" :label="item.name" :key="item.id" :style="{color : item.color}"
                        :title="item.name"></el-checkbox>
         </el-checkbox-group>
       </div>
@@ -92,7 +92,7 @@ export default {
       modelParamCheckedList: [],
       modelParamList: [],//每次进来查询的对应输出还是输入的 modelParamList 永恒不变
       oid: '',
-      colors : ['red', 'orange', 'yellow', 'green', 'blue', 'pink', '#9900FF', ' black', '#FFCCFF', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF', '#663399', '#660033'],
+      colors : ['red', 'orange', '#333366', 'green', 'blue', '#CC9900', '#9900FF', ' black', '#FFCCFF', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF', '#663399', '#660033'],
       forecastParameterHistory: {
         allList: [],
         columnName: '',
@@ -120,7 +120,7 @@ export default {
             }
           },
           legend: {
-            show: true,
+            show: false,
             data: [],
             top: 20,
           },
@@ -391,7 +391,14 @@ export default {
             this.modelFeaturesList.forEach((item, index) => {
               if (item.type == '2') {
                 nameList.push(item.name);
-                modelParamConstList.push(item);
+                let tableItem = {
+                  name : item.name,
+                  id : item.id,
+                  color : this.colors[modelParamConstList.length],
+                  minValue : item.minValue,
+                  maxValue : item.maxValue
+                }
+                modelParamConstList.push(tableItem);
               }
             });
             this.modelParamCheckedList = nameList;
@@ -405,7 +412,14 @@ export default {
             this.modelFeaturesList.forEach((item, index) => {
               if (item.type == '1') {
                 nameList.push(item.name);
-                modelParamConstList.push(item);
+                let tableItem = {
+                  name : item.name,
+                  id : item.id,
+                  color : this.colors[modelParamConstList.length],
+                  minValue : item.minValue,
+                  maxValue : item.maxValue
+                }
+                modelParamConstList.push(tableItem);
               }
             });
             this.modelParamCheckedList = nameList;
@@ -419,7 +433,14 @@ export default {
             this.modelFeaturesList.forEach((item, index) => {
               if (item.type == '1') {
                 nameList.push(item.name);
-                modelParamConstList.push(item);
+                let tableItem = {
+                  name : item.name,
+                  id : item.id,
+                  color : this.colors[modelParamConstList.length],
+                  minValue : item.minValue,
+                  maxValue : item.maxValue
+                }
+                modelParamConstList.push(tableItem);
               }
             });
             this.modelParamCheckedList = nameList;
