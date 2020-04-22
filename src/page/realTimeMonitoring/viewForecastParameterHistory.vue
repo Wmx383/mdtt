@@ -249,7 +249,7 @@ export default {
                 type: 'line',
                 smooth: true,
                 itemStyle : {
-                  color : this.colors[this.forecastParameterHistory.option.series.length]
+                  color : this.colors[index]
                 }
               });
 
@@ -296,7 +296,7 @@ export default {
                 type: 'line',
                 smooth: true,
                 itemStyle : {
-                  color : this.colors[this.forecastParameterHistory.option.series.length]
+                  color : this.colors[index]
                 }
               });
 
@@ -344,7 +344,7 @@ export default {
                 type: 'line',
                 smooth: true,
                 itemStyle : {
-                  color : this.colors[this.forecastParameterHistory.option.series.length]
+                  color : this.colors[index]
                 }
               });
 
