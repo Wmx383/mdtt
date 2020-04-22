@@ -92,7 +92,7 @@ export default {
       modelParamCheckedList: [],
       modelParamList: [],//每次进来查询的对应输出还是输入的 modelParamList 永恒不变
       oid: '',
-      colors : ['rgb(255, 0 ,0)', 'rgb(255,125,0)', 'rgb(255，255，0 )', 'rgb(0，255，0 )', 'rgb(0，0，255 )', 'rgb(0,255,255)', 'rgb(255,0,255 )', ' rgb(0,0,0)', 'rgb(192,192,192)', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF', '#663399', '#660033'],
+      colors : ['red', 'orange', 'yellow', 'green', 'blue', 'pink', '#9900FF', ' black', '#FFCCFF', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF', '#663399', '#660033'],
       forecastParameterHistory: {
         allList: [],
         columnName: '',
@@ -236,7 +236,6 @@ export default {
                 })
               });
 
-              console.log(this.colors[this.forecastParameterHistory.option.series.length]);
               this.forecastParameterHistory.option.series.push({
                 name: item.name,
                 data: data,
