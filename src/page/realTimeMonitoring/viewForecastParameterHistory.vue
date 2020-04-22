@@ -184,9 +184,12 @@ export default {
           gyz  =((this.forecastParameterHistory.allList.limsOutputData[params.dataIndex][index] - minValue) / (maxValue - minValue)).toFixed(5);
         }
         result = params.seriesName + '<br/>时间:' + params.name + '<br/>预测参数归一值:'+ params.value +'<br/>在线参数归一化:' + this.forecastParameterHistory.allList.actualOutputData[params.dataIndex][index] + '<br/>limis归一值:'+ gyz +'';
-      }else{
+      }else if(this.type == 'input'){
         result = params.seriesName + '<br/>时间:' + params.name + '<br/>输入值:'+ params.value +'<br/>';
+      }else{
+        result = params.seriesName + '<br/>时间:' + params.name + '<br/>差值:'+ params.value +'<br/>';
       }
+
 
 
       return result;
@@ -298,35 +301,35 @@ export default {
       this.forecastParameterHistory.option.legend.data = [];
       this.forecastParameterHistory.option.series = [];
 
-      if (this.modelFeaturesList.length > 0) {
-        let legendData = [];
-        let tooltipText = '';
-        this.modelFeaturesList.forEach((item, index) => {
-          if (item.type == '1') {
-            legendData.push(item.name);
-            this.forecastParameterHistory.option.series.push({
-              name: item.name,
-              data: [],
-              type: 'line',
-              smooth: true
-            });
-          }
-        });
-        this.forecastParameterHistory.option.legend.data = legendData;
-      }
+      if (this.modelParamList.length > 0) {
+        let legend = [];
+        this.modelParamList.forEach((item, index) => {
+          for(let i = 0; i< this.modelParamCheckedList.length; i++){
+            if(item.name == this.modelParamCheckedList[i]){
+              legend.push(item.name);
+              let xAxisData = [];
+              let data = [];
+              this.forecastParameterHistory.dataList.forEach((item2, index2) => {
+                xAxisData.push(index2);
+                data.push({
+                  value: item2[index + 1],
+                  name: moment(parseInt(item2[0])).format('YYYY-MM-DD HH:mm:ss')
+                })
+              });
 
-      if (this.forecastParameterHistory.dataList.length > 0) {
-        let xAxisData = [];
-        this.forecastParameterHistory.dataList.forEach((itemList, index) => {
-          xAxisData.push(index + 1);
-          for (let j = 0; j < this.forecastParameterHistory.option.series.length; j++) {
-            this.forecastParameterHistory.option.series[j].data.push({
-              value: itemList[j + 1],
-              name: moment(parseInt(itemList[0])).format('YYYY-MM-DD HH:mm:ss')
-            });
+              this.forecastParameterHistory.option.series.push({
+                name: item.name,
+                data: data,
+                type: 'line',
+                smooth: true
+              });
+
+              this.forecastParameterHistory.option.xAxis.data = xAxisData;
+            }
           }
+
         });
-        this.forecastParameterHistory.option.xAxis.data = xAxisData;
+        this.forecastParameterHistory.option.legend.data = legend;
       }
 
       let forecastParameterHistoryEcharts = echarts.init(document.getElementById('forecastParameterHistoryEcharts'));
@@ -387,7 +390,19 @@ export default {
             this._getDate();
             this._onChangeDate();
           } else if (type == 'diff') {
+            let modelParamConstList = [];
+            let nameList = [];
+            this.modelFeaturesList.forEach((item, index) => {
+              if (item.type == '1') {
+                nameList.push(item.name);
+                modelParamConstList.push(item);
+              }
+            });
+            this.modelParamCheckedList = nameList;
+            this.modelParamList = JSON.parse(JSON.stringify(modelParamConstList));
             this._initForecastParameterHistoryEchartsByDiff();
+            this._getDate();
+            this._onChangeDate();
           }
 
         } else {
