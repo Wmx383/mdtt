@@ -204,6 +204,13 @@ export default {
     },
     async _onChangeDate () {
       this.forecastParameterHistory.forecastParameterHistoryList = [];
+      if(this.forecastParameterHistoryForm.date!= null && this.forecastParameterHistoryForm.date[0] != this.forecastParameterHistoryForm.date[1]){
+        this.$message({message: '请选择一天时间', type: 'warning'});
+        this.forecastParameterHistoryForm.date = [];
+        this._clearEcharts();
+        return;
+      }
+
       if (this.forecastParameterHistoryForm.date != null) {
         if (this.type == 'diff') {
           await this._getInputFeaturesStatistics();
