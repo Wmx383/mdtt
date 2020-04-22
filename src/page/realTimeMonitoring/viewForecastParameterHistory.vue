@@ -1133,7 +1133,7 @@ export default {
 <style scoped>
   .leftDiv {
     position: relative;
-    width: 170px;
+    width: 240px;
     height: 380px;
     border: 1px solid rgba(0, 21, 41, 0.08);
   }
@@ -1141,7 +1141,7 @@ export default {
   .forecastParameterHistoryTitle {
     position: absolute;
     left: 0;
-    width: 170px;
+    width: 240px;
     height: 30px;
     overflow: hidden;
     font-size: 20px;
@@ -1153,7 +1153,7 @@ export default {
     position: absolute;
     left: 0px;
     top: 40px;
-    width: 170px;
+    width: 240px;
     height: 380px;
     overflow: hidden;
   }
@@ -1163,7 +1163,7 @@ export default {
   }
 
   #forecastParameterHistoryEcharts {
-    margin-left: 150px;
+    margin-left: 180px;
     height: 380px;
     width: 900px;
   }
