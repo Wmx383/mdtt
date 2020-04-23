@@ -194,7 +194,7 @@ export default {
 
   .el-scrollbar .el-scrollbar__wrap {
     overflow-x: hidden;
-    overflow-y: visible;
+    overflow-y: hidden;
     /*background-color: #b5b6b9;*/
   }
 

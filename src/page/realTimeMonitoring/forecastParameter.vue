@@ -1162,9 +1162,20 @@ export default {
           seriesData_2.push({
             value: this.inputOutRelation.relationListBefore_A[index].input,
           });
-          seriesData_3.push({
+          /*seriesData_3.push({
             value: item.input > this.inputOutRelation.relationListBefore_A[index].input ? this.inputOutRelation.relationListBefore_A[index].input : item.input ,
-          });
+          });*/
+
+          if((item.input - this.inputOutRelation.relationListBefore_A[index].input) >= 0){
+            seriesData_3.push({
+              value: this.inputOutRelation.relationListBefore_A[index].input
+            })
+          }else{
+            seriesData_3.push({
+              value: item.input
+            })
+          }
+
         });
 
         if (xAxisData.length > 0) {
