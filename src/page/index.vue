@@ -53,6 +53,11 @@
     <div class="content">
       <router-view></router-view>
     </div>
+    <footer>
+      <p class="bottomPage">
+        Copyright©2019北京淇朗科技有限公司
+      </p>
+    </footer>
   </div>
 
 </template>
@@ -163,6 +168,14 @@
 
   .content {
     height: 100%;
+  }
+
+
+  .bottomPage {
+    color: #2f4f4f;
+    font-size: 15px;
+    text-align: center;
+    position: absolute; bottom: -4px; left: 43%;
   }
 
 </style>
