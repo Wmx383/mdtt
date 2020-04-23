@@ -882,13 +882,17 @@ export default {
               shadowOffsetY: 2
             }
           }],
+          grid : {
+            show : true,
+            backgroundColor : '#FFE4E1'
+          },
           series: [{
             name: '输入值',
             data: [],
             type: 'line',
             barGap: 0,
             areaStyle: {
-              color: '#fff546'
+              color: 'LightPink'
             },
             smooth: true
           }, {
@@ -897,7 +901,22 @@ export default {
             type: 'line',
             barGap: 0,
             areaStyle: {
-              color: '#bec4ff'
+              color: 'LightPink'
+            },
+            smooth: true
+          }, {
+            name: '假的',
+            data: [],
+            type: 'line',
+            barGap: 0,
+            areaStyle: {
+              color: '#fff',
+              origin: 'start',
+              shadowColor: '#F3F3F3',
+              shadowOffsetX: 1,
+            },
+            lineStyle : {
+              opacity : 0
             },
             smooth: true
           }]
@@ -1010,12 +1029,14 @@ export default {
     changeLine2(){
       this.inputOutRelation.inputOutParamDiffOption.series[0].type= 'line';
       this.inputOutRelation.inputOutParamDiffOption.series[1].type= 'line';
+      this.inputOutRelation.inputOutParamDiffOption.series[2].type= 'line';
       this.inputOutRelation.inputOutParamDiffOption.xAxis.boundaryGap = false;
       this._initInputOutParamDiff();
     },
     changeBar2(){
       this.inputOutRelation.inputOutParamDiffOption.series[0].type= 'bar';
       this.inputOutRelation.inputOutParamDiffOption.series[1].type= 'bar';
+      this.inputOutRelation.inputOutParamDiffOption.series[2].type= 'bar';
       this.inputOutRelation.inputOutParamDiffOption.xAxis.boundaryGap = true;
       this._initInputOutParamDiff();
     },
@@ -1118,6 +1139,7 @@ export default {
         let xAxisData = [];
         let seriesData_1 = [];
         let seriesData_2 = [];
+        let seriesData_3 = [];
         this.inputOutRelation.relationList_A.forEach((item, index) => {
           if (item.name.indexOf('-') > 0) {
             xAxisData.push(item.name.substring(0, item.name.indexOf('-')));
@@ -1140,6 +1162,9 @@ export default {
           seriesData_2.push({
             value: this.inputOutRelation.relationListBefore_A[index].input,
           });
+          seriesData_3.push({
+            value: item.input > this.inputOutRelation.relationListBefore_A[index].input ? this.inputOutRelation.relationListBefore_A[index].input : item.input ,
+          });
         });
 
         if (xAxisData.length > 0) {
@@ -1154,6 +1179,7 @@ export default {
         this.inputOutRelation.inputOutParamDiffOption.xAxis.data = xAxisData;
         this.inputOutRelation.inputOutParamDiffOption.series[0].data = seriesData_1;
         this.inputOutRelation.inputOutParamDiffOption.series[1].data = seriesData_2;
+        this.inputOutRelation.inputOutParamDiffOption.series[2].data = seriesData_3;
       }
 
 
@@ -1284,6 +1310,7 @@ export default {
       this.inputOutRelation.inputOutParamDiffOption.xAxis.data = [];
       this.inputOutRelation.inputOutParamDiffOption.series[0].data = [];
       this.inputOutRelation.inputOutParamDiffOption.series[1].data = [];
+      this.inputOutRelation.inputOutParamDiffOption.series[2].data = [];
       this.inputOutRelation.inputOutParamDiffOption.dataZoom[0].startValue = '';
       this.inputOutRelation.inputOutParamDiffOption.dataZoom[0].endValue = '';
 
