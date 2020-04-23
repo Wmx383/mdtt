@@ -760,7 +760,7 @@ export default {
             }
           },
           legend: {
-            data: ['在线输出', '实际输出'],
+            data: ['预测输出', 'lims输出', '在线输出'],
             left: 'left',
             /*selected: {
               // 选中'系列1'
@@ -772,8 +772,17 @@ export default {
           toolbox: {
             feature: {
               saveAsImage: {},
-              magicType: {
-                type: ['line', 'bar']
+              myTool2: {
+                show: true,
+                title: '切换为折线图',
+                icon: 'path://M981.4 938.7H271.1c-102.6 0-185.7-83.1-185.7-185.7V652.2c5-1.7 9.8-4.5 14-8.8L343.8 399c13.9-13.9 36.6-13.9 50.5 0l173.2 173.2 40.3 40.3c13.9 13.9 36.6 13.9 50.5 0l40.3-40.3 320.6-320.6 0.2-0.2c5.9-5.9 6-15.1 0.2-21l-45-44.8c-5.9-5.9-15.3-5.5-21 0.2l-0.2 0.2-295.3 295.5c-13.9 13.9-36.6 13.9-50.5 0L394.3 268.1c-13.9-13.9-36.6-13.9-50.5 0L85.4 526.4V42.7C85.4 19.1 66.3 0 42.7 0 19 0 0 19.1 0 42.7v795.6C0 940.9 83 1024 185.7 1024h795.6c23.6 0 42.7-19.1 42.8-42.6 0-23.6-19.1-42.7-42.7-42.7z',
+                onclick: this.changeLine1
+              },
+              myTool3: {
+                show: true,
+                title: '切换为柱状图',
+                icon: 'path ://M881.2 131.1c0-5.7-2.2-11-6.2-15L846.9 88c-8.3-8.3-21.8-8.3-30.1 0l-44.6 44.6c-4 4-6.2 9.4-6.2 15v595.1c0 13.2 10.8 24 24 24h67.2c13.2 0 24-10.8 24-24V131.1zM702.3 253.9c0-19-22.9-28.4-36.4-15l-72.6 72.6c-4 4-6.2 9.4-6.2 15v416.3c0 13.2 10.8 24 24 24h67.2c13.2 0 24-10.8 24-24V253.9zM523.4 263.6c0-5.7-2.2-11-6.2-15l-72.7-72.7c-8.3-8.3-21.8-8.3-30.1 0-4 4-6.2 9.4-6.2 15v551.9c0 13.2 10.8 24 24 24h67.2c13.2 0 24-10.8 24-24V263.6zM344.5 297.1c0-19-22.9-28.4-36.4-15l-72.6 72.6c-4 4-6.2 9.4-6.2 15v372.9c0 13.2 10.8 24 24 24h67.2c13.2 0 24-10.8 24-24V297.1z M981.3 1024H185.7C83.1 1024 0 940.9 0 838.3V42.7C0 19.1 19.1 0 42.7 0s42.7 19.1 42.7 42.7V753c0 102.6 83.1 185.7 185.7 185.7h710.3c23.6 0 42.7 19.1 42.7 42.7-0.1 23.5-19.2 42.6-42.8 42.6z',
+                onclick: this.changeBar1
               },
               myTool1: {
                 show: true,
@@ -805,13 +814,18 @@ export default {
           ],
           series: [
             {
-              name: '在线输出',
+              name: '预测输出',
               type: 'bar',
               barGap: 0,
               data: []
             },
             {
-              name: '实际输出',
+              name: 'lims输出',
+              type: 'bar',
+              data: []
+            },
+            {
+              name: '在线输出',
               type: 'bar',
               data: []
             }
@@ -829,8 +843,17 @@ export default {
           toolbox: {
             feature: {
               saveAsImage: {},
-              magicType: {
-                type: ['line', 'bar']
+              myTool2: {
+                show: true,
+                title: '切换为折线图',
+                icon: 'path://M981.4 938.7H271.1c-102.6 0-185.7-83.1-185.7-185.7V652.2c5-1.7 9.8-4.5 14-8.8L343.8 399c13.9-13.9 36.6-13.9 50.5 0l173.2 173.2 40.3 40.3c13.9 13.9 36.6 13.9 50.5 0l40.3-40.3 320.6-320.6 0.2-0.2c5.9-5.9 6-15.1 0.2-21l-45-44.8c-5.9-5.9-15.3-5.5-21 0.2l-0.2 0.2-295.3 295.5c-13.9 13.9-36.6 13.9-50.5 0L394.3 268.1c-13.9-13.9-36.6-13.9-50.5 0L85.4 526.4V42.7C85.4 19.1 66.3 0 42.7 0 19 0 0 19.1 0 42.7v795.6C0 940.9 83 1024 185.7 1024h795.6c23.6 0 42.7-19.1 42.8-42.6 0-23.6-19.1-42.7-42.7-42.7z',
+                onclick: this.changeLine2
+              },
+              myTool3: {
+                show: true,
+                title: '切换为柱状图',
+                icon: 'path ://M881.2 131.1c0-5.7-2.2-11-6.2-15L846.9 88c-8.3-8.3-21.8-8.3-30.1 0l-44.6 44.6c-4 4-6.2 9.4-6.2 15v595.1c0 13.2 10.8 24 24 24h67.2c13.2 0 24-10.8 24-24V131.1zM702.3 253.9c0-19-22.9-28.4-36.4-15l-72.6 72.6c-4 4-6.2 9.4-6.2 15v416.3c0 13.2 10.8 24 24 24h67.2c13.2 0 24-10.8 24-24V253.9zM523.4 263.6c0-5.7-2.2-11-6.2-15l-72.7-72.7c-8.3-8.3-21.8-8.3-30.1 0-4 4-6.2 9.4-6.2 15v551.9c0 13.2 10.8 24 24 24h67.2c13.2 0 24-10.8 24-24V263.6zM344.5 297.1c0-19-22.9-28.4-36.4-15l-72.6 72.6c-4 4-6.2 9.4-6.2 15v372.9c0 13.2 10.8 24 24 24h67.2c13.2 0 24-10.8 24-24V297.1z M981.3 1024H185.7C83.1 1024 0 940.9 0 838.3V42.7C0 19.1 19.1 0 42.7 0s42.7 19.1 42.7 42.7V753c0 102.6 83.1 185.7 185.7 185.7h710.3c23.6 0 42.7 19.1 42.7 42.7-0.1 23.5-19.2 42.6-42.8 42.6z',
+                onclick: this.changeBar2
               },
               myTool1: {
                 show: true,
@@ -871,18 +894,35 @@ export default {
             name: '输入值',
             data: [],
             type: 'line',
+            barGap: 0,
             areaStyle: {
-              color: '#fff546'
+              color: '#ff4d51'
             },
-            smooth: true
+            //smooth: true
           }, {
             name: '上次输入值',
             data: [],
             type: 'line',
+            barGap: 0,
             areaStyle: {
-              color: '#bec4ff'
+              color: '#ff4d51'
             },
-            smooth: true
+            //smooth: true
+          }, {
+            name: '假的',
+            data: [],
+            type: 'line',
+            barGap: 0,
+            areaStyle: {
+              color: 'white',
+              origin: 'start',
+              shadowColor: 'white',
+              shadowOffsetX: 1,
+            },
+            lineStyle : {
+              opacity : 0
+            },
+            //smooth: true
           }]
         }
       },
@@ -894,8 +934,8 @@ export default {
           "dataTime": 1574667658000,
           "inputCountValue": ["0.427", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
           "outputCountValue": ["0.25", "0.6", "1.66", "0.78949", "0.97270"],
-          "actualOutput": null,
-          "actualOutputCV": [],
+          "actualOutput":["77.92", "65.2", "85.2", "55.9", "74.5"],
+          "actualOutputCV": ["0.65", "0.25", "0.99", "0.44", "0.63"],
           "collectTime": null,
           "limsOutput": ["99.88", "0.02", "0.10"]
         },
@@ -905,8 +945,8 @@ export default {
           "dataTime": 1574667658000,
           "inputCountValue": ["0.234287", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
           "outputCountValue": ["0.34426", "0.95355", "0.765", "0.78949", "0.97270"],
-          "actualOutput": null,
-          "actualOutputCV": [],
+          "actualOutput": ["77.92", "65.2", "85.2", "55.9", "74.5"],
+          "actualOutputCV": ["0.65", "0.35", "0.69", "0.45", "0.63"],
           "collectTime": null,
           "limsOutput": ["3", "4", "5"]
         },
@@ -916,8 +956,8 @@ export default {
           "dataTime": 1574667658000,
           "inputCountValue": ["0.24517", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
           "outputCountValue": ["0.34426", "0.95355", "241", "0.78949", "0.97270"],
-          "actualOutput": null,
-          "actualOutputCV": [],
+          "actualOutput": ["77.92", "65.2", "85.2", "55.9", "74.5"],
+          "actualOutputCV": ["0.34", "0.45", "0.99", "0.44", "0.63"],
           "collectTime": null,
           "limsOutput": ["8", "25", "0.3"]
         },
@@ -927,8 +967,8 @@ export default {
           "dataTime": 1574667658000,
           "inputCountValue": ["0.51287", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
           "outputCountValue": ["0.34426", "0.95355", "0.668", "0.78949", "0.97270"],
-          "actualOutput": null,
-          "actualOutputCV": [],
+          "actualOutput": ["77.92", "65.2", "85.2", "55.9", "74.5"],
+          "actualOutputCV": ["0.23", "0.25", "0.49", "0.44", "0.78"],
           "collectTime": null,
           "limsOutput": ["48", "111", "12"]
         },
@@ -938,8 +978,8 @@ export default {
           "dataTime": 1574667658000,
           "inputCountValue": ["0.52187", "0.65688", "0.66680", "1.21111", "0.67544", "0.80329", "0.73357", "1.20924", "1.20545"],
           "outputCountValue": ["0.34426", "0.95355", "1.441", "0.78949", "0.97270"],
-          "actualOutput": null,
-          "actualOutputCV": [],
+          "actualOutput": ["77.92", "65.2", "85.2", "55.9", "74.5"],
+          "actualOutputCV": ["0.13", "0.35", "0.61", "0.44", "0.63"],
           "collectTime": null,
           "limsOutput": ["15", "233", "23"]
         }
@@ -978,31 +1018,64 @@ export default {
     clearInterval(this.timingTask);
   },
   methods: {
+    changeLine1(){
+      this.inputOutRelation.outPutOption.series[0].type= 'line';
+      this.inputOutRelation.outPutOption.series[1].type= 'line';
+      this.inputOutRelation.outPutOption.series[2].type= 'line';
+      this._initOutPutParam();
+    },
+    changeBar1(){
+      this.inputOutRelation.outPutOption.series[0].type= 'bar';
+      this.inputOutRelation.outPutOption.series[1].type= 'bar';
+      this.inputOutRelation.outPutOption.series[2].type= 'bar';
+      this._initOutPutParam();
+    },
+    changeLine2(){
+      this.inputOutRelation.inputOutParamDiffOption.series[0].type= 'line';
+      this.inputOutRelation.inputOutParamDiffOption.series[1].type= 'line';
+      this.inputOutRelation.inputOutParamDiffOption.series[2].type= 'line';
+      this.inputOutRelation.inputOutParamDiffOption.xAxis.boundaryGap = false;
+      this._initInputOutParamDiff();
+    },
+    changeBar2(){
+      this.inputOutRelation.inputOutParamDiffOption.series[0].type= 'bar';
+      this.inputOutRelation.inputOutParamDiffOption.series[1].type= 'bar';
+      this.inputOutRelation.inputOutParamDiffOption.series[2].type= 'bar';
+      this.inputOutRelation.inputOutParamDiffOption.xAxis.boundaryGap = true;
+      this._initInputOutParamDiff();
+    },
     _getToolTip (params) {
-      return '' + params[0].axisValue + '<br/>预测输出值:' + params[0].data.name + ' <br/>归一化预测输出值: ' + params[0].data.value + '';
+      return '' + params[0].axisValue + '<br/>预测输出值:' + params[0].data.name + '<br/>归一化预测输出值:' + params[0].data.value + '<br/>lims值:' + params[1].data.name + ' <br/>lims归一化输出值: ' + params[1].data.value + ' <br/>在线输出值: ' + params[2].data.name + '<br/>归一化在线输出值: ' + params[2].data.value + '';
     },
     _getToolTipByDiff (params) {
-      return '' + params[0].axisValue + '<br/>输入值:' + params[0].data.value + ' <br/>上一次输入值: ' + params[1].data.value + ' <br/> 正差: ' + params[0].data.name + ' <br/> 负差: ' + params[1].data.name + '';
+      return '' + params[0].axisValue + '<br/>输入值:' + params[0].data.value + ' <br/>上一次输入值: ' + params[1].data.value + ' <br/> 差值: ' + params[0].data.name + ' ';
     },
     _initOutPutParam () {
       if (this.inputOutRelation.relationList_B.length > 0) {
         let xAxisData = [];
         let seriesData_1 = [];
         let seriesData_2 = [];
+        let seriesData_3 = [];
         this.inputOutRelation.relationList_B.forEach((item, index) => {
           xAxisData.push(item.name);
-          seriesData_1.push({
+          seriesData_1.push({ //预测值
             value: item.outputCountValue,
             name: item.output
-          })
-          seriesData_2.push({
-            value: item.limsOutput,
-          })
+          });
+          seriesData_2.push({ //lims值
+            name: item.limsOutput,
+            value: item.limsOutputGY
+          });
+          seriesData_3.push({ //在线值
+            value: item.actualOutputCV,
+            name: item.actualOutput
+          });
         });
 
         this.inputOutRelation.outPutOption.xAxis[0].data = xAxisData;
         this.inputOutRelation.outPutOption.series[0].data = seriesData_1;
         this.inputOutRelation.outPutOption.series[1].data = seriesData_2;
+        this.inputOutRelation.outPutOption.series[2].data = seriesData_3;
       }
       let OutPutChart = echarts.init(document.getElementById('outPutParam'));
       OutPutChart.setOption(this.inputOutRelation.outPutOption, true);
@@ -1070,6 +1143,7 @@ export default {
         let xAxisData = [];
         let seriesData_1 = [];
         let seriesData_2 = [];
+        let seriesData_3 = [];
         this.inputOutRelation.relationList_A.forEach((item, index) => {
           if (item.name.indexOf('-') > 0) {
             xAxisData.push(item.name.substring(0, item.name.indexOf('-')));
@@ -1077,14 +1151,12 @@ export default {
             xAxisData.push(item.name);
           }
 
-          let differ = item.input - this.inputOutRelation.relationListBefore_A[index].input;
+          let differ = Math.abs(item.input - this.inputOutRelation.relationListBefore_A[index].input);
           let differPlus = 0;
-          let differMinus = 0;
+          //let differMinus = 0;
 
           if (differ > 0) {
             differPlus = differ;
-          } else {
-            differMinus = differ;
           }
 
           seriesData_1.push({
@@ -1093,8 +1165,21 @@ export default {
           });
           seriesData_2.push({
             value: this.inputOutRelation.relationListBefore_A[index].input,
-            name: differMinus
           });
+          /*seriesData_3.push({
+            value: item.input > this.inputOutRelation.relationListBefore_A[index].input ? this.inputOutRelation.relationListBefore_A[index].input : item.input ,
+          });*/
+
+          if((item.input - this.inputOutRelation.relationListBefore_A[index].input) >= 0){
+            seriesData_3.push({
+              value: this.inputOutRelation.relationListBefore_A[index].input
+            })
+          }else{
+            seriesData_3.push({
+              value: item.input
+            })
+          }
+
         });
 
         if (xAxisData.length > 0) {
@@ -1109,6 +1194,7 @@ export default {
         this.inputOutRelation.inputOutParamDiffOption.xAxis.data = xAxisData;
         this.inputOutRelation.inputOutParamDiffOption.series[0].data = seriesData_1;
         this.inputOutRelation.inputOutParamDiffOption.series[1].data = seriesData_2;
+        this.inputOutRelation.inputOutParamDiffOption.series[2].data = seriesData_3;
       }
 
 
@@ -1217,6 +1303,7 @@ export default {
       this.inputOutRelation.outPutOption.xAxis[0].data = [];
       this.inputOutRelation.outPutOption.series[0].data = [];
       this.inputOutRelation.outPutOption.series[1].data = [];
+      this.inputOutRelation.outPutOption.series[2].data = [];
 
       this.inputOutRelation.inputOption.series[0].data[0].value = 0;
       this.inputOutRelation.inputOption.series[0].data[0].name = '0';
@@ -1238,6 +1325,7 @@ export default {
       this.inputOutRelation.inputOutParamDiffOption.xAxis.data = [];
       this.inputOutRelation.inputOutParamDiffOption.series[0].data = [];
       this.inputOutRelation.inputOutParamDiffOption.series[1].data = [];
+      this.inputOutRelation.inputOutParamDiffOption.series[2].data = [];
       this.inputOutRelation.inputOutParamDiffOption.dataZoom[0].startValue = '';
       this.inputOutRelation.inputOutParamDiffOption.dataZoom[0].endValue = '';
 
@@ -1305,12 +1393,32 @@ export default {
           }
 
           for (let i = 0; i < this.inputOutRelation.relationList_B.length; i++) {
-            this.inputOutRelation.relationList_B[i].output = list.output[i];
-            this.inputOutRelation.relationList_B[i].outputCountValue = list.outputCountValue[i];
+            if(list.output[i] == undefined){
+              this.inputOutRelation.relationList_B[i].output = 0;
+            }else{
+              this.inputOutRelation.relationList_B[i].output = list.output[i];
+            }
+            if(list.outputCountValue[i] == undefined){
+              this.inputOutRelation.relationList_B[i].outputCountValue = 0;
+            }else{
+              this.inputOutRelation.relationList_B[i].outputCountValue = list.outputCountValue[i];
+            }
+            if(list.actualOutputCV[i] == undefined){
+              this.inputOutRelation.relationList_B[i].actualOutputCV = 0;
+            }else{
+              this.inputOutRelation.relationList_B[i].actualOutputCV = list.actualOutputCV[i];
+            }
+            if(list.actualOutput[i] == undefined){
+              this.inputOutRelation.relationList_B[i].actualOutput = 0;
+            }else{
+              this.inputOutRelation.relationList_B[i].actualOutput = list.actualOutput[i];
+            }
             if (list.limsOutput.length - 1 > i) {
               const limsOutput = (list.limsOutput[i] - this.inputOutRelation.relationList_B[i].minValue) / (this.inputOutRelation.relationList_B[i].maxValue - this.inputOutRelation.relationList_B[i].minValue);
-              this.inputOutRelation.relationList_B[i].limsOutput = limsOutput;
+              this.inputOutRelation.relationList_B[i].limsOutputGY = limsOutput;
+              this.inputOutRelation.relationList_B[i].limsOutput = list.limsOutput[i];
             } else {
+              this.inputOutRelation.relationList_B[i].limsOutputGY = 0;
               this.inputOutRelation.relationList_B[i].limsOutput = 0;
             }
           }
