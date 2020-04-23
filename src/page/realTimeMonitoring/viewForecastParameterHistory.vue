@@ -1185,16 +1185,23 @@ export default {
       this.$emit('_closeForecastParameterHistoryViewDialog');
     },
     _handleCheckedModelParamChange (dataList) {
-      for(let key  in this.colorCheckedList){
-        for(let i = 0; i< dataList.length; i++){
-          if(key == dataList[i]){
-            this.colorCheckedList[key] = true;
-            break;
-          }else if(i == dataList.length - 1){
-            this.colorCheckedList[key] = false;
+      if(dataList.length == 0){
+        for(let key  in this.colorCheckedList){
+          this.colorCheckedList[key] = false;
+        }
+      }else{
+        for(let key  in this.colorCheckedList){
+          for(let i = 0; i< dataList.length; i++){
+            if(key == dataList[i]){
+              this.colorCheckedList[key] = true;
+              break;
+            }else if(i == dataList.length - 1){
+              this.colorCheckedList[key] = false;
+            }
           }
         }
       }
+
       this._initForecastParameterHistoryEchartsByOutput();
     }
   }
