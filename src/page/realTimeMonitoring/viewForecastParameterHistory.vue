@@ -6,7 +6,7 @@
         class="demo-form-inline search-form">
 
         <el-form-item>
-          <span>选择日期:&nbsp;&nbsp;&nbsp;</span>
+          <span style="color:#000;">选择日期:&nbsp;&nbsp;&nbsp;</span>
           <el-date-picker
             v-model="forecastParameterHistoryForm.date"
             type="daterange"
@@ -23,7 +23,7 @@
     </div>
     <div class="leftDiv">
       <div class="forecastParameterHistoryTitle">
-        <span>{{title}}</span>
+        <span style="color: #000">{{title}}</span>
       </div>
       <div class="selectedLegend">
         <el-checkbox-group v-model="modelParamCheckedList" @change="_handleCheckedModelParamChange" :max="5">
