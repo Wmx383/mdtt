@@ -138,7 +138,7 @@
                 shadowOffsetX: 2,
                 shadowOffsetY: 2
               }
-            }],
+            }],//测试
             xAxis: {
               type: 'category',
               boundaryGap: false,
