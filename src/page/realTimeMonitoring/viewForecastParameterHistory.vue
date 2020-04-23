@@ -238,9 +238,9 @@ export default {
           if (this.forecastParameterHistory.allList.limsOutputData.length > 0) {
             gyz = ((this.forecastParameterHistory.allList.limsOutputData[params.dataIndex][index] - minValue) / (maxValue - minValue)).toFixed(5);
           }
-          result = params.seriesName + '<br/>时间:' + params.name + '<br/>预测参数归一值:' + params.value + '<br/>在线参数归一值:' + this.forecastParameterHistory.allList.actualOutputData[params.dataIndex][index] + '<br/>limis归一值:' + gyz + '';
+          result = params.seriesName + '<br/>时间:' + params.name + '<br/>预测参数归一值:' + params.value + '<br/>在线参数归一值:' + this.forecastParameterHistory.allList.actualOutputData[params.dataIndex][index] + '<br/>lims归一值:' + gyz + '';
         } else {
-          result = params.seriesName + '<br/>时间:' + params.name + '<br/>预测参数实际值:' + params.value + '<br/>在线参数实际值:' + this.forecastParameterHistory.allList.actualOutput[params.dataIndex][index] + '<br/>limis实际值:' + this.forecastParameterHistory.allList.limsOutputData[params.dataIndex][index] + '';
+          result = params.seriesName + '<br/>时间:' + params.name + '<br/>预测参数实际值:' + params.value + '<br/>在线参数实际值:' + this.forecastParameterHistory.allList.actualOutput[params.dataIndex][index] + '<br/>lims实际值:' + this.forecastParameterHistory.allList.limsOutputData[params.dataIndex][index] + '';
 
         }
       } else if (this.type == 'input') {
@@ -1693,5 +1693,11 @@ export default {
   .rightButton{
     position: absolute;
     right : 15px
+  }
+</style>
+<style>
+  .el-checkbox__input.is-checked .el-checkbox__inner, .el-checkbox__input.is-indeterminate .el-checkbox__inner {
+    background-color: lightgray;
+    border-color: lightgray;
   }
 </style>

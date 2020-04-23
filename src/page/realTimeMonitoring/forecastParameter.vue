@@ -884,7 +884,7 @@ export default {
           }],
           grid : {
             show : true,
-            backgroundColor : '#FFE4E1'
+            backgroundColor : 'white'
           },
           series: [{
             name: '输入值',
@@ -892,7 +892,7 @@ export default {
             type: 'line',
             barGap: 0,
             areaStyle: {
-              color: 'LightPink'
+              color: '#ff4d51'
             },
             //smooth: true
           }, {
@@ -901,7 +901,7 @@ export default {
             type: 'line',
             barGap: 0,
             areaStyle: {
-              color: 'LightPink'
+              color: '#ff4d51'
             },
             //smooth: true
           }, {
@@ -910,9 +910,9 @@ export default {
             type: 'line',
             barGap: 0,
             areaStyle: {
-              color: '#fff',
+              color: 'white',
               origin: 'start',
-              shadowColor: '#F3F3F3',
+              shadowColor: 'white',
               shadowOffsetX: 1,
             },
             lineStyle : {
