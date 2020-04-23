@@ -798,7 +798,10 @@ export default {
           ],
           yAxis: [
             {
-              type: 'value'
+              type: 'value',
+              max: function (value) {
+                return  (value.max * (1.2)).toFixed(0);
+              }
             }
           ],
           series: [
@@ -865,7 +868,10 @@ export default {
             left: 'left'
           },
           yAxis: {
-            type: 'value'
+            type: 'value',
+            max: function (value) {
+              return  (value.max * (1.2)).toFixed(0);
+            }
           },
           dataZoom: [{
             type: 'inside',

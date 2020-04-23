@@ -163,6 +163,9 @@ export default {
           },
           yAxis: {
             type: 'value',
+            max: function (value) {
+              return  (value.max * (1.2)).toFixed(0);
+            },
             axisLine: {
               lineStyle: {
                 color: '#000'
@@ -1684,10 +1687,6 @@ export default {
     margin-left: 180px;
     height: 380px;
     width: 890px;
-  }
-
-  .el-input__inner {
-    border: 1px solid #000;
   }
 
   .rightButton{
