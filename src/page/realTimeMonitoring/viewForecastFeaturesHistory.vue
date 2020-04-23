@@ -775,4 +775,7 @@ export default {
     height: 380px;
     width: 100%;
   }
+  >>>.el-checkbox__label {
+    color: inherit;
+  }
 </style>
