@@ -19,7 +19,7 @@
           >
           </el-date-picker>
         </el-form-item>
-        <el-form-item v-if="type != 'diff'">
+        <el-form-item v-if="type != 'diff'" class="rightButton">
           <el-button type="primary" size="small" @click="_switchHistoryDataType">{{historyDataType.title}}</el-button>
         </el-form-item>
       </el-form>
@@ -1688,5 +1688,10 @@ export default {
 
   .el-input__inner {
     border: 1px solid #000;
+  }
+
+  .rightButton{
+    position: absolute;
+    right : 15px
   }
 </style>
