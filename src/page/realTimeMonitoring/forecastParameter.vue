@@ -1358,10 +1358,30 @@ export default {
           }
 
           for (let i = 0; i < this.inputOutRelation.relationList_B.length; i++) {
-            this.inputOutRelation.relationList_B[i].output = list.output[i];
-            this.inputOutRelation.relationList_B[i].outputCountValue = list.outputCountValue[i];
-            this.inputOutRelation.relationList_B[i].actualOutputCV = list.actualOutputCV[i];
-            this.inputOutRelation.relationList_B[i].actualOutput = list.actualOutput[i];
+            //this.inputOutRelation.relationList_B[i].output = list.output[i];
+            //this.inputOutRelation.relationList_B[i].outputCountValue = list.outputCountValue[i];
+            //this.inputOutRelation.relationList_B[i].actualOutputCV = list.actualOutputCV[i];
+            //this.inputOutRelation.relationList_B[i].actualOutput = list.actualOutput[i];
+            if(list.output[i] == undefined){
+              this.inputOutRelation.relationList_B[i].output = 0;
+            }else{
+              this.inputOutRelation.relationList_B[i].output = list.output[i];
+            }
+            if(list.outputCountValue[i] == undefined){
+              this.inputOutRelation.relationList_B[i].outputCountValue = 0;
+            }else{
+              this.inputOutRelation.relationList_B[i].outputCountValue = list.outputCountValue[i];
+            }
+            if(list.actualOutputCV[i] == undefined){
+              this.inputOutRelation.relationList_B[i].actualOutputCV = 0;
+            }else{
+              this.inputOutRelation.relationList_B[i].actualOutputCV = list.actualOutputCV[i];
+            }
+            if(list.actualOutput[i] == undefined){
+              this.inputOutRelation.relationList_B[i].actualOutput = 0;
+            }else{
+              this.inputOutRelation.relationList_B[i].actualOutput = list.actualOutput[i];
+            }
             if (list.limsOutput.length - 1 > i) {
               const limsOutput = (list.limsOutput[i] - this.inputOutRelation.relationList_B[i].minValue) / (this.inputOutRelation.relationList_B[i].maxValue - this.inputOutRelation.relationList_B[i].minValue);
               this.inputOutRelation.relationList_B[i].limsOutputGY = limsOutput;
