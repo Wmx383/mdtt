@@ -82,7 +82,7 @@
   }
 
   .black-form .el-form-item .el-form-item__content .el-input__inner{
-    bolder : 1px solid black;
+    border: 1px solid #000;
   }
 
 </style>

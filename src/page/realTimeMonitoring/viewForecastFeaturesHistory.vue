@@ -3,10 +3,10 @@
     <div style="margin-left: 5px; margin-top: 5px">
       <el-form
         :inline="true"
-        class="demo-form-inline search-form">
+        class="demo-form-inline search-form black-form">
 
         <el-form-item>
-          <span>选择日期:&nbsp;&nbsp;&nbsp;</span>
+          <span style="color:#000;">选择日期:&nbsp;&nbsp;&nbsp;</span>
           <el-date-picker
             v-model="forecastFeaturesHistoryForm.date"
             type="daterange"
@@ -19,11 +19,27 @@
           >
           </el-date-picker>
         </el-form-item>
+        <el-form-item v-if="type != 'diff'" class="rightButton">
+          <el-button type="primary" size="small" @click="_switchHistoryDataType">{{historyDataType.title}}</el-button>
+        </el-form-item>
       </el-form>
     </div>
+    <div class="leftDiv">
+      <div class="forecastFeaturesHistoryTitle">
+        <span style="color: #000">{{title}}</span>
+      </div>
+      <div class="selectedLegend">
+        <el-checkbox-group v-model="modelParamCheckedList" @change="_handleCheckedModelParamChange"
+                           :max="historyDataType.max">
+          <el-checkbox v-for="(item,index) in modelParamList" :label="item.name" :key="item.id"
+          ><span :style="{color : colorCheckedList[item.name] ? item.color : '#000'}"
+                 :title="item.title">{{item.name}}</span></el-checkbox>
+        </el-checkbox-group>
+      </div>
 
-    <div id="forecastFeaturesHistoryEcharts">
+      <div id="forecastFeaturesHistoryEcharts">
 
+      </div>
     </div>
 
     <div class="table_container">
@@ -77,18 +93,30 @@ export default {
       forecastFeaturesHistoryForm: {
         date: []
       },
+      historyDataType: {
+        title: '归一值',
+        max: 5,
+        type: 'gyz'
+      },
+      title: '',
+      modelParamCheckedList: [],
+      colorCheckedList: {},
+      modelParamList: [],//每次进来查询的对应输出还是输入的 modelParamList 永恒不变
       oid: '',
+      colors: ['red', 'orange', '#333366', 'green', 'blue', '#CC9900', '#9900FF', '#CC1691', '#7B68EE', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF', '#663399', '#660033'],
       forecastFeaturesHistory: {
+        allList: [],
         columnName: '',
         dataList: [],
         option: {
           title: {
-            text: ''
+            text: '',
+            show: false
           },
           grid: {},
           tooltip: {
             formatter: this._getToolTip,
-            trigger: 'axis',
+            trigger: 'item',
             axisPointer: {
               type: 'cross',
               crossStyle: {
@@ -100,10 +128,11 @@ export default {
             feature: {
               magicType: {show: true, type: ['line', 'bar']},
               saveAsImage: {show: true}
-            }
+            },
+            right: '10px'
           },
           legend: {
-            show: true,
+            show: false,
             data: [],
             top: 20,
           },
@@ -121,14 +150,27 @@ export default {
               shadowOffsetX: 2,
               shadowOffsetY: 2
             }
-          }],
+          }],//测试
           xAxis: {
             type: 'category',
             boundaryGap: false,
-            data: []
+            data: [],
+            axisLine: {
+              lineStyle: {
+                color: '#000'
+              }
+            }
           },
           yAxis: {
-            type: 'value'
+            type: 'value',
+            max: function (value) {
+              return  (value.max * (1.2)).toFixed(0);
+            },
+            axisLine: {
+              lineStyle: {
+                color: '#000'
+              }
+            }
           },
           series: []
         },
@@ -153,115 +195,175 @@ export default {
       modelFeaturesList: [],
       flag: true,
       modelId: '',
-      type: ''
+      type: '',
     }
   },
   methods: {
+    //切换历史数据类型
+    _switchHistoryDataType () {
+      this.forecastFeaturesHistory.allList = [];
+      this.forecastFeaturesHistory.dataList = [];
+      this.modelParamCheckedList = [];
+      this._handleCheckedModelParamChange(this.modelParamCheckedList);
+      //实际值切换至归一值
+      if (this.historyDataType.type == 'sjz') {
+        this.historyDataType.type = 'gyz';
+        this.historyDataType.title = '归一值';
+        this.historyDataType.max = 5;
+      }
+      //归一值切换至实际值
+      else {
+        this.historyDataType.type = 'sjz';
+        this.historyDataType.title = '实际值';
+        this.historyDataType.max = 1;
+      }
+      this._selectForecastFeaturesHistory();
+
+
+    },
+    //鼠标移动出发显示函数
     _getToolTip (params) {
       let result = '';
-      params.forEach((item, index) => {
-        result += '' + item.seriesName + ':' + item.value + '<br/>';
-      });
+      if (this.type == 'output') {
+        let index = 0;
+        let minValue = 0;
+        let maxValue = 0;
+        for (let i = 0; i < this.modelParamList.length; i++) {
+          if (params.seriesName == this.modelParamList[i].name) {
+            index = i;
+            minValue = this.modelParamList[i].minValue;
+            maxValue = this.modelParamList[i].maxValue;
+            break;
+          }
+        }
+        if (this.historyDataType.type == 'gyz') {
+          let gyz = 0;
+          if (this.forecastFeaturesHistory.allList.limsOutputData.length > 0) {
+            gyz = ((this.forecastFeaturesHistory.allList.limsOutputData[params.dataIndex][index] - minValue) / (maxValue - minValue)).toFixed(5);
+          }
+          result = params.seriesName + '<br/>时间:' + params.name + '<br/>预测参数归一值:' + params.value + '<br/>在线参数归一值:' + this.forecastFeaturesHistory.allList.actualOutputData[params.dataIndex][index] + '<br/>lims归一值:' + gyz + '';
+        } else {
+          result = params.seriesName + '<br/>时间:' + params.name + '<br/>预测参数实际值:' + params.value + '<br/>在线参数实际值:' + this.forecastFeaturesHistory.allList.actualOutput[params.dataIndex][index] + '<br/>lims实际值:' + this.forecastFeaturesHistory.allList.limsOutputData[params.dataIndex][index] + '';
+
+        }
+      } else if (this.type == 'input') {
+        if (this.historyDataType.type == 'gyz') {
+          result = params.seriesName + '<br/>时间:' + params.name + '<br/>输入归一值:' + params.value + '<br/>';
+        } else {
+          result = params.seriesName + '<br/>时间:' + params.name + '<br/>输入实际值:' + params.value + '<br/>';
+        }
+
+      } else {
+        result = params.seriesName + '<br/>时间:' + params.name + '<br/>差值:' + params.value + '<br/>';
+      }
+
+
       return result;
     },
     async _onChangeDate () {
+      this.forecastFeaturesHistory.forecastFeaturesHistoryList = [];
+      if (this.forecastFeaturesHistoryForm.date != null && this.forecastFeaturesHistoryForm.date[0] != this.forecastFeaturesHistoryForm.date[1]) {
+        this.$message({message: '请选择一天时间', type: 'warning'});
+        this.forecastFeaturesHistoryForm.date = [];
+        this._clearEcharts();
+        return;
+      }
+
       if (this.forecastFeaturesHistoryForm.date != null) {
         if (this.type == 'diff') {
           await this._getInputFeaturesStatistics();
         } else {
           await this._selectForecastFeaturesHistory();
         }
-
-
       } else {
         this._clearEcharts()
       }
     },
     _initForecastFeaturesHistoryEchartsByOutput () {
-      this.forecastFeaturesHistory.option.title.text = '输出历史查询';
+      this.title = '输出历史查询';
       this.forecastFeaturesHistory.option.xAxis.data = [];
       this.forecastFeaturesHistory.option.legend.data = [];
       this.forecastFeaturesHistory.option.series = [];
       //this.forecastFeaturesHistory.option.series[0].data = [];
+      if (this.modelParamList.length > 0) {
+        let legend = [];
+        this.modelParamList.forEach((item, index) => {
+          for (let i = 0; i < this.modelParamCheckedList.length; i++) {
+            if (item.name == this.modelParamCheckedList[i]) {
+              legend.push(item.name);
+              let xAxisData = [];
+              let data = [];
+              this.forecastFeaturesHistory.dataList.forEach((item2, index2) => {
+                xAxisData.push(index2);
+                data.push({
+                  value: item2[index + 1],
+                  name: moment(parseInt(item2[0])).format('YYYY-MM-DD HH:mm:ss')
+                })
+              });
 
-      if (this.modelFeaturesList.length > 0) {
-        let legendData = [];
-        this.modelFeaturesList.forEach((item, index) => {
-          if (item.type == '2') {
-            legendData.push(item.name);
-            this.forecastFeaturesHistory.option.series.push({
-              name: item.name,
-              data: [],
-              type: 'line',
-              smooth: true
-            });
+              this.forecastFeaturesHistory.option.series.push({
+                name: item.name,
+                data: data,
+                type: 'line',
+                smooth: true,
+                itemStyle: {
+                  color: this.colors[index]
+                }
+              });
+
+              this.forecastFeaturesHistory.option.xAxis.data = xAxisData;
+            }
           }
+
         });
-        this.forecastFeaturesHistory.option.legend.data = legendData;
-      }
-
-      if (this.forecastFeaturesHistory.dataList.length > 0) {
-
-        let seriesData_0 = [];
-        let xAxisData = [];
-        this.forecastFeaturesHistory.dataList.forEach((item, index) => {
-          xAxisData.push(index + 1);
-          seriesData_0.push({
-            value: item[1],
-            name: moment(parseInt(item[0])).format('YYYY-MM-DD HH:mm:ss')
-          })
-        });
-
-        this.forecastFeaturesHistory.option.xAxis.data = xAxisData;
-        this.forecastFeaturesHistory.option.series[0].data = seriesData_0;
+        this.forecastFeaturesHistory.option.legend.data = legend;
       }
 
       let forecastFeaturesHistoryEcharts = echarts.init(document.getElementById('forecastFeaturesHistoryEcharts'));
       forecastFeaturesHistoryEcharts.setOption(this.forecastFeaturesHistory.option, true);
-
       let that = this;
       forecastFeaturesHistoryEcharts.on('click', function (params) {
         that._handleOnclickByOutput(params);
       })
     },
     _initForecastFeaturesHistoryEchartsByInput () {
-      this.forecastFeaturesHistory.option.title.text = '输入历史查询';
+      this.title = '输入历史查询';
       this.forecastFeaturesHistory.option.xAxis.data = [];
       this.forecastFeaturesHistory.option.legend.data = [];
       this.forecastFeaturesHistory.option.series = [];
 
-      if (this.modelFeaturesList.length > 0) {
-        let legendData = [];
-        let tooltipText = '';
-        this.modelFeaturesList.forEach((item, index) => {
-          if (item.type == '1') {
-            legendData.push(item.name);
-            this.forecastFeaturesHistory.option.series.push({
-              name: item.name,
-              data: [],
-              type: 'line',
-              smooth: true
-            });
+      if (this.modelParamList.length > 0) {
+        let legend = [];
+        this.modelParamList.forEach((item, index) => {
+          for (let i = 0; i < this.modelParamCheckedList.length; i++) {
+            if (item.name == this.modelParamCheckedList[i]) {
+              legend.push(item.name);
+              let xAxisData = [];
+              let data = [];
+              this.forecastFeaturesHistory.dataList.forEach((item2, index2) => {
+                xAxisData.push(index2);
+                data.push({
+                  value: item2[index + 1],
+                  name: moment(parseInt(item2[0])).format('YYYY-MM-DD HH:mm:ss')
+                })
+              });
+
+              this.forecastFeaturesHistory.option.series.push({
+                name: item.name,
+                data: data,
+                type: 'line',
+                smooth: true,
+                itemStyle: {
+                  color: this.colors[index]
+                }
+              });
+
+              this.forecastFeaturesHistory.option.xAxis.data = xAxisData;
+            }
           }
 
-
         });
-        //this.forecastFeaturesHistory.option.tooltip.formatter = tooltipText;
-        this.forecastFeaturesHistory.option.legend.data = legendData;
-      }
-
-      if (this.forecastFeaturesHistory.dataList.length > 0) {
-        let xAxisData = [];
-        this.forecastFeaturesHistory.dataList.forEach((itemList, index) => {
-          xAxisData.push(index + 1);
-          for (let j = 0; j < this.forecastFeaturesHistory.option.series.length; j++) {
-            this.forecastFeaturesHistory.option.series[j].data.push({
-              value: itemList[j + 1],
-              name: moment(parseInt(itemList[0])).format('YYYY-MM-DD HH:mm:ss')
-            });
-          }
-        });
-        this.forecastFeaturesHistory.option.xAxis.data = xAxisData;
+        this.forecastFeaturesHistory.option.legend.data = legend;
       }
 
       let forecastFeaturesHistoryEcharts = echarts.init(document.getElementById('forecastFeaturesHistoryEcharts'));
@@ -273,40 +375,43 @@ export default {
       })
     },
     _initForecastFeaturesHistoryEchartsByDiff () {
-      this.forecastFeaturesHistory.option.title.text = '输入差值历史查询';
+      this.title = '输入差值历史查询';
       this.forecastFeaturesHistory.option.xAxis.data = [];
       this.forecastFeaturesHistory.option.legend.data = [];
       this.forecastFeaturesHistory.option.series = [];
 
-      if (this.modelFeaturesList.length > 0) {
-        let legendData = [];
-        let tooltipText = '';
-        this.modelFeaturesList.forEach((item, index) => {
-          if (item.type == '1') {
-            legendData.push(item.name);
-            this.forecastFeaturesHistory.option.series.push({
-              name: item.name,
-              data: [],
-              type: 'line',
-              smooth: true
-            });
-          }
-        });
-        this.forecastFeaturesHistory.option.legend.data = legendData;
-      }
+      if (this.modelParamList.length > 0) {
+        let legend = [];
+        this.modelParamList.forEach((item, index) => {
+          for (let i = 0; i < this.modelParamCheckedList.length; i++) {
+            if (item.name == this.modelParamCheckedList[i]) {
+              legend.push(item.name);
+              let xAxisData = [];
+              let data = [];
+              this.forecastFeaturesHistory.dataList.forEach((item2, index2) => {
+                xAxisData.push(index2);
+                data.push({
+                  value: item2[index + 1],
+                  name: moment(parseInt(item2[0])).format('YYYY-MM-DD HH:mm:ss')
+                })
+              });
 
-      if (this.forecastFeaturesHistory.dataList.length > 0) {
-        let xAxisData = [];
-        this.forecastFeaturesHistory.dataList.forEach((itemList, index) => {
-          xAxisData.push(index + 1);
-          for (let j = 0; j < this.forecastFeaturesHistory.option.series.length; j++) {
-            this.forecastFeaturesHistory.option.series[j].data.push({
-              value: itemList[j + 1],
-              name: moment(parseInt(itemList[0])).format('YYYY-MM-DD HH:mm:ss')
-            });
+              this.forecastFeaturesHistory.option.series.push({
+                name: item.name,
+                data: data,
+                type: 'line',
+                smooth: true,
+                itemStyle: {
+                  color: this.colors[index]
+                }
+              });
+
+              this.forecastFeaturesHistory.option.xAxis.data = xAxisData;
+            }
           }
+
         });
-        this.forecastFeaturesHistory.option.xAxis.data = xAxisData;
+        this.forecastFeaturesHistory.option.legend.data = legend;
       }
 
       let forecastFeaturesHistoryEcharts = echarts.init(document.getElementById('forecastFeaturesHistoryEcharts'));
@@ -318,9 +423,16 @@ export default {
       })
     },
     _handleOnclickByOutput (params) {
+      let name = params.seriesName;
+      for(let i = 0; i < this.modelParamList.length; i++){
+        if(params.seriesName == this.modelParamList[i].name){
+          name = this.modelParamList[i].title;
+          break;
+        }
+      }
       this.forecastFeaturesHistory.forecastFeaturesHistoryList = [
         {
-          name: params.seriesName,
+          name: name,
           date: params.name,
           data: params.value
         }
@@ -338,11 +450,82 @@ export default {
         if (res.data.status == 1) {
           this.modelFeaturesList = res.data.result;
           if (type == 'output') {
+            let modelParamConstList = [];
+            let nameList = [];
+            let colorCheckdList = {};
+            this.modelFeaturesList.forEach((item, index) => {
+              if (item.type == '2') {
+                nameList.push(item.name);
+                let tableItem = {
+                  name: item.name,
+                  title: item.name,
+                  id: item.id,
+                  color: this.colors[modelParamConstList.length],
+                  minValue: item.minValue,
+                  maxValue: item.maxValue
+                };
+                colorCheckdList[item.name] = false;
+                modelParamConstList.push(tableItem);
+              }
+            });
+            this.modelParamCheckedList = [];
+            this.colorCheckedList = colorCheckdList;
+            this.modelParamList = JSON.parse(JSON.stringify(modelParamConstList));
             this._initForecastFeaturesHistoryEchartsByOutput();
+            this._getDate();
+            this._onChangeDate();
           } else if (type == 'input') {
+            let modelParamConstList = [];
+            let nameList = [];
+            let colorCheckdList = {};
+            this.modelFeaturesList.forEach((item, index) => {
+              if (item.type == '1') {
+                nameList.push(item.name);
+                let index = item.name.indexOf('-');
+                let tableItem = {
+                  name: index > 0 ? item.name.substring(0, index) : item.name,
+                  title: item.name,
+                  id: item.id,
+                  color: this.colors[modelParamConstList.length],
+                  minValue: item.minValue,
+                  maxValue: item.maxValue
+                };
+                colorCheckdList[index > 0 ? item.name.substring(0, index) : item.name] = false;
+                modelParamConstList.push(tableItem);
+              }
+            });
+            this.modelParamCheckedList = [];
+            this.colorCheckedList = colorCheckdList;
+            this.modelParamList = JSON.parse(JSON.stringify(modelParamConstList));
             this._initForecastFeaturesHistoryEchartsByInput();
+            this._getDate();
+            this._onChangeDate();
           } else if (type == 'diff') {
+            let modelParamConstList = [];
+            let nameList = [];
+            let colorCheckdList = {};
+            this.modelFeaturesList.forEach((item, index) => {
+              if (item.type == '1') {
+                nameList.push(item.name);
+                let index = item.name.indexOf('-');
+                let tableItem = {
+                  name: index > 0 ? item.name.substring(0, index) : item.name,
+                  title: item.name,
+                  id: item.id,
+                  color: this.colors[modelParamConstList.length],
+                  minValue: item.minValue,
+                  maxValue: item.maxValue
+                };
+                colorCheckdList[index > 0 ? item.name.substring(0, index) : item.name] = false;
+                modelParamConstList.push(tableItem);
+              }
+            });
+            this.modelParamCheckedList = [];
+            this.colorCheckedList = colorCheckdList;
+            this.modelParamList = JSON.parse(JSON.stringify(modelParamConstList));
             this._initForecastFeaturesHistoryEchartsByDiff();
+            this._getDate();
+            this._onChangeDate();
           }
 
         } else {
@@ -351,22 +534,6 @@ export default {
       })
     },
     _getDate () {
-      let lastDay = new Date();
-      let seperator1 = '-'
-      lastDay.setTime(lastDay.getTime() - 24 * 60 * 60 * 1000);
-      let lastYear = lastDay.getFullYear();
-      let lastMonth = lastDay.getMonth() + 1
-      let lastStrDate = lastDay.getDate();
-
-      if (lastMonth >= 1 && lastMonth <= 9) {
-        lastMonth = '0' + lastMonth
-      }
-      if (lastStrDate >= 0 && lastStrDate <= 9) {
-        lastStrDate = '0' + lastStrDate
-      }
-
-      let lastDayFormat = lastYear + seperator1 + lastMonth + seperator1 + lastStrDate;
-
       let date = new Date()
       let year = date.getFullYear()
       let month = date.getMonth() + 1
@@ -377,8 +544,8 @@ export default {
       if (strDate >= 0 && strDate <= 9) {
         strDate = '0' + strDate
       }
-      let nowData = year + seperator1 + month + seperator1 + strDate
-      this.forecastFeaturesHistoryForm.date = [lastDayFormat, nowData]  // 默认赋值一年时间
+      let nowData = year + '-' + month + '-' + strDate
+      this.forecastFeaturesHistoryForm.date = [nowData, nowData]  // 默认赋值一年时间
     },
     _getHistoryAlarmInfoListByOrgId (orgId) {
 
@@ -443,7 +610,7 @@ export default {
         this._initForecastFeaturesHistoryEchartsByOutput();
       } else if (this.type == 'input') {
         this._initForecastFeaturesHistoryEchartsByInput();
-      }else if (this.type == 'diff') {
+      } else if (this.type == 'diff') {
         this._initForecastFeaturesHistoryEchartsByDiff();
       }
     },
@@ -457,227 +624,912 @@ export default {
         if (res.data.status == 1) {
           let dataList = res.data.result.outputData;
           dataList = {
-            inputData: [
-              ["1565254804000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-              ["1565254819000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-              ["1565254834000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-              ["1565254849000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-              ["1565254864000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-              ["1565254879000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-              ["1565254894000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-              ["1565254909000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-              ["1565254924000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-              ["1565254939000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-              ["1565254954000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565254969000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565254984000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565254999000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255014000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255029000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255044000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255059000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255074000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255089000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255104000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255119000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255134000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255149000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255164000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255179000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255194000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255209000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255224000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255239000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255254000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255269000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255284000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255299000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255314000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255329000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255344000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255359000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255374000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255389000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255404000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255419000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255434000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255449000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255464000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255479000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255494000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-              ["1565255509000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-              ["1565255524000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-              ["1565255539000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-              ["1565255554000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-              ["1565255569000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-              ["1565255584000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-              ["1565255599000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-              ["1565255614000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"]
+            input: [
+              ["1565254804000", "254", "59", "63", "120", "540", "302", "170", "150", "140"],
+              ["1565254819000", "254", "59", "63", "120", "540", "302", "170", "150", "140"],
+              ["1565254834000", "254", "59", "63", "120", "540", "302", "170", "150", "140"],
+              ["1565254849000", "254", "59", "63", "120", "540", "302", "170", "150", "140"],
+              ["1565254864000", "254", "59", "63", "120", "540", "302", "170", "150", "140"],
+              ["1565254879000", "254", "59", "63", "120", "540", "302", "170", "150", "140"],
+              ["1565254894000", "254", "59", "63", "120", "540", "302", "170", "150", "140"],
+              ["1565254909000", "254", "59", "63", "120", "540", "302", "170", "150", "140"],
+              ["1565254924000", "254", "59", "63", "120", "540", "302", "170", "150", "140"],
+              ["1565254939000", "254", "59", "63", "120", "540", "302", "170", "150", "140"],
+              ["1565254954000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565254969000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565254984000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565254999000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255014000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255029000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255044000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255059000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255074000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255089000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255104000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255119000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255134000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255149000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255164000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255179000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255194000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255209000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255224000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255239000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255254000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255269000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255284000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255299000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255314000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255329000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255344000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255359000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255374000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255389000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255404000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255419000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255434000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255449000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255464000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255479000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255494000", "154", "19", "163", "220", "140", "102", "270", "350", "440"],
+              ["1565255509000", "254", "59", "63", "120", "540", "302", "170", "150", "140"],
+              ["1565255524000", "254", "59", "63", "120", "540", "302", "170", "150", "140"],
+              ["1565255539000", "254", "59", "63", "120", "540", "302", "170", "150", "140"],
+              ["1565255554000", "254", "59", "63", "120", "540", "302", "170", "150", "140"],
+              ["1565255569000", "254", "59", "63", "120", "540", "302", "170", "150", "140"],
+              ["1565255584000", "254", "59", "63", "120", "540", "302", "170", "150", "140"],
+              ["1565255599000", "254", "59", "63", "120", "540", "302", "170", "150", "140"],
+              ["1565255614000", "254", "59", "63", "120", "540", "302", "170", "150", "140"]
 
-            ],
+            ],//输入实际值
+            inputData: [
+              ["1565254804000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565254819000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565254834000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565254849000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565254864000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565254879000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565254894000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565254909000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565254924000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565254939000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565254954000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565254969000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565254984000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565254999000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255014000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255029000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255044000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255059000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255074000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255089000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255104000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255119000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255134000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255149000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255164000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255179000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255194000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255209000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255224000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255239000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255254000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255269000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255284000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255299000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255314000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255329000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255344000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255359000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255374000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255389000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255404000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255419000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255434000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255449000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255464000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255479000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255494000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12", "0.65", "0.78"],
+              ["1565255509000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565255524000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565255539000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565255554000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565255569000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565255584000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565255599000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"],
+              ["1565255614000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52", "0.65", "0.78"]
+
+            ],//输入归一值
+            output: [
+              ["1565254804000", "250", "150", "100", "130", "60"],
+              ["1565254819000", "150", "350", "200", "20", "90"],
+              ["1565254834000", "150", "350", "200", "20", "90"],
+              ["1565254849000", "37", "33", "78", "54", "39"],
+              ["1565254864000", "47", "43", "68", "64", "49"],
+              ["1565254879000", "57", "53", "58", "74", "59"],
+              ["1565254894000", "67", "63", "58", "84", "59"],
+              ["1565254909000", "77", "73", "48", "94", "69"],
+              ["1565254924000", "87", "83", "38", "84", "79"],
+              ["1565254939000", "97", "93", "28", "74", "99"],
+              ["1565254954000", "87", "83", "18", "64", "89"],
+              ["1565254969000", "77", "73", "28", "54", "29"],
+              ["1565254984000", "67", "63", "38", "44", "39"],
+              ["1565254999000", "57", "53", "48", "34", "49"],
+              ["1565255014000", "47", "43", "58", "24", "59"],
+              ["1565255029000", "37", "33", "58", "14", "69"],
+              ["1565255044000", "27", "23", "58", "94", "79"],
+              ["1565255059000", "17", "13", "68", "84", "89"],
+              ["1565255074000", "27", "23", "78", "74", "99"],
+              ["1565255089000", "37", "33", "88", "64", "19"],
+              ["1565255104000", "47", "43", "98", "54", "29"],
+              ["1565255119000", "57", "53", "88", "54", "39"],
+              ["1565255134000", "67", "63", "78", "44", "49"],
+              ["1565255149000", "77", "73", "68", "34", "59"],
+              ["1565255164000", "87", "83", "58", "24", "69"],
+              ["1565255179000", "97", "93", "48", "14", "79"],
+              ["1565255194000", "17", "83", "38", "24", "89"],
+              ["1565255209000", "27", "73", "28", "34", "99"],
+              ["1565255224000", "37", "63", "18", "44", "89"],
+              ["1565255239000", "47", "53", "98", "54", "79"],
+              ["1565255254000", "57", "43", "88", "64", "19"],
+              ["1565255269000", "67", "33", "78", "74", "29"],
+              ["1565255284000", "77", "23", "68", "84", "39"],
+              ["1565255299000", "87", "13", "58", "94", "49"],
+              ["1565255314000", "97", "23", "48", "14", "59"],
+              ["1565255329000", "87", "33", "38", "24", "69"],
+              ["1565255344000", "77", "43", "28", "34", "19"],
+              ["1565255359000", "67", "53", "18", "44", "29"],
+              ["1565255374000", "57", "63", "28", "54", "39"],
+              ["1565255389000", "47", "73", "38", "64", "49"],
+              ["1565255404000", "37", "83", "48", "74", "59"],
+              ["1565255419000", "27", "93", "58", "54", "59"],
+              ["1565255434000", "17", "83", "58", "54", "59"],
+              ["1565255449000", "57", "73", "58", "54", "59"],
+              ["1565255464000", "57", "63", "58", "54", "59"],
+              ["1565255479000", "57", "53", "58", "54", "59"],
+              ["1565255494000", "57", "63", "58", "54", "59"],
+              ["1565255509000", "77", "43", "78", "84", "99"],
+              ["1565255524000", "77", "33", "78", "84", "99"],
+              ["1565255539000", "250", "150", "100", "130", "60"],
+              ["1565255554000", "77", "13", "78", "84", "99"],
+              ["1565255569000", "250", "150", "100", "130", "60"],
+              ["1565255584000", "250", "150", "100", "130", "60"],
+              ["1565255599000", "250", "150", "100", "130", "60"],
+              ["1565255614000", "250", "150", "100", "130", "60"],
+              ["1565255629000", "250", "150", "100", "130", "60"],
+              ["1565255644000", "250", "150", "100", "130", "60"],
+              ["1565255659000", "250", "150", "100", "130", "60"],
+              ["1565255674000", "250", "150", "100", "130", "60"],
+              ["1565255689000", "250", "150", "100", "130", "60"],
+              ["1565255704000", "250", "150", "100", "130", "60"],
+              ["1565255719000", "250", "150", "100", "130", "60"],
+              ["1565255734000", "250", "150", "100", "130", "60"],
+              ["1565255749000", "250", "150", "100", "130", "60"],
+              ["1565255764000", "250", "150", "100", "130", "60"],
+              ["1565255779000", "250", "150", "100", "130", "60"],
+              ["1565255794000", "250", "150", "100", "130", "60"],
+              ["1565255809000", "250", "150", "100", "130", "60"],
+              ["1565255824000", "250", "150", "100", "130", "60"],
+              ["1565255839000", "250", "150", "100", "130", "60"],
+              ["1565255854000", "250", "150", "100", "130", "60"],
+              ["1565255869000", "250", "150", "100", "130", "60"],
+              ["1565255884000", "250", "150", "100", "130", "60"],
+              ["1565255899000", "250", "150", "100", "130", "60"],
+              ["1565255914000", "250", "150", "100", "130", "60"],
+              ["1565255929000", "250", "150", "100", "130", "60"],
+              ["1565255944000", "250", "150", "100", "130", "60"],
+              ["1565255959000", "250", "150", "100", "130", "60"],
+              ["1565255974000", "250", "150", "100", "130", "60"],
+              ["1565255989000", "250", "150", "100", "130", "60"],
+              ["1565256004000", "250", "150", "100", "130", "60"],
+              ["1565256019000", "250", "150", "100", "130", "60"],
+              ["1565256034000", "250", "150", "100", "130", "60"],
+              ["1565256049000", "57", "53", "58", "54", "59"],
+              ["1565256064000", "57", "53", "58", "54", "59"],
+              ["1565256079000", "57", "53", "58", "54", "59"],
+              ["1565256094000", "57", "53", "58", "54", "59"],
+              ["1565256109000", "57", "53", "58", "54", "59"],
+              ["1565256124000", "57", "53", "58", "54", "59"],
+              ["1565256139000", "57", "53", "58", "54", "59"],
+              ["1565256154000", "57", "53", "58", "54", "59"],
+              ["1565256169000", "57", "53", "58", "54", "59"],
+              ["1565256184000", "57", "53", "58", "54", "59"],
+              ["1565256199000", "57", "53", "58", "54", "59"],
+              ["1565256214000", "57", "53", "58", "54", "59"],
+              ["1565256229000", "250", "150", "100", "130", "60"],
+              ["1565256244000", "250", "150", "100", "130", "60"],
+              ["1565256259000", "250", "150", "100", "130", "60"],
+              ["1565256274000", "250", "150", "100", "130", "60"],
+              ["1565256289000", "250", "150", "100", "130", "60"],
+              ["1565256304000", "250", "150", "100", "130", "60"],
+              ["1565256319000", "250", "150", "100", "130", "60"],
+              ["1565256334000", "250", "150", "100", "130", "60"],
+              ["1565256349000", "250", "150", "100", "130", "60"],
+              ["1565256364000", "250", "150", "100", "130", "60"],
+              ["1565256379000", "250", "150", "100", "130", "60"],
+              ["1565256394000", "250", "150", "100", "130", "60"],
+              ["1565256409000", "57", "53", "58", "54", "59"],
+              ["1565256424000", "57", "53", "58", "54", "59"],
+              ["1565256439000", "57", "53", "58", "54", "59"],
+              ["1565256454000", "57", "53", "58", "54", "59"],
+              ["1565256469000", "57", "53", "58", "54", "59"],
+              ["1565256484000", "57", "53", "58", "54", "59"],
+              ["1565256499000", "57", "53", "58", "54", "59"],
+              ["1565256514000", "57", "53", "58", "54", "59"],
+              ["1565256529000", "57", "53", "58", "54", "59"],
+              ["1565256544000", "57", "53", "58", "54", "59"],
+              ["1565256559000", "57", "53", "58", "54", "59"],
+              ["1565256574000", "57", "53", "58", "54", "59"],
+              ["1565256589000", "57", "53", "58", "54", "59"],
+              ["1565256604000", "57", "53", "58", "54", "59"],
+              ["1565256619000", "57", "53", "58", "54", "59"],
+              ["1565256634000", "57", "53", "58", "54", "59"],
+              ["1565256649000", "57", "53", "58", "54", "59"],
+              ["1565256664000", "57", "53", "58", "54", "59"],
+              ["1565256679000", "57", "53", "58", "54", "59"],
+              ["1565256694000", "57", "53", "58", "54", "59"],
+              ["1565256709000", "57", "53", "58", "54", "59"],
+              ["1565256724000", "57", "53", "58", "54", "59"],
+              ["1565256739000", "57", "53", "58", "54", "59"],
+              ["1565256754000", "250", "150", "100", "130", "60"],
+              ["1565256769000", "250", "150", "100", "130", "60"],
+              ["1565256784000", "250", "150", "100", "130", "60"],
+              ["1565256799000", "250", "150", "100", "130", "60"],
+              ["1565256814000", "250", "150", "100", "130", "60"],
+              ["1565256829000", "250", "150", "100", "130", "60"],
+              ["1565256844000", "250", "150", "100", "130", "60"],
+              ["1565256859000", "250", "150", "100", "130", "60"],
+              ["1565256874000", "250", "150", "100", "130", "60"],
+              ["1565256889000", "250", "150", "100", "130", "60"],
+              ["1565256904000", "250", "150", "100", "130", "60"],
+              ["1565256919000", "250", "150", "100", "130", "60"],
+              ["1565256934000", "250", "150", "100", "130", "60"],
+              ["1565256949000", "250", "150", "100", "130", "60"],
+              ["1565256964000", "250", "150", "100", "130", "60"],
+              ["1565256979000", "250", "150", "100", "130", "60"],
+              ["1565256994000", "250", "150", "100", "130", "60"],
+              ["1565257009000", "250", "150", "100", "130", "60"],
+              ["1565257024000", "250", "150", "100", "130", "60"],
+              ["1565257039000", "250", "150", "100", "130", "60"],
+              ["1565257054000", "250", "150", "100", "130", "60"],
+              ["1565257069000", "250", "150", "100", "130", "60"],
+            ],//预测实际值
             outputData: [
-              ["1565254804000", "7"],
-              ["1565254819000", "7"],
-              ["1565254834000", "7"],
-              ["1565254849000", "7"],
-              ["1565254864000", "7"],
-              ["1565254879000", "7"],
-              ["1565254894000", "7"],
-              ["1565254909000", "7"],
-              ["1565254924000", "7"],
-              ["1565254939000", "7"],
-              ["1565254954000", "7"],
-              ["1565254969000", "5"],
-              ["1565254984000", "5"],
-              ["1565254999000", "5"],
-              ["1565255014000", "5"],
-              ["1565255029000", "5"],
-              ["1565255044000", "5"],
-              ["1565255059000", "5"],
-              ["1565255074000", "5"],
-              ["1565255089000", "5"],
-              ["1565255104000", "5"],
-              ["1565255119000", "5"],
-              ["1565255134000", "5"],
-              ["1565255149000", "5"],
-              ["1565255164000", "5"],
-              ["1565255179000", "5"],
-              ["1565255194000", "5"],
-              ["1565255209000", "5"],
-              ["1565255224000", "5"],
-              ["1565255239000", "5"],
-              ["1565255254000", "5"],
-              ["1565255269000", "5"],
-              ["1565255284000", "5"],
-              ["1565255299000", "5"],
-              ["1565255314000", "5"],
-              ["1565255329000", "5"],
-              ["1565255344000", "5"],
-              ["1565255359000", "5"],
-              ["1565255374000", "5"],
-              ["1565255389000", "5"],
-              ["1565255404000", "5"],
-              ["1565255419000", "5"],
-              ["1565255434000", "5"],
-              ["1565255449000", "5"],
-              ["1565255464000", "5"],
-              ["1565255479000", "5"],
-              ["1565255494000", "5"],
-              ["1565255509000", "7"],
-              ["1565255524000", "7"],
-              ["1565255539000", "7"],
-              ["1565255554000", "7"],
-              ["1565255569000", "7"],
-              ["1565255584000", "7"],
-              ["1565255599000", "7"],
-              ["1565255614000", "7"],
-              ["1565255629000", "7"],
-              ["1565255644000", "7"],
-              ["1565255659000", "7"],
-              ["1565255674000", "7"],
-              ["1565255689000", "7"],
-              ["1565255704000", "7"],
-              ["1565255719000", "7"],
-              ["1565255734000", "7"],
-              ["1565255749000", "7"],
-              ["1565255764000", "7"],
-              ["1565255779000", "7"],
-              ["1565255794000", "7"],
-              ["1565255809000", "7"],
-              ["1565255824000", "7"],
-              ["1565255839000", "7"],
-              ["1565255854000", "7"],
-              ["1565255869000", "7"],
-              ["1565255884000", "7"],
-              ["1565255899000", "7"],
-              ["1565255914000", "7"],
-              ["1565255929000", "7"],
-              ["1565255944000", "7"],
-              ["1565255959000", "7"],
-              ["1565255974000", "7"],
-              ["1565255989000", "7"],
-              ["1565256004000", "7"],
-              ["1565256019000", "7"],
-              ["1565256034000", "7"],
-              ["1565256049000", "5"],
-              ["1565256064000", "5"],
-              ["1565256079000", "5"],
-              ["1565256094000", "5"],
-              ["1565256109000", "5"],
-              ["1565256124000", "5"],
-              ["1565256139000", "5"],
-              ["1565256154000", "5"],
-              ["1565256169000", "5"],
-              ["1565256184000", "5"],
-              ["1565256199000", "5"],
-              ["1565256214000", "5"],
-              ["1565256229000", "7"],
-              ["1565256244000", "7"],
-              ["1565256259000", "7"],
-              ["1565256274000", "7"],
-              ["1565256289000", "7"],
-              ["1565256304000", "7"],
-              ["1565256319000", "7"],
-              ["1565256334000", "7"],
-              ["1565256349000", "7"],
-              ["1565256364000", "7"],
-              ["1565256379000", "7"],
-              ["1565256394000", "7"],
-              ["1565256409000", "5"],
-              ["1565256424000", "5"],
-              ["1565256439000", "5"],
-              ["1565256454000", "5"],
-              ["1565256469000", "5"],
-              ["1565256484000", "5"],
-              ["1565256499000", "5"],
-              ["1565256514000", "5"],
-              ["1565256529000", "5"],
-              ["1565256544000", "5"],
-              ["1565256559000", "5"],
-              ["1565256574000", "5"],
-              ["1565256589000", "5"],
-              ["1565256604000", "5"],
-              ["1565256619000", "5"],
-              ["1565256634000", "5"],
-              ["1565256649000", "5"],
-              ["1565256664000", "5"],
-              ["1565256679000", "5"],
-              ["1565256694000", "5"],
-              ["1565256709000", "5"],
-              ["1565256724000", "5"],
-              ["1565256739000", "5"],
-              ["1565256754000", "5"],
-              ["1565256769000", "7"],
-              ["1565256784000", "7"],
-              ["1565256799000", "7"],
-              ["1565256814000", "7"],
-              ["1565256829000", "7"],
-              ["1565256844000", "7"],
-              ["1565256859000", "7"],
-              ["1565256874000", "7"],
-              ["1565256889000", "7"],
-              ["1565256904000", "7"],
-              ["1565256919000", "7"],
-              ["1565256934000", "7"],
-              ["1565256949000", "7"],
-              ["1565256964000", "7"],
-              ["1565256979000", "7"],
-              ["1565256994000", "7"],
-              ["1565257009000", "7"],
-              ["1565257024000", "7"],
-              ["1565257039000", "7"],
-              ["1565257054000", "7"],
-              ["1565257069000", "7"]
-            ],
-            actualOutputData: [],
-            limsOutputData: []
+              ["1565254804000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565254819000", "0.17", "0.13", "0.98", "0.24", "0.19"],
+              ["1565254834000", "0.27", "0.23", "0.88", "0.44", "0.29"],
+              ["1565254849000", "0.37", "0.33", "0.78", "0.54", "0.39"],
+              ["1565254864000", "0.47", "0.43", "0.68", "0.64", "0.49"],
+              ["1565254879000", "0.57", "0.53", "0.58", "0.74", "0.59"],
+              ["1565254894000", "0.67", "0.63", "0.58", "0.84", "0.59"],
+              ["1565254909000", "0.77", "0.73", "0.48", "0.94", "0.69"],
+              ["1565254924000", "0.87", "0.83", "0.38", "0.84", "0.79"],
+              ["1565254939000", "0.97", "0.93", "0.28", "0.74", "0.99"],
+              ["1565254954000", "0.87", "0.83", "0.18", "0.64", "0.89"],
+              ["1565254969000", "0.77", "0.73", "0.28", "0.54", "0.29"],
+              ["1565254984000", "0.67", "0.63", "0.38", "0.44", "0.39"],
+              ["1565254999000", "0.57", "0.53", "0.48", "0.34", "0.49"],
+              ["1565255014000", "0.47", "0.43", "0.58", "0.24", "0.59"],
+              ["1565255029000", "0.37", "0.33", "0.58", "0.14", "0.69"],
+              ["1565255044000", "0.27", "0.23", "0.58", "0.94", "0.79"],
+              ["1565255059000", "0.17", "0.13", "0.68", "0.84", "0.89"],
+              ["1565255074000", "0.27", "0.23", "0.78", "0.74", "0.99"],
+              ["1565255089000", "0.37", "0.33", "0.88", "0.64", "0.19"],
+              ["1565255104000", "0.47", "0.43", "0.98", "0.54", "0.29"],
+              ["1565255119000", "0.57", "0.53", "0.88", "0.54", "0.39"],
+              ["1565255134000", "0.67", "0.63", "0.78", "0.44", "0.49"],
+              ["1565255149000", "0.77", "0.73", "0.68", "0.34", "0.59"],
+              ["1565255164000", "0.87", "0.83", "0.58", "0.24", "0.69"],
+              ["1565255179000", "0.97", "0.93", "0.48", "0.14", "0.79"],
+              ["1565255194000", "0.17", "0.83", "0.38", "0.24", "0.89"],
+              ["1565255209000", "0.27", "0.73", "0.28", "0.34", "0.99"],
+              ["1565255224000", "0.37", "0.63", "0.18", "0.44", "0.89"],
+              ["1565255239000", "0.47", "0.53", "0.98", "0.54", "0.79"],
+              ["1565255254000", "0.57", "0.43", "0.88", "0.64", "0.19"],
+              ["1565255269000", "0.67", "0.33", "0.78", "0.74", "0.29"],
+              ["1565255284000", "0.77", "0.23", "0.68", "0.84", "0.39"],
+              ["1565255299000", "0.87", "0.13", "0.58", "0.94", "0.49"],
+              ["1565255314000", "0.97", "0.23", "0.48", "0.14", "0.59"],
+              ["1565255329000", "0.87", "0.33", "0.38", "0.24", "0.69"],
+              ["1565255344000", "0.77", "0.43", "0.28", "0.34", "0.19"],
+              ["1565255359000", "0.67", "0.53", "0.18", "0.44", "0.29"],
+              ["1565255374000", "0.57", "0.63", "0.28", "0.54", "0.39"],
+              ["1565255389000", "0.47", "0.73", "0.38", "0.64", "0.49"],
+              ["1565255404000", "0.37", "0.83", "0.48", "0.74", "0.59"],
+              ["1565255419000", "0.27", "0.93", "0.58", "0.54", "0.59"],
+              ["1565255434000", "0.17", "0.83", "0.58", "0.54", "0.59"],
+              ["1565255449000", "0.57", "0.73", "0.58", "0.54", "0.59"],
+              ["1565255464000", "0.57", "0.63", "0.58", "0.54", "0.59"],
+              ["1565255479000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565255494000", "0.57", "0.63", "0.58", "0.54", "0.59"],
+              ["1565255509000", "0.77", "0.43", "0.78", "0.84", "0.99"],
+              ["1565255524000", "0.77", "0.33", "0.78", "0.84", "0.99"],
+              ["1565255539000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255554000", "0.77", "0.13", "0.78", "0.84", "0.99"],
+              ["1565255569000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255584000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255599000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255614000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255629000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255644000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255659000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255674000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255689000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255704000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255719000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255734000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255749000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255764000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255779000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255794000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255809000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255824000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255839000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255854000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255869000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255884000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255899000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255914000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255929000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255944000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255959000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255974000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565255989000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256004000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256019000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256034000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256049000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256064000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256079000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256094000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256109000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256124000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256139000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256154000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256169000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256184000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256199000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256214000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256229000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256244000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256259000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256274000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256289000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256304000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256319000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256334000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256349000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256364000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256379000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256394000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256409000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256424000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256439000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256454000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256469000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256484000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256499000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256514000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256529000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256544000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256559000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256574000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256589000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256604000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256619000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256634000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256649000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256664000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256679000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256694000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256709000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256724000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256739000", "0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["1565256754000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256769000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256784000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256799000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256814000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256829000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256844000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256859000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256874000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256889000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256904000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256919000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256934000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256949000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256964000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256979000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565256994000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565257009000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565257024000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565257039000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565257054000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+              ["1565257069000", "0.77", "0.23", "0.78", "0.84", "0.99"],
+            ],//预测归一值
+            actualOutput: [
+              ["39", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["57", "53", "58", "54", "59"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"],
+              ["36", "54", "39", "22", "56"]
+            ],//在线实际值
+            actualOutputData: [
+              ["0.39", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.57", "0.53", "0.58", "0.54", "0.59"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"],
+              ["0.36", "0.54", "0.39", "0.22", "0.56"]
+            ],//在线归一值
+            limsOutputData:
+              [
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.57", "0.53", "0.58", "0.54", "0.59"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"],
+                ["0.23", "0.06", "0.22", "0.39", "0.14"]
+              ],//实际
           }
+          ;
+          this.forecastFeaturesHistory.allList = dataList;
           //假数据
           if (this.type == 'output') {
-            this.forecastFeaturesHistory.dataList = dataList.outputData;
+            if (this.historyDataType.type == 'gyz') {
+              this.forecastFeaturesHistory.dataList = dataList.outputData;
+            } else {
+              this.forecastFeaturesHistory.dataList = dataList.output;
+            }
+
             this._initForecastFeaturesHistoryEchartsByOutput();
           } else if (this.type == 'input') {
-            this.forecastFeaturesHistory.dataList = dataList.inputData;
+            if (this.historyDataType.type == 'gyz') {
+              this.forecastFeaturesHistory.dataList = dataList.inputData;
+            } else {
+              this.forecastFeaturesHistory.dataList = dataList.input;
+            }
+
             this._initForecastFeaturesHistoryEchartsByInput();
           }
 
@@ -696,62 +1548,61 @@ export default {
       }).then(res => {
         if (res.data.status == 1) {
           let dataList = res.data.result.differenctValue;
-          dataList = [
-            ["1565254804000","0.13", "0.52", "0.88", "0.66", "0.06", "0.32", "0.12"],
-            ["1565254819000","0.13", "0.52", "0.88", "0.66", "0.06", "0.32", "0.12"],
-            ["1565254834000","0.13", "0.52", "0.88", "0.66", "0.06", "0.32", "0.12"],
-            ["1565254849000","0.13", "0.52", "0.88", "0.66", "0.06", "0.32", "0.12"],
-            ["1565254864000","0.13", "0.52", "0.88", "0.66", "0.06", "0.32", "0.12"],
-            ["1565254879000","0.13", "0.52", "0.88", "0.66", "0.06", "0.32", "0.12"],
-            ["1565254894000","0.13", "0.52", "0.88", "0.66", "0.06", "0.32", "0.12"],
-            ["1565254909000","0.13", "0.52", "0.88", "0.66", "0.06", "0.32", "0.12"],
-            ["1565254924000","0.13", "0.52", "0.88", "0.66", "0.06", "0.32", "0.12"],
-            ["1565254939000","0.13", "0.52", "0.88", "0.66", "0.06", "0.32", "0.12"],
-            ["1565254954000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565254969000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565254984000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565254999000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255014000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255029000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255044000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255059000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255074000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255089000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255104000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255119000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255134000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255149000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255164000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255179000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255194000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255209000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255224000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255239000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255254000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255269000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255284000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255299000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255314000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255329000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255344000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255359000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255374000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255389000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255404000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255419000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255434000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255449000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255464000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255479000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255494000", "0.62", "0.22", "0.71", "0.1", "0.2", "0.3", "0.4"],
-            ["1565255509000","0.13", "0.52", "0.88", "0.66", "0.06", "0.32", "0.12"],
-            ["1565255524000","0.13", "0.52", "0.88", "0.66", "0.06", "0.32", "0.12"],
-            ["1565255539000","0.13", "0.52", "0.88", "0.66", "0.06", "0.32", "0.12"],
-            ["1565255554000","0.13", "0.52", "0.88", "0.66", "0.06", "0.32", "0.12"],
-            ["1565255569000","0.13", "0.52", "0.88", "0.66", "0.06", "0.32", "0.12"],
-            ["1565255584000","0.13", "0.52", "0.88", "0.66", "0.06", "0.32", "0.12"],
-            ["1565255599000","0.13", "0.52", "0.88", "0.66", "0.06", "0.32", "0.12"],
-            ["1565255614000","0.13", "0.52", "0.88", "0.66", "0.06", "0.32", "0.12"]];
+          dataList = [["1565254804000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254819000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254834000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254849000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254864000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254879000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254894000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254909000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254924000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254939000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565254954000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565254969000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565254984000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565254999000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255014000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255029000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255044000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255059000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255074000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255089000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255104000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255119000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255134000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255149000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255164000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255179000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255194000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255209000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255224000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255239000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255254000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255269000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255284000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255299000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255314000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255329000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255344000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255359000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255374000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255389000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255404000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255419000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255434000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255449000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255464000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255479000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255494000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
+            ["1565255509000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565255524000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565255539000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565255554000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565255569000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565255584000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565255599000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
+            ["1565255614000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"]];
           this.forecastFeaturesHistory.dataList = dataList;
           this._initForecastFeaturesHistoryEchartsByDiff();
         } else {
@@ -761,21 +1612,90 @@ export default {
     },
     _closeForecastFeaturesHistoryViewDialog () {
       this.$emit('_closeForecastFeaturesHistoryViewDialog');
+    },
+    _handleCheckedModelParamChange (dataList) {
+      if (dataList.length == 0) {
+        for (let key  in this.colorCheckedList) {
+          this.colorCheckedList[key] = false;
+        }
+      } else {
+        for (let key  in this.colorCheckedList) {
+          for (let i = 0; i < dataList.length; i++) {
+            if (key == dataList[i]) {
+              this.colorCheckedList[key] = true;
+              break;
+            } else if (i == dataList.length - 1) {
+              this.colorCheckedList[key] = false;
+            }
+          }
+        }
+      }
+
+      if (this.type == 'output') {
+        this._initForecastFeaturesHistoryEchartsByOutput();
+      } else if (this.type == 'input') {
+        this._initForecastFeaturesHistoryEchartsByInput();
+      } else {
+        this._initForecastFeaturesHistoryEchartsByDiff();
+      }
+
     }
   }
 }
 </script>
-
+<style>
+  /*.el-checkbox__input.is-checked + .el-checkbox__label {
+    color: red
+  }*/
+</style>
 <style scoped>
+
+
+  .leftDiv {
+    position: relative;
+    width: 240px;
+    height: 380px;
+    border: 1px solid rgba(0, 21, 41, 0.08);
+  }
+
+  .forecastFeaturesHistoryTitle {
+    position: absolute;
+    left: 0;
+    width: 240px;
+    height: 30px;
+    overflow: hidden;
+    font-size: 20px;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .selectedLegend {
+    position: absolute;
+    left: 0px;
+    top: 40px;
+    width: 240px;
+    height: 380px;
+    overflow: hidden;
+  }
+
   .text_right {
     text-align: right;
   }
 
   #forecastFeaturesHistoryEcharts {
+    margin-left: 180px;
     height: 380px;
-    width: 100%;
+    width: 890px;
   }
-  >>>.el-checkbox__label {
-    color: inherit;
+
+  .rightButton{
+    position: absolute;
+    right : 15px
+  }
+</style>
+<style>
+  .el-checkbox__input.is-checked .el-checkbox__inner, .el-checkbox__input.is-indeterminate .el-checkbox__inner {
+    background-color: lightgray;
+    border-color: lightgray;
   }
 </style>
