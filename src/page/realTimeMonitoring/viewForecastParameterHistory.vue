@@ -3,7 +3,7 @@
     <div style="margin-left: 5px; margin-top: 5px">
       <el-form
         :inline="true"
-        class="demo-form-inline search-form">
+        class="demo-form-inline search-form black-form">
 
         <el-form-item>
           <span style="color:#000;">选择日期:&nbsp;&nbsp;&nbsp;</span>
