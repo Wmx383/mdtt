@@ -27,8 +27,8 @@
       </div>
       <div class="selectedLegend">
         <el-checkbox-group v-model="modelParamCheckedList" @change="_handleCheckedModelParamChange" :max="5">
-          <el-checkbox v-for="item in modelParamList" :label="item.name" :key="item.id" :style="{color : item.color}"
-                       ><span :style="{color : item.color}">{{item.name}}</span></el-checkbox>
+          <el-checkbox v-for="(item,index) in modelParamList" :label="item.name" :key="item.id"
+                       ><span :style="{color : colorCheckedList[item.name] ? item.color : '#000'}">{{item.name}}</span></el-checkbox>
         </el-checkbox-group>
       </div>
 
@@ -90,9 +90,10 @@ export default {
       },
       title: '',
       modelParamCheckedList: [],
+      colorCheckedList: {},
       modelParamList: [],//每次进来查询的对应输出还是输入的 modelParamList 永恒不变
       oid: '',
-      colors: ['red', 'orange', '#333366', 'green', 'blue', '#CC9900', '#9900FF', ' black', '#FFCCFF', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF', '#663399', '#660033'],
+      colors: ['red', 'orange', '#333366', 'green', 'blue', '#CC9900', '#9900FF', '#CC1691', '#7B68EE', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF', '#663399', '#660033'],
       forecastParameterHistory: {
         allList: [],
         columnName: '',
@@ -117,7 +118,8 @@ export default {
             feature: {
               magicType: {show: true, type: ['line', 'bar']},
               saveAsImage: {show: true}
-            }
+            },
+            right : '10px'
           },
           legend: {
             show: false,
@@ -375,7 +377,6 @@ export default {
       })
     },
     _handleOnclickByOutput (params) {
-      console.log(params);
       this.forecastParameterHistory.forecastParameterHistoryList = [
         {
           name: params.seriesName,
@@ -398,6 +399,7 @@ export default {
           if (type == 'output') {
             let modelParamConstList = [];
             let nameList = [];
+            let colorCheckdList = {};
             this.modelFeaturesList.forEach((item, index) => {
               if (item.type == '2') {
                 nameList.push(item.name);
@@ -407,11 +409,13 @@ export default {
                   color: this.colors[modelParamConstList.length],
                   minValue: item.minValue,
                   maxValue: item.maxValue
-                }
+                };
+                colorCheckdList[item.name] = false;
                 modelParamConstList.push(tableItem);
               }
             });
             this.modelParamCheckedList = [];
+            this.colorCheckedList = colorCheckdList;
             this.modelParamList = JSON.parse(JSON.stringify(modelParamConstList));
             this._initForecastParameterHistoryEchartsByOutput();
             this._getDate();
@@ -419,6 +423,7 @@ export default {
           } else if (type == 'input') {
             let modelParamConstList = [];
             let nameList = [];
+            let colorCheckdList = {};
             this.modelFeaturesList.forEach((item, index) => {
               if (item.type == '1') {
                 nameList.push(item.name);
@@ -428,11 +433,13 @@ export default {
                   color: this.colors[modelParamConstList.length],
                   minValue: item.minValue,
                   maxValue: item.maxValue
-                }
+                };
+                colorCheckdList[item.name] = false;
                 modelParamConstList.push(tableItem);
               }
             });
             this.modelParamCheckedList = [];
+            this.colorCheckedList = colorCheckdList;
             this.modelParamList = JSON.parse(JSON.stringify(modelParamConstList));
             this._initForecastParameterHistoryEchartsByInput();
             this._getDate();
@@ -440,6 +447,7 @@ export default {
           } else if (type == 'diff') {
             let modelParamConstList = [];
             let nameList = [];
+            let colorCheckdList = {};
             this.modelFeaturesList.forEach((item, index) => {
               if (item.type == '1') {
                 nameList.push(item.name);
@@ -449,11 +457,13 @@ export default {
                   color: this.colors[modelParamConstList.length],
                   minValue: item.minValue,
                   maxValue: item.maxValue
-                }
+                };
+                colorCheckdList[item.name] = false;
                 modelParamConstList.push(tableItem);
               }
             });
             this.modelParamCheckedList = [];
+            this.colorCheckedList = colorCheckdList;
             this.modelParamList = JSON.parse(JSON.stringify(modelParamConstList));
             this._initForecastParameterHistoryEchartsByDiff();
             this._getDate();
@@ -466,7 +476,6 @@ export default {
       })
     },
     _getDate () {
-      console.log('初始化时间');
       let date = new Date()
       let year = date.getFullYear()
       let month = date.getMonth() + 1
@@ -1170,10 +1179,17 @@ export default {
     _closeForecastParameterHistoryViewDialog () {
       this.$emit('_closeForecastParameterHistoryViewDialog');
     },
-    _handleCheckedModelParamChange (value) {
-      //console.log(this.modelParamCheckedList);
-      //console.log(this.forecastParameterHistory.option.series[0].name);
-      //console.log(this.forecastParameterHistory.option.series[1].name);
+    _handleCheckedModelParamChange (dataList) {
+      for(let key  in this.colorCheckedList){
+        for(let i = 0; i< dataList.length; i++){
+          if(key == dataList[i]){
+            this.colorCheckedList[key] = true;
+            break;
+          }else if(i == dataList.length - 1){
+            this.colorCheckedList[key] = false;
+          }
+        }
+      }
       this._initForecastParameterHistoryEchartsByOutput();
     }
   }
@@ -1221,6 +1237,10 @@ export default {
   #forecastParameterHistoryEcharts {
     margin-left: 180px;
     height: 380px;
-    width: 900px;
+    width: 890px;
+  }
+
+  .el-input__inner{
+    border: 1px solid #000;
   }
 </style>
