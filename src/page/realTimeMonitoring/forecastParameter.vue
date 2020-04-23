@@ -894,7 +894,7 @@ export default {
             areaStyle: {
               color: 'LightPink'
             },
-            smooth: true
+            //smooth: true
           }, {
             name: '上次输入值',
             data: [],
@@ -903,7 +903,7 @@ export default {
             areaStyle: {
               color: 'LightPink'
             },
-            smooth: true
+            //smooth: true
           }, {
             name: '假的',
             data: [],
@@ -918,7 +918,7 @@ export default {
             lineStyle : {
               opacity : 0
             },
-            smooth: true
+            //smooth: true
           }]
         }
       },
