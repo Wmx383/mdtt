@@ -81,4 +81,8 @@
     margin-bottom: 5px;
   }
 
+  .black-form .el-form-item .el-form-item__content .el-input__inner{
+    bolder : 1px solid black;
+  }
+
 </style>
