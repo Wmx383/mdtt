@@ -28,7 +28,7 @@
       <div class="selectedLegend">
         <el-checkbox-group v-model="modelParamCheckedList" @change="_handleCheckedModelParamChange" :max="5">
           <el-checkbox v-for="(item,index) in modelParamList" :label="item.name" :key="item.id"
-                       ><span :style="{color : colorCheckedList[item.name] ? item.color : '#000'}">{{item.name}}</span></el-checkbox>
+                       ><span :style="{color : colorCheckedList[item.name] ? item.color : '#000'}" :title="item.title">{{item.name}}</span></el-checkbox>
         </el-checkbox-group>
       </div>
 
@@ -405,6 +405,7 @@ export default {
                 nameList.push(item.name);
                 let tableItem = {
                   name: item.name,
+                  title : item.name,
                   id: item.id,
                   color: this.colors[modelParamConstList.length],
                   minValue: item.minValue,
@@ -427,14 +428,16 @@ export default {
             this.modelFeaturesList.forEach((item, index) => {
               if (item.type == '1') {
                 nameList.push(item.name);
+                let index = item.name.indexOf('-');
                 let tableItem = {
-                  name: item.name,
+                  name: index > 0 ? item.name.substring(0, index) : item.name,
+                  title : item.name,
                   id: item.id,
                   color: this.colors[modelParamConstList.length],
                   minValue: item.minValue,
                   maxValue: item.maxValue
                 };
-                colorCheckdList[item.name] = false;
+                colorCheckdList[index > 0 ? item.name.substring(0, index) : item.name] = false;
                 modelParamConstList.push(tableItem);
               }
             });
@@ -451,14 +454,16 @@ export default {
             this.modelFeaturesList.forEach((item, index) => {
               if (item.type == '1') {
                 nameList.push(item.name);
+                let index = item.name.indexOf('-');
                 let tableItem = {
-                  name: item.name,
+                  name: index > 0 ? item.name.substring(0, index) : item.name,
+                  title : item.name,
                   id: item.id,
                   color: this.colors[modelParamConstList.length],
                   minValue: item.minValue,
                   maxValue: item.maxValue
                 };
-                colorCheckdList[item.name] = false;
+                colorCheckdList[index > 0 ? item.name.substring(0, index) : item.name] = false;
                 modelParamConstList.push(tableItem);
               }
             });
