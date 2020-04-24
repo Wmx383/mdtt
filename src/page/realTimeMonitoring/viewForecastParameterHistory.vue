@@ -124,13 +124,6 @@ export default {
               }
             }
           },
-          toolbox: {
-            feature: {
-              magicType: {show: true, type: ['line', 'bar']},
-              saveAsImage: {show: true}
-            },
-            right: '10px'
-          },
           legend: {
             show: false,
             data: [],

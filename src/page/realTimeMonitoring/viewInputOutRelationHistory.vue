@@ -135,13 +135,6 @@ export default {
             }
           }
         },
-        toolbox: {
-          feature: {
-            magicType: {show: true, type: ['line', 'bar']},
-            saveAsImage: {show: true}
-          },
-          right: '10px'
-        },
         legend: {
           show: false,
           data: [],
@@ -1568,6 +1561,7 @@ export default {
     height: 380px;
     width: 778px;
     border: 1px solid rgba(0, 21, 41, 0.08);
+    z-index: 999999;
   }
 
   .rightButton {
