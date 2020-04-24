@@ -279,7 +279,6 @@
     },
     created() {
       this.setOrgTreeAndUserHeight()
-      this.getOrgTree();
       this.getUserPageList();
       this.$nextTick(_ => {
         this.$refs.viewOrgComRef._getUserRoleOrgTree();
@@ -292,25 +291,14 @@
       },
       //获取树
       getOrgTree() {
-        this.$http({
-          url: "/api/api/user/getUserRoleOrgTree",
-          "content-type": "application/json",
-          method: 'get',
-        }).then(res => {
-          if (res.data.status == 1) {
-            this.treeData = res.data.result;
-          } else {
-            //TO-DO 临时先这么写提醒吧 哈哈哈哈
-            this.$router.push({path: "/"});
-          }
-        })
+        this.treeData = JSON.parse(JSON.stringify(this.$refs.viewOrgComRef.data));
       },
       //点击树
       _handleOnClickOrg(args) {
         this.treeOrgId = args[1];
         this.treeOrgType = args[2];
         this.rowValue.rowId = ''
-
+        this.getOrgTree();
         if (this.treeOrgType == '1') {
           this.getUserList();
         } else {

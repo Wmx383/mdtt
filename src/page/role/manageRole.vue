@@ -279,13 +279,24 @@
         }).then(res => {
           if (res.data.status == 1) {
             this.treeData = res.data.result;
+            this.doDelete(this.treeData, 0);
             this.getAllOrgIdList(this.treeData);
           } else {
             this.$router.push({path: "/"});
           }
         })
       },
-
+      doDelete(data, status){
+        for(let i = 0; i < data.length; i ++){
+          if(data[i].status == status){
+            data.splice(i, 1)
+          }else{
+            if(data[i].childList){
+              this.doDelete(data[i].childList, status)
+            }
+          }
+        }
+      },
       //获取所有的orgId
       getAllOrgIdList(treeData) {
         let org = [];

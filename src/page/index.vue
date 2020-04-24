@@ -25,7 +25,7 @@
               <el-menu-item index="/user/manageUser"><i class="el-icon-menu"></i>用户管理</el-menu-item>
               <el-menu-item index="/systemManage/manageData"><i class="el-icon-menu"></i>数据配置</el-menu-item>
               <el-menu-item index="/role/manageRole"><i class="el-icon-menu"></i>角色管理</el-menu-item>
-              <el-menu-item index="/systemManage/manageOrg"><i class="el-icon-menu"></i>组织机构管理</el-menu-item>
+              <el-menu-item index="/org/manageOrg"><i class="el-icon-menu"></i>组织机构管理</el-menu-item>
               <el-menu-item index="/modelGroup/manageModelGroup"><i class="el-icon-menu"></i>模型组管理</el-menu-item>
               <el-menu-item index="/samplePoint/manageSamplePoint"><i class="el-icon-menu"></i>采样点管理</el-menu-item>
               <el-menu-item index="/norm/manageNorm"><i class="el-icon-menu"></i>指标管理</el-menu-item>

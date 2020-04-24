@@ -60,10 +60,10 @@ export default new Router({
           component :() => import('@/page/role/manageRole')
         },
         {
-          path: '/systemManage/manageOrg',
+          path: '/org/manageOrg',
           name: '组织机构管理',
           hidden : true,
-          component :() => import('@/page/systemManage/manageOrg')
+          component :() => import('@/page/org/manageOrg')
         },
         {
           path: '/modelGroup/manageModelGroup',

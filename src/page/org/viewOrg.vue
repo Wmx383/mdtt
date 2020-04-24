@@ -43,8 +43,8 @@ export default {
     _getCurrentNode () {
       return this.$refs.tree.getCurrentNode();
     },
-    _getUserRoleOrgTree () {
-      this.$http({
+    async _getUserRoleOrgTree () {
+      await this.$http({
         url: "/api/api/user/getUserRoleOrgTree",
         "content-type": "application/json",
         method: 'get',
@@ -53,12 +53,36 @@ export default {
         if (res.data.status == 1) {
           this.loading = false;
           this.data = res.data.result;
+          console.log(this.data);
+          this.doDelete(this.data, 0);
         } else {
           //TO-DO 临时先这么写提醒吧 哈哈哈哈
           this.$message({message: res.data.msg, type: 'error'});
         }
       })
     },
+    async _selectOrgByUpdate(id){
+      await this._getUserRoleOrgTree();
+      this._setUserRoleOrgTree(id);
+    },
+    _setUserRoleOrgTree(id){
+      this.$refs.tree.setCurrentKey(id);
+      this.handleNodeClick(this.$refs.tree.getCurrentNode());
+    },
+
+    doDelete(data, status){
+      for(let i = 0; i < data.length; i ++){
+        if(data[i].status == status){
+          data.splice(i, 1)
+        }else{
+          if(data[i].childList){
+            this.doDelete(data[i].childList, status)
+          }
+        }
+      }
+    },
+
+
     _getUserRoleOrgTreeByThreeLevel () {
       this.$http({
         url: "/api/api/user/getUserRoleOrgTree",
