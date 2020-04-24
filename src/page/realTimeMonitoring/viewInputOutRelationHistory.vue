@@ -214,7 +214,7 @@ export default {
       modelParamCheckedList: [],
       modelParamList: [],//每次进来查询的对应输出还是输入的 modelParamList 永恒不变
       oid: '',
-      inputColors: ['red', 'orange', '#333366', 'green', 'blue', '#CC9900', '#9900FF', '#CC1691', '#7B68EE', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF', '#663399', '#660033'],
+      inputColors: ['red', 'orange', '#333366', '#57E81A', 'blue', '#CC9900', '#9900FF', '#CC1691', '#7B68EE', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF', '#663399', '#660033'],
       outColors: [
         '#E800E8',
         '#921AFF',
