@@ -260,10 +260,16 @@ export default {
     }
   },
   methods: {
-    async _getModelParamList (modelId) {
+    async _getModelParamList (modelId, ycType) {
+      let urlStr = '';
+      if(ycType){
+        urlStr = 'modelParam/getModelParamList';
+      }else{
+        urlStr =  'modelFeatures/getModelFeaturesList';
+      }
       this.modelId = modelId;
       await this.$http({
-        url: '/api/api/modelParam/getModelParamList?modelId=' + modelId + '',
+        url: '/api/api/'+ urlStr +'?modelId=' + modelId + '',
         "content-type": "application/json",
         method: 'get',
       }).then(res => {
