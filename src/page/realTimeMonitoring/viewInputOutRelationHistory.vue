@@ -1569,3 +1569,8 @@ export default {
     right: 15px
   }
 </style>
+<style>
+  .black-form .el-form-item .el-form-item__content .el-input__inner {
+    border: 1px solid lightgray;
+  }
+</style>
