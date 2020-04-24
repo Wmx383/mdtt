@@ -8,7 +8,7 @@
         <el-form-item>
           <span style="color:#000;">选择日期:&nbsp;&nbsp;&nbsp;</span>
           <el-date-picker
-            v-model="forecastParameterHistoryForm.date"
+            v-model="inputOutRelationHistoryForm.date"
             type="daterange"
             range-separator="至"
             start-placeholder="开始日期"
@@ -19,42 +19,66 @@
           >
           </el-date-picker>
         </el-form-item>
-        <el-form-item v-if="type != 'diff'" class="rightButton">
+        <el-form-item class="rightButton">
           <el-button type="primary" size="small" @click="_switchHistoryDataType">{{historyDataType.title}}</el-button>
         </el-form-item>
       </el-form>
     </div>
-    <div class="leftDiv">
-      <div class="forecastParameterHistoryTitle">
-        <span style="color: #000">{{title}}</span>
-      </div>
-      <div class="selectedLegend">
-        <el-checkbox-group v-model="modelParamCheckedList" @change="_handleCheckedModelParamChange"
-                           :max="historyDataType.max">
-          <el-checkbox v-for="(item,index) in modelParamList" :label="item.name" :key="item.id"
-          ><span :style="{color : colorCheckedList[item.name] ? item.color : '#000'}"
-                 :title="item.title">{{item.name}}</span></el-checkbox>
-        </el-checkbox-group>
+    <div class="inputOutRelationContentDiv">
+      <div class="leftDiv">
+        <div class="outTitle">
+          <span style="color: #000">{{outModel.title}}</span>
+        </div>
+        <div class="selectedLegend">
+          <el-checkbox-group v-model="outModel.outModelParamCheckedList" @change="_handleOutCheckedModelParamChange"
+                             :max="historyDataType.max">
+            <el-checkbox v-for="(item,index) in outModel.outModelParamList" :label="item.name" :key="item.id"
+            ><span :style="{color : outModel.outColorCheckedList[item.name] ? item.color : '#000'}"
+                   :title="item.title">{{item.name}}</span></el-checkbox>
+          </el-checkbox-group>
+        </div>
       </div>
 
-      <div id="forecastParameterHistoryEcharts">
+      <div id="inputOutRelationHistoryEcharts" class="middleDiv">
 
       </div>
+
+      <div class="rightDiv">
+        <div class="inputTitle">
+          <span style="color: #000">{{inputModel.title}}</span>
+        </div>
+        <div class="selectedLegend">
+          <el-checkbox-group v-model="inputModel.inputModelParamCheckedList"
+                             @change="_handleInputCheckedModelParamChange"
+                             :max="historyDataType.max">
+            <el-checkbox v-for="(item,index) in inputModel.inputModelParamList" :label="item.name" :key="item.id"
+            ><span :style="{color : inputModel.inputColorCheckedList[item.name] ? item.color : '#000'}"
+                   :title="item.title">{{item.name}}</span></el-checkbox>
+          </el-checkbox-group>
+        </div>
+      </div>
+
     </div>
-
     <div class="table_container">
       <el-table
-        v-loading="forecastParameterHistory.gridLoading"
-        :data="forecastParameterHistory.forecastParameterHistoryList"
-        :style="forecastParameterHistory.gridTableStyle"
-        :height="forecastParameterHistory.gridTableStyle.height"
+        v-loading="inputOutRelationHistory.gridLoading"
+        :data="inputOutRelationHistory.inputOutRelationHistoryList"
+        :style="inputOutRelationHistory.gridTableStyle"
+        :height="inputOutRelationHistory.gridTableStyle.height"
         align='center'
-        ref="forecastParameterHistoryTable"
+        ref="inputOutRelationHistoryTable"
         highlight-current-row
       >
         <el-table-column
           prop="name"
           label="参数"
+          align='left'
+          min-width="200"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="type"
+          label="类型"
           align='left'
           min-width="200"
         >
@@ -68,7 +92,7 @@
         </el-table-column>
         <el-table-column
           prop="data"
-          :label="forecastParameterHistory.columnName"
+          :label="inputOutRelationHistory.columnName"
           align='left'
           min-width="200"
         >
@@ -76,10 +100,9 @@
       </el-table>
     </div>
     <footer class="text_right">
-      <el-button type="primary" size="small" @click="_closeForecastParameterHistoryViewDialog">取消</el-button>
+      <el-button type="primary" size="small" @click="_closeInputOutRelationHistoryViewDialog">取消</el-button>
     </footer>
   </div>
-
 </template>
 
 <script>
@@ -87,82 +110,72 @@ import moment from 'moment';
 import echarts from 'echarts';
 
 export default {
-  name: "viewForecastParameterHistoryHistory",
+  name: "viewInputOutRelationHistory",
   data () {
     return {
-      forecastParameterHistoryForm: {
+      inputOutRelationHistoryForm: {
         date: []
       },
-      historyDataType: {
-        title: '归一值',
-        max: 5,
-        type: 'gyz'
-      },
-      title: '',
-      modelParamCheckedList: [],
-      colorCheckedList: {},
-      modelParamList: [],//每次进来查询的对应输出还是输入的 modelParamList 永恒不变
-      oid: '',
-      colors: ['red', 'orange', '#333366', 'green', 'blue', '#CC9900', '#9900FF', '#CC1691', '#7B68EE', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF', '#663399', '#660033'],
-      forecastParameterHistory: {
-        allList: [],
-        columnName: '',
-        dataList: [],
-        option: {
-          title: {
-            text: '',
-            show: false
-          },
-          grid: {},
-          tooltip: {
-            formatter: this._getToolTip,
-            trigger: 'item',
-            axisPointer: {
-              type: 'cross',
-              crossStyle: {
-                color: '#999'
-              }
+      allList: [],
+      inputDataList: [],
+      outDataList: [],
+      option: {
+        title: {
+          text: '',
+          show: false
+        },
+        grid: {},
+        tooltip: {
+          formatter: this._getToolTip,
+          trigger: 'item',
+          axisPointer: {
+            type: 'cross',
+            crossStyle: {
+              color: '#999'
             }
+          }
+        },
+        toolbox: {
+          feature: {
+            magicType: {show: true, type: ['line', 'bar']},
+            saveAsImage: {show: true}
           },
-          toolbox: {
-            feature: {
-              magicType: {show: true, type: ['line', 'bar']},
-              saveAsImage: {show: true}
-            },
-            right: '10px'
-          },
-          legend: {
-            show: false,
-            data: [],
-            top: 20,
-          },
-          dataZoom: [{
-            type: 'inside',
-            start: 0,
-            end: 40,
-          }, {
-            handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
-            handleSize: '80%',
-            handleStyle: {
-              color: '#fff',
-              shadowBlur: 3,
-              shadowColor: 'rgba(0, 0, 0, 0.6)',
-              shadowOffsetX: 2,
-              shadowOffsetY: 2
+          right: '10px'
+        },
+        legend: {
+          show: false,
+          data: [],
+          top: 20,
+        },
+        dataZoom: [{
+          type: 'inside',
+          start: 0,
+          end: 40,
+        }, {
+          handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+          handleSize: '80%',
+          handleStyle: {
+            color: '#fff',
+            shadowBlur: 3,
+            shadowColor: 'rgba(0, 0, 0, 0.6)',
+            shadowOffsetX: 2,
+            shadowOffsetY: 2
+          }
+        }],//测试
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: [],
+          axisLine: {
+            lineStyle: {
+              color: '#000'
             }
-          }],//测试
-          xAxis: {
-            type: 'category',
-            boundaryGap: false,
-            data: [],
-            axisLine: {
-              lineStyle: {
-                color: '#000'
-              }
-            }
-          },
-          yAxis: {
+          }
+        },
+        yAxis: [
+          {
             type: 'value',
+            name: '输出',
             max: function (value) {
               return (value.max * (1.2)).toFixed(0);
             },
@@ -172,13 +185,65 @@ export default {
               }
             }
           },
-          series: []
-        },
+          {
+            name: '输入',
+            type: 'value',
+            max: function (value) {
+              return (value.max * (1.2)).toFixed(0);
+            },
+            axisLine: {
+              lineStyle: {
+                color: '#000'
+              }
+            }
+          }],
+        series: []
+      },
+      outModel: {
+        outModelParamList: [],
+        outModelParamCheckedList: [],
+        outColorCheckedList: {},
+        title: '输出类型'
+      },
+      inputModel: {
+        inputModelParamList: [],
+        inputModelParamCheckedList: [],
+        inputColorCheckedList: {},
+        title: '输入类型'
+      },
+      modelParamCheckedList: [],
+      modelParamList: [],//每次进来查询的对应输出还是输入的 modelParamList 永恒不变
+      oid: '',
+      inputColors: ['red', 'orange', '#333366', 'green', 'blue', '#CC9900', '#9900FF', '#CC1691', '#7B68EE', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF', '#663399', '#660033'],
+      outColors: [
+        '#E800E8',
+        '#921AFF',
+        '#FF0080',
+        '#7B7B7B',
+        '#00BB00',
+        '#02C874',
+        '#00AEAE',
+        '#0066CC',
+        '#0000E3',
+        '#F75000',
+        '#FF8000',
+        '#D9B300',
+        '#C4C400',
+        '#8CEA00',
+        '#AE57A4'],
+      historyDataType: {
+        title: '归一值',
+        max: 5,
+        type: 'gyz'
+      },
+      modelId: '',
+      inputOutRelationHistory: {
+        columnName: '值',
         sortNum: 0,
         gridLoading: false,
-        forecastParameterHistoryAllList: [],
-        forecastParameterHistoryPageList: [],
-        forecastParameterHistoryList: [],
+        inputOutRelationHistoryAllList: [],
+        inputOutRelationHistoryPageList: [],
+        inputOutRelationHistoryList: [],
         gridTableStyle: {
           width: '100%',
           height: '100px'
@@ -192,433 +257,70 @@ export default {
         },
         selectedDate: [],
       },
-      modelFeaturesList: [],
-      flag: true,
-      modelId: '',
-      type: '',
     }
   },
   methods: {
-    //切换历史数据类型
-    _switchHistoryDataType () {
-      this.forecastParameterHistory.allList = [];
-      this.forecastParameterHistory.dataList = [];
-      this.modelParamCheckedList = [];
-      this._handleCheckedModelParamChange(this.modelParamCheckedList);
-      //实际值切换至归一值
-      if (this.historyDataType.type == 'sjz') {
-        this.historyDataType.type = 'gyz';
-        this.historyDataType.title = '归一值';
-        this.historyDataType.max = 5;
-      }
-      //归一值切换至实际值
-      else {
-        this.historyDataType.type = 'sjz';
-        this.historyDataType.title = '实际值';
-        this.historyDataType.max = 1;
-      }
-      this._selectForecastParameterHistory();
-
-
-    },
-    //鼠标移动出发显示函数
-    _getToolTip (params) {
-      let result = '';
-      if (this.type == 'output') {
-        let index = 0;
-        let minValue = 0;
-        let maxValue = 0;
-        for (let i = 0; i < this.modelParamList.length; i++) {
-          if (params.seriesName == this.modelParamList[i].name) {
-            index = i;
-            minValue = this.modelParamList[i].minValue;
-            maxValue = this.modelParamList[i].maxValue;
-            break;
-          }
-        }
-        if (this.historyDataType.type == 'gyz') {
-          let gyz = 0;
-          if (this.forecastParameterHistory.allList.limsOutputData.length > 0) {
-            gyz = ((this.forecastParameterHistory.allList.limsOutputData[params.dataIndex][index] - minValue) / (maxValue - minValue)).toFixed(5);
-          }
-          result = params.seriesName + '<br/>时间:' + params.name + '<br/>预测参数归一值:' + params.value + '<br/>在线参数归一值:' + this.forecastParameterHistory.allList.actualOutputData[params.dataIndex][index] + '<br/>lims归一值:' + gyz + '';
-        } else {
-          result = params.seriesName + '<br/>时间:' + params.name + '<br/>预测参数实际值:' + params.value + '<br/>在线参数实际值:' + this.forecastParameterHistory.allList.actualOutput[params.dataIndex][index] + '<br/>lims实际值:' + this.forecastParameterHistory.allList.limsOutputData[params.dataIndex][index] + '';
-
-        }
-      } else if (this.type == 'input') {
-        if (this.historyDataType.type == 'gyz') {
-          result = params.seriesName + '<br/>时间:' + params.name + '<br/>输入归一值:' + params.value + '<br/>';
-        } else {
-          result = params.seriesName + '<br/>时间:' + params.name + '<br/>输入实际值:' + params.value + '<br/>';
-        }
-
-      } else {
-        result = params.seriesName + '<br/>时间:' + params.name + '<br/>差值:' + params.value + '<br/>';
-      }
-
-
-      return result;
-    },
-    async _onChangeDate () {
-      this.forecastParameterHistory.forecastParameterHistoryList = [];
-      if (this.forecastParameterHistoryForm.date != null && this.forecastParameterHistoryForm.date[0] != this.forecastParameterHistoryForm.date[1]) {
-        this.$message({message: '请选择一天时间', type: 'warning'});
-        this.forecastParameterHistoryForm.date = [];
-        this._clearEcharts();
-        return;
-      }
-
-      if (this.forecastParameterHistoryForm.date != null) {
-        if (this.type == 'diff') {
-          await this._getInputFeaturesStatistics();
-        } else {
-          await this._selectForecastParameterHistory();
-        }
-      } else {
-        this._clearEcharts()
-      }
-    },
-    _initForecastParameterHistoryEchartsByOutput () {
-      console.log('我?');
-      this.title = '输出历史查询';
-      this.forecastParameterHistory.option.xAxis.data = [];
-      this.forecastParameterHistory.option.legend.data = [];
-      this.forecastParameterHistory.option.series = [];
-      //this.forecastParameterHistory.option.series[0].data = [];
-      if (this.modelParamList.length > 0) {
-        let legend = [];
-        this.modelParamList.forEach((item, index) => {
-          for (let i = 0; i < this.modelParamCheckedList.length; i++) {
-            if (item.name == this.modelParamCheckedList[i]) {
-              legend.push(item.name);
-              let xAxisData = [];
-              let data = [];
-              this.forecastParameterHistory.dataList.forEach((item2, index2) => {
-                xAxisData.push(index2);
-                data.push({
-                  value: item2[index + 1],
-                  name: moment(parseInt(item2[0])).format('YYYY-MM-DD HH:mm:ss')
-                })
-              });
-
-              this.forecastParameterHistory.option.series.push({
-                name: item.name,
-                data: data,
-                type: 'line',
-                smooth: true,
-                itemStyle: {
-                  color: this.colors[index]
-                }
-              });
-
-              this.forecastParameterHistory.option.xAxis.data = xAxisData;
-            }
-          }
-
-        });
-        this.forecastParameterHistory.option.legend.data = legend;
-      }
-
-      let forecastParameterHistoryEcharts = echarts.init(document.getElementById('forecastParameterHistoryEcharts'));
-      forecastParameterHistoryEcharts.setOption(this.forecastParameterHistory.option, true);
-      let that = this;
-      forecastParameterHistoryEcharts.on('click', function (params) {
-        that._handleOnclickByOutput(params);
-      })
-    },
-    _initForecastParameterHistoryEchartsByInput () {
-      this.title = '输入历史查询';
-      this.forecastParameterHistory.option.xAxis.data = [];
-      this.forecastParameterHistory.option.legend.data = [];
-      this.forecastParameterHistory.option.series = [];
-
-      if (this.modelParamList.length > 0) {
-        let legend = [];
-        this.modelParamList.forEach((item, index) => {
-          for (let i = 0; i < this.modelParamCheckedList.length; i++) {
-            if (item.name == this.modelParamCheckedList[i]) {
-              legend.push(item.name);
-              let xAxisData = [];
-              let data = [];
-              this.forecastParameterHistory.dataList.forEach((item2, index2) => {
-                xAxisData.push(index2);
-                data.push({
-                  value: item2[index + 1],
-                  name: moment(parseInt(item2[0])).format('YYYY-MM-DD HH:mm:ss')
-                })
-              });
-
-              this.forecastParameterHistory.option.series.push({
-                name: item.name,
-                data: data,
-                type: 'line',
-                smooth: true,
-                itemStyle: {
-                  color: this.colors[index]
-                }
-              });
-
-              this.forecastParameterHistory.option.xAxis.data = xAxisData;
-            }
-          }
-
-        });
-        this.forecastParameterHistory.option.legend.data = legend;
-      }
-
-      let forecastParameterHistoryEcharts = echarts.init(document.getElementById('forecastParameterHistoryEcharts'));
-      forecastParameterHistoryEcharts.setOption(this.forecastParameterHistory.option, true);
-
-      let that = this;
-      forecastParameterHistoryEcharts.on('click', function (params) {
-        that._handleOnclickByOutput(params);
-      })
-    },
-    _initForecastParameterHistoryEchartsByDiff () {
-      this.title = '输入差值历史查询';
-      this.forecastParameterHistory.option.xAxis.data = [];
-      this.forecastParameterHistory.option.legend.data = [];
-      this.forecastParameterHistory.option.series = [];
-
-      if (this.modelParamList.length > 0) {
-        let legend = [];
-        this.modelParamList.forEach((item, index) => {
-          for (let i = 0; i < this.modelParamCheckedList.length; i++) {
-            if (item.name == this.modelParamCheckedList[i]) {
-              legend.push(item.name);
-              let xAxisData = [];
-              let data = [];
-              this.forecastParameterHistory.dataList.forEach((item2, index2) => {
-                xAxisData.push(index2);
-                data.push({
-                  value: item2[index + 1],
-                  name: moment(parseInt(item2[0])).format('YYYY-MM-DD HH:mm:ss')
-                })
-              });
-
-              this.forecastParameterHistory.option.series.push({
-                name: item.name,
-                data: data,
-                type: 'line',
-                smooth: true,
-                itemStyle: {
-                  color: this.colors[index]
-                }
-              });
-
-              this.forecastParameterHistory.option.xAxis.data = xAxisData;
-            }
-          }
-
-        });
-        this.forecastParameterHistory.option.legend.data = legend;
-      }
-
-      let forecastParameterHistoryEcharts = echarts.init(document.getElementById('forecastParameterHistoryEcharts'));
-      forecastParameterHistoryEcharts.setOption(this.forecastParameterHistory.option, true);
-
-      let that = this;
-      forecastParameterHistoryEcharts.on('click', function (params) {
-        that._handleOnclickByOutput(params);
-      })
-    },
-    _handleOnclickByOutput (params) {
-      let name = params.seriesName;
-      for (let i = 0; i < this.modelParamList.length; i++) {
-        if (params.seriesName == this.modelParamList[i].name) {
-          name = this.modelParamList[i].title;
-          break;
-        }
-      }
-      this.forecastParameterHistory.forecastParameterHistoryList = [
-        {
-          name: name,
-          date: params.name,
-          data: params.value
-        }
-      ];
-    },
-    async _getModelFeaturesList (modelId, type) {
+    async _getModelParamList (modelId) {
       this.modelId = modelId;
-      this.type = type;
-      this.forecastParameterHistory.forecastParameterHistoryAllList = [];
       await this.$http({
         url: '/api/api/modelParam/getModelParamList?modelId=' + modelId + '',
         "content-type": "application/json",
         method: 'get',
       }).then(res => {
         if (res.data.status == 1) {
-          this.modelFeaturesList = res.data.result;
-          if (type == 'output') {
-            let modelParamConstList = [];
-            let nameList = [];
-            let colorCheckdList = {};
-            this.modelFeaturesList.forEach((item, index) => {
-              if (item.type == '2') {
-                nameList.push(item.name);
-                let tableItem = {
-                  name: item.name,
-                  title: item.name,
-                  id: item.id,
-                  color: this.colors[modelParamConstList.length],
-                  minValue: item.minValue,
-                  maxValue: item.maxValue
-                };
-                colorCheckdList[item.name] = false;
-                modelParamConstList.push(tableItem);
-              }
-            });
-            this.modelParamCheckedList = [];
-            this.colorCheckedList = colorCheckdList;
-            this.modelParamList = JSON.parse(JSON.stringify(modelParamConstList));
-            this._initForecastParameterHistoryEchartsByOutput();
-            this._getDate();
-            this._onChangeDate();
-          } else if (type == 'input') {
-            let modelParamConstList = [];
-            let nameList = [];
-            let colorCheckdList = {};
-            this.modelFeaturesList.forEach((item, index) => {
-              if (item.type == '1') {
-                nameList.push(item.name);
-                let index = item.name.indexOf('-');
-                let tableItem = {
-                  name: index > 0 ? item.name.substring(0, index) : item.name,
-                  title: item.name,
-                  id: item.id,
-                  color: this.colors[modelParamConstList.length],
-                  minValue: item.minValue,
-                  maxValue: item.maxValue
-                };
-                colorCheckdList[index > 0 ? item.name.substring(0, index) : item.name] = false;
-                modelParamConstList.push(tableItem);
-              }
-            });
-            this.modelParamCheckedList = [];
-            this.colorCheckedList = colorCheckdList;
-            this.modelParamList = JSON.parse(JSON.stringify(modelParamConstList));
-            this._initForecastParameterHistoryEchartsByInput();
-            this._getDate();
-            this._onChangeDate();
-          } else if (type == 'diff') {
-            let modelParamConstList = [];
-            let nameList = [];
-            let colorCheckdList = {};
-            this.modelFeaturesList.forEach((item, index) => {
-              if (item.type == '1') {
-                nameList.push(item.name);
-                let index = item.name.indexOf('-');
-                let tableItem = {
-                  name: index > 0 ? item.name.substring(0, index) : item.name,
-                  title: item.name,
-                  id: item.id,
-                  color: this.colors[modelParamConstList.length],
-                  minValue: item.minValue,
-                  maxValue: item.maxValue
-                };
-                colorCheckdList[index > 0 ? item.name.substring(0, index) : item.name] = false;
-                modelParamConstList.push(tableItem);
-              }
-            });
-            this.modelParamCheckedList = [];
-            this.colorCheckedList = colorCheckdList;
-            this.modelParamList = JSON.parse(JSON.stringify(modelParamConstList));
-            this._initForecastParameterHistoryEchartsByDiff();
-            this._getDate();
-            this._onChangeDate();
-          }
-
+          let list = res.data.result;
+          let modelParamConstList = [];
+          let inputModelParamConstList = [];
+          let outModelParamConstList = [];
+          let inputColorCheckedList = {};
+          let outColorCheckedList = {};
+          list.forEach((item, index) => {
+            if (item.type == '1') {
+              let index = item.name.indexOf('-');
+              let tableItem = {
+                name: index > 0 ? item.name.substring(0, index) : item.name,
+                title: item.name,
+                id: item.id,
+                color: this.inputColors[inputModelParamConstList.length],
+                minValue: item.minValue,
+                maxValue: item.maxValue
+              };
+              inputColorCheckedList[index > 0 ? item.name.substring(0, index) : item.name] = false;
+              inputModelParamConstList.push(tableItem);
+              modelParamConstList.push(tableItem);
+            } else {
+              let tableItem = {
+                name: item.name,
+                title: item.name,
+                id: item.id,
+                color: this.outColors[outModelParamConstList.length],
+                minValue: item.minValue,
+                maxValue: item.maxValue
+              };
+              outColorCheckedList[item.name] = false;
+              outModelParamConstList.push(tableItem);
+              modelParamConstList.push(tableItem);
+            }
+          });
+          this.modelParamCheckedList = [];
+          this.modelParamList = JSON.parse(JSON.stringify(modelParamConstList));
+          this.inputModel.inputModelParamList = inputModelParamConstList;
+          this.inputModel.inputColorCheckedList = inputColorCheckedList;
+          this.outModel.outModelParamList = outModelParamConstList;
+          this.outModel.outColorCheckedList = outColorCheckedList;
+          this._initInputOutRelationHistoryEcharts();
+          this._getDate();
+          this._onChangeDate();
         } else {
           this.$message({message: res.data.msg, type: 'error'});
         }
       })
     },
-    _getDate () {
-      let date = new Date()
-      let year = date.getFullYear()
-      let month = date.getMonth() + 1
-      let strDate = date.getDate()
-      if (month >= 1 && month <= 9) {
-        month = '0' + month
-      }
-      if (strDate >= 0 && strDate <= 9) {
-        strDate = '0' + strDate
-      }
-      let nowData = year + '-' + month + '-' + strDate
-      this.forecastParameterHistoryForm.date = [nowData, nowData]  // 默认赋值一年时间
-    },
-    _getHistoryAlarmInfoListByOrgId (orgId) {
-
-      alert('你点击到了我');
-      /*if(this.flag){
-        this.flag = false;
-
-        this.forecastParameterHistory.gridLoading = true;
-        this.forecastParameterHistory.forecastParameterHistoryPageList = [];
-        this.forecastParameterHistory.forecastParameterHistoryList = [];
-
-        this.$http({
-          url: '/api/api/alarm/getHistoryAlarmInfoListByOrgId?orgId=' + orgId + '&fromTime=' + parseInt(moment((this.forecastParameterHistoryForm.date[0])).format('X') + '000') + '&toTime=' + parseInt(moment((this.forecastParameterHistoryForm.date[1])).format('X') + '000') + '',
-          "content-type": "application/json",
-          method: 'get',
-        }).then(res => {
-          if (res.data.status == 1) {
-            const resultList = res.data.result;
-            let list = [];
-            for (let i = 0; i < resultList.length; i++) {
-              const limit = resultList[i].lowerLimit + "-" + resultList[i].upperLimit;
-              const tableItem = {
-                alarmVal: resultList[i].value,
-                modelName: resultList[i].modelName,
-                alarmType: resultList[i].type == 0 ? '参数异常' : '特征异常',
-                limit: limit,
-                parent: resultList[i].value,
-                alarmDate: moment(resultList[i].dataTime).format('YYYY-MM-DD HH:mm:ss'),
-                status: resultList[i].status,
-                confirmTime: resultList[i].confirmTime == null ? "未确认" : moment(resultList[i].confirmTime).format('YYYY-MM-DD HH:mm:ss'),
-                description: resultList[i].description,
-                reason: resultList[i].reason,
-                id: resultList[i].id,
-                key: resultList[i].id
-              }
-              list.push(tableItem)
-            }
-            this.forecastParameterHistory.forecastParameterHistoryList = list;
-            //模拟分页
-            this._selectForecastParameterHistoryByPaging();
-            this.flag = true;
-          } else {
-            this.$message({message: res.data.msg, type: 'error'});
-            this.flag = true;
-          }
-        })
-      }*/
-
-    },
-    _selectForecastParameterHistoryByPaging () {
-      this.forecastParameterHistory.forecastParameterHistoryPageList = this.forecastParameterHistory.forecastParameterHistoryList.filter((item, index) =>
-        index < this.forecastParameterHistory.pagination.page_index * this.forecastParameterHistory.pagination.page_size && index >= this.forecastParameterHistory.pagination.page_size * (this.forecastParameterHistory.pagination.page_index - 1)
-      );
-      this.forecastParameterHistory.pagination.total = this.forecastParameterHistory.forecastParameterHistoryList.length;
-
-      this.forecastParameterHistory.gridLoading = false;
-    },
-    _clearEcharts () {
-      this.forecastParameterHistory.forecastParameterHistoryList = [];
-      this.forecastParameterHistory.dataList = [];
-      if (this.type == 'output') {
-        this._initForecastParameterHistoryEchartsByOutput();
-      } else if (this.type == 'input') {
-        this._initForecastParameterHistoryEchartsByInput();
-      } else if (this.type == 'diff') {
-        this._initForecastParameterHistoryEchartsByDiff();
-      }
-    },
-    async _selectForecastParameterHistory () {
-      this.forecastParameterHistory.dataList = [];
+    async _selectInputOutRelationHistory () {
+      this.outDataList = [];
+      this.inputDataList = [];
       await this.$http({
-        url: '/api/api/preHistory/getFeaturesHistoryListByTime?modelId=' + this.modelId + '&fromTime=' + parseInt(moment((this.forecastParameterHistoryForm.date[0])).format('X') + '000') + '&toTime=' + parseInt(moment((this.forecastParameterHistoryForm.date[1])).format('X') + '000') + '&type=1',
+        url: '/api/api/preHistory/getFeaturesHistoryListByTime?modelId=' + this.modelId + '&fromTime=' + parseInt(moment((this.inputOutRelationHistoryForm.date[0])).format('X') + '000') + '&toTime=' + parseInt(moment((this.inputOutRelationHistoryForm.date[1])).format('X') + '000') + '&type=1',
         "content-type": "application/json",
         method: 'get',
       }).then(res => {
@@ -1514,157 +1216,328 @@ export default {
               ],//实际
           }
           ;
-          this.forecastParameterHistory.allList = dataList;
+          this.allList = dataList;
+
           //假数据
-          if (this.type == 'output') {
-            if (this.historyDataType.type == 'gyz') {
-              this.forecastParameterHistory.dataList = dataList.outputData;
-            } else {
-              this.forecastParameterHistory.dataList = dataList.output;
-            }
-
-            this._initForecastParameterHistoryEchartsByOutput();
-          } else if (this.type == 'input') {
-            if (this.historyDataType.type == 'gyz') {
-              this.forecastParameterHistory.dataList = dataList.inputData;
-            } else {
-              this.forecastParameterHistory.dataList = dataList.input;
-            }
-
-            this._initForecastParameterHistoryEchartsByInput();
+          if (this.historyDataType.type == 'gyz') {
+            this.outDataList = dataList.outputData;
+            this.inputDataList = dataList.inputData;
+          } else {
+            this.outDataList = dataList.output;
+            this.inputDataList = dataList.input;
           }
 
+          this._initInputOutRelationHistoryEcharts();
+        } else {
+          this.$message({message: res.data.msg, type: 'error'});
+        }
+      })
+    },
+    _initInputOutRelationHistoryEcharts () {
+      this.option.xAxis.data = [];
+      this.option.legend.data = [];
+      this.option.series = [];
 
+      let legend = [];
+      let xAxisData = [];
+      if (this.inputModel.inputModelParamList.length > 0) {
+        this.inputModel.inputModelParamList.forEach((item, index) => {
+          for (let i = 0; i < this.inputModel.inputModelParamCheckedList.length; i++) {
+            if (this.inputModel.inputModelParamCheckedList[i] == item.name) {
+              legend.push(item.name);
+              let data = [];
+              this.inputDataList.forEach((item2, index2) => {
+                data.push({
+                  value: item2[index + 1],
+                  name: moment(parseInt(item2[0])).format('YYYY-MM-DD HH:mm:ss')
+                })
+              });
+
+              this.option.series.push({
+                name: item.name,
+                yAxisIndex: 1,
+                data: data,
+                type: 'line',
+                smooth: true,
+                itemStyle: {
+                  color: this.inputColors[index]
+                }
+              });
+            }
+          }
+        });
+
+        this.option.legend.data.push(legend);
+      }
+
+      if (this.outModel.outModelParamList.length > 0) {
+        this.outModel.outModelParamList.forEach((item, index) => {
+          for (let i = 0; i < this.outModel.outModelParamCheckedList.length; i++) {
+            if (this.outModel.outModelParamCheckedList[i] == item.name) {
+              legend.push(item.name);
+              let data = [];
+              this.outDataList.forEach((item2, index2) => {
+                data.push({
+                  value: item2[index + 1],
+                  name: moment(parseInt(item2[0])).format('YYYY-MM-DD HH:mm:ss')
+                })
+              });
+
+              this.option.series.push({
+                name: item.name,
+                data: data,
+                type: 'line',
+                smooth: true,
+                itemStyle: {
+                  color: this.outColors[index]
+                }
+              });
+            }
+          }
+        })
+      }
+
+      if (this.outModel.outModelParamCheckedList.length > 0 && this.inputModel.inputModelParamCheckedList.length > 0) {
+        if (this.outDataList.length > this.inputDataList.length) {
+          this.outDataList.forEach((item, index) => {
+            xAxisData.push(index)
+          })
         } else {
-          this.$message({message: res.data.msg, type: 'error'});
+          this.inputDataList.forEach((item, index) => {
+            xAxisData.push(index)
+          })
         }
+      } else if (this.outModel.outModelParamCheckedList.length == 0 && this.inputModel.inputModelParamCheckedList.length > 0) {
+        this.inputDataList.forEach((item, index) => {
+          xAxisData.push(index)
+        })
+      } else if (this.outModel.outModelParamCheckedList.length > 0 && this.inputModel.inputModelParamCheckedList.length == 0) {
+        this.outDataList.forEach((item, index) => {
+          xAxisData.push(index)
+        })
+      }
+
+      this.option.xAxis.data = xAxisData;
+
+      let inputOutRelationHistoryEcharts = echarts.init(document.getElementById('inputOutRelationHistoryEcharts'));
+      inputOutRelationHistoryEcharts.setOption(this.option, true);
+
+      let that = this;
+      inputOutRelationHistoryEcharts.on('click', function (params) {
+        that._handleOnclickByOutput(params);
       })
     },
-    async _getInputFeaturesStatistics () {
-      this.forecastParameterHistory.dataList = [];
-      await this.$http({
-        url: '/api/api/featuresHistory/getInputFeaturesStatistics?modelId=' + this.modelId + '&fromTime=' + parseInt(moment((this.forecastParameterHistoryForm.date[0])).format('X') + '000') + '&toTime=' + parseInt(moment((this.forecastParameterHistoryForm.date[1])).format('X') + '000') + '&type=1',
-        "content-type": "application/json",
-        method: 'get',
-      }).then(res => {
-        if (res.data.status == 1) {
-          let dataList = res.data.result.differenctValue;
-          dataList = [["1565254804000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-            ["1565254819000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-            ["1565254834000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-            ["1565254849000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-            ["1565254864000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-            ["1565254879000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-            ["1565254894000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-            ["1565254909000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-            ["1565254924000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-            ["1565254939000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-            ["1565254954000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565254969000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565254984000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565254999000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255014000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255029000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255044000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255059000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255074000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255089000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255104000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255119000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255134000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255149000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255164000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255179000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255194000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255209000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255224000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255239000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255254000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255269000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255284000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255299000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255314000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255329000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255344000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255359000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255374000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255389000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255404000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255419000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255434000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255449000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255464000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255479000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255494000", "0.21", "0.92", "0.11", "0.92", "0.66", "0.22", "0.12"],
-            ["1565255509000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-            ["1565255524000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-            ["1565255539000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-            ["1565255554000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-            ["1565255569000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-            ["1565255584000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-            ["1565255599000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"],
-            ["1565255614000", "0.44", "0.32", "0.51", "0.32", "0.86", "0.12", "0.52"]];
-          this.forecastParameterHistory.dataList = dataList;
-          this._initForecastParameterHistoryEchartsByDiff();
-        } else {
-          this.$message({message: res.data.msg, type: 'error'});
-        }
-      })
+    async _onChangeDate () {
+      this.inputOutRelationHistory.inputOutRelationHistoryList = [];
+      if (this.inputOutRelationHistoryForm.date != null && this.inputOutRelationHistoryForm.date[0] != this.inputOutRelationHistoryForm.date[1]) {
+        this.$message({message: '请选择一天时间', type: 'warning'});
+        this.inputOutRelationHistoryForm.date = [];
+        this._clearEcharts();
+        return;
+      }
+      if (this.inputOutRelationHistoryForm.date != null) {
+        await this._selectInputOutRelationHistory();
+      } else {
+        this._clearEcharts()
+      }
     },
-    _closeForecastParameterHistoryViewDialog () {
-      this.$emit('_closeForecastParameterHistoryViewDialog');
+    _switchHistoryDataType () {
+      this.allList = [];
+      this.inputDataList = [];
+      this.outDataList = [];
+      this.inputOutRelationHistory.inputOutRelationHistoryList = [];
+      this.inputModel.inputModelParamCheckedList = [];
+      this.outModel.outModelParamCheckedList = [];
+      this._handleInputCheckedModelParamChange(this.inputModel.inputModelParamCheckedList);
+      this._handleOutCheckedModelParamChange(this.outModel.outModelParamCheckedList);
+      //实际值切换至归一值
+      if (this.historyDataType.type == 'sjz') {
+        this.historyDataType.type = 'gyz';
+        this.historyDataType.title = '归一值';
+        this.inputOutRelationHistory.columnName = '归一值';
+        this.historyDataType.max = 5;
+      }
+      //归一值切换至实际值
+      else {
+        this.historyDataType.type = 'sjz';
+        this.historyDataType.title = '实际值';
+        this.inputOutRelationHistory.columnName = '实际值';
+        this.historyDataType.max = 1;
+      }
+      this._selectInputOutRelationHistory();
     },
-    _handleCheckedModelParamChange (dataList) {
+    _handleInputCheckedModelParamChange (dataList) {
       if (dataList.length == 0) {
-        for (let key  in this.colorCheckedList) {
-          this.colorCheckedList[key] = false;
+        for (let key  in this.inputModel.inputColorCheckedList) {
+          this.inputModel.inputColorCheckedList[key] = false;
         }
       } else {
-        for (let key  in this.colorCheckedList) {
+        for (let key  in this.inputModel.inputColorCheckedList) {
           for (let i = 0; i < dataList.length; i++) {
             if (key == dataList[i]) {
-              this.colorCheckedList[key] = true;
+              this.inputModel.inputColorCheckedList[key] = true;
               break;
             } else if (i == dataList.length - 1) {
-              this.colorCheckedList[key] = false;
+              this.inputModel.inputColorCheckedList[key] = false;
             }
           }
         }
       }
-
-      if (this.type == 'output') {
-        this._initForecastParameterHistoryEchartsByOutput();
-      } else if (this.type == 'input') {
-        this._initForecastParameterHistoryEchartsByInput();
+      this._initInputOutRelationHistoryEcharts();
+    },
+    _handleOutCheckedModelParamChange (dataList) {
+      if (dataList.length == 0) {
+        for (let key  in this.outModel.outColorCheckedList) {
+          this.outModel.outColorCheckedList[key] = false;
+        }
       } else {
-        this._initForecastParameterHistoryEchartsByDiff();
+        for (let key  in this.outModel.outColorCheckedList) {
+          for (let i = 0; i < dataList.length; i++) {
+            if (key == dataList[i]) {
+              this.outModel.outColorCheckedList[key] = true;
+              break;
+            } else if (i == dataList.length - 1) {
+              this.outModel.outColorCheckedList[key] = false;
+            }
+          }
+        }
+      }
+      this._initInputOutRelationHistoryEcharts();
+    },
+    _getToolTip (params) {
+      let seriesName = params.seriesName;
+      let bool = false;
+      for (let i = 0; i < this.outModel.outModelParamCheckedList.length > 0; i++) {
+        if (seriesName == this.outModel.outModelParamCheckedList[i]) {
+          bool = true;
+          break;
+        }
+      }
+      let result = '';
+      if (bool) {
+        let index = 0;
+        let minValue = 0;
+        let maxValue = 0;
+        for (let i = 0; i < this.outModel.outModelParamList.length; i++) {
+          if (params.seriesName == this.outModel.outModelParamList[i].name) {
+            index = i;
+            minValue = this.outModel.outModelParamList[i].minValue;
+            maxValue = this.outModel.outModelParamList[i].maxValue;
+            break;
+          }
+        }
+        if (this.historyDataType.type == 'gyz') {
+          let gyz = 0;
+          if (this.allList.limsOutputData.length > 0) {
+            gyz = ((this.allList.limsOutputData[params.dataIndex][index] - minValue) / (maxValue - minValue)).toFixed(5);
+          }
+          result = params.seriesName + '<br/>时间:' + params.name + '<br/>预测参数归一值:' + params.value + '<br/>在线参数归一值:' + this.allList.actualOutputData[params.dataIndex][index] + '<br/>lims归一值:' + gyz + '';
+        } else {
+          result = params.seriesName + '<br/>时间:' + params.name + '<br/>预测参数实际值:' + params.value + '<br/>在线参数实际值:' + this.allList.actualOutput[params.dataIndex][index] + '<br/>lims实际值:' + this.allList.limsOutputData[params.dataIndex][index] + '<br/>';
+
+        }
+      } else {
+        if (this.historyDataType.type == 'gyz') {
+          result += params.seriesName + '<br/>时间:' + params.name + '<br/>输入归一值:' + params.value + '<br/>';
+        } else {
+          result += params.seriesName + '<br/>时间:' + params.name + '<br/>输入实际值:' + params.value + '<br/>';
+        }
       }
 
-    }
+      return result;
+    },
+    _handleOnclickByOutput (params) {
+      let seriesName = params.seriesName;
+      let type = '输出类型';
+
+
+      let bool = false;
+      for (let i = 0; i < this.inputModel.inputModelParamList.length > 0; i++) {
+        if (seriesName == this.inputModel.inputModelParamList[i].name) {
+          seriesName = this.inputModel.inputModelParamList[i].title;
+          type = '输入类型';
+          bool = true;
+          break;
+        }
+      }
+
+      if(this.historyDataType.type == 'gyz'){
+        this.inputOutRelationHistory.columnName = '归一值'
+      }else{
+        this.inputOutRelationHistory.columnName = '实际值'
+      }
+
+      this.inputOutRelationHistory.inputOutRelationHistoryList = [
+        {
+          name: seriesName,
+          type : type,
+          date: params.name,
+          data: params.value
+        }
+      ];
+    },
+    _getDate () {
+      let date = new Date()
+      let year = date.getFullYear()
+      let month = date.getMonth() + 1
+      let strDate = date.getDate()
+      if (month >= 1 && month <= 9) {
+        month = '0' + month
+      }
+      if (strDate >= 0 && strDate <= 9) {
+        strDate = '0' + strDate
+      }
+      let nowData = year + '-' + month + '-' + strDate
+      this.inputOutRelationHistoryForm.date = [nowData, nowData]  // 默认赋值一年时间
+    },
+    _clearEcharts () {
+      this.inputOutRelationHistory.inputOutRelationHistoryList = [];
+      this.inputDataList = [];
+      this.outDataList = [];
+      this._initInputOutRelationHistoryEcharts();
+    },
+    _closeInputOutRelationHistoryViewDialog () {
+      this.$emit('_closeInputOutRelationHistoryViewDialog');
+    },
   }
 }
 </script>
-<style>
-  /*.el-checkbox__input.is-checked + .el-checkbox__label {
-    color: red
-  }*/
-</style>
+
 <style scoped>
 
 
-  .leftDiv {
+  .inputOutRelationContentDiv {
     position: relative;
-    width: 240px;
+    width: 100%;
     height: 380px;
-    border: 1px solid rgba(0, 21, 41, 0.08);
   }
 
-  .forecastParameterHistoryTitle {
+  .leftDiv {
     position: absolute;
     left: 0;
     width: 240px;
-    height: 30px;
+    height: 380px;
     overflow: hidden;
+    border: 1px solid rgba(0, 21, 41, 0.08);
+  }
+
+  .leftDiv .outTitle {
+    font-size: 20px;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .rightDiv {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 240px;
+    height: 380px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 21, 41, 0.08);
+  }
+
+  .rightDiv .inputTitle {
     font-size: 20px;
     text-align: center;
     font-weight: bold;
@@ -1676,6 +1549,7 @@ export default {
     top: 40px;
     width: 240px;
     height: 380px;
+    margin-left: 80px;
     overflow: hidden;
   }
 
@@ -1683,20 +1557,15 @@ export default {
     text-align: right;
   }
 
-  #forecastParameterHistoryEcharts {
-    margin-left: 180px;
+  #inputOutRelationHistoryEcharts {
+    margin-left: 240px;
     height: 380px;
-    width: 890px;
+    width: 778px;
+    border: 1px solid rgba(0, 21, 41, 0.08);
   }
 
   .rightButton {
     position: absolute;
     right: 15px
-  }
-</style>
-<style>
-  .el-checkbox__input.is-checked .el-checkbox__inner, .el-checkbox__input.is-indeterminate .el-checkbox__inner {
-    background-color: lightgray;
-    border-color: lightgray;
   }
 </style>
