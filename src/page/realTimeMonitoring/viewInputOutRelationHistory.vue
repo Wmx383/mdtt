@@ -220,7 +220,7 @@ export default {
         '#921AFF',
         '#FF0080',
         '#7B7B7B',
-        '#00BB00',
+        '#a3bb63',
         '#02C874',
         '#00AEAE',
         '#0066CC',
@@ -1580,3 +1580,5 @@ export default {
     border: 1px solid lightgray;
   }
 </style>
+
+
