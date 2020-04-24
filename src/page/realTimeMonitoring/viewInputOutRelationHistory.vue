@@ -135,6 +135,12 @@ export default {
             }
           }
         },
+        toolbox: {
+          feature: {
+            saveAsImage: {show: true}
+          },
+          right: '10px'
+        },
         legend: {
           show: false,
           data: [],
