@@ -1532,7 +1532,7 @@ export default {
       this.viewInputOutRelationHistory.show = true;
       this.viewInputOutRelationHistory.dialogVisible = true;
       this.$nextTick(_ => {
-        this.$refs.viewInputOutRelationHistoryRef._getModelParamList(node.ogId);
+        this.$refs.viewInputOutRelationHistoryRef._getModelParamList(node.ogId, true);
       });
     },
     _closeForecastParameterHistoryViewDialog () {
