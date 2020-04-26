@@ -93,7 +93,7 @@ export default {
         if (res.data.status == 1) {
           this.loading = false;
           this.dataAllList =  res.data.result;
-          let dataList = res.data.result;
+          let dataList = JSON.parse(JSON.stringify(this.dataAllList));
           this._handelData(dataList);
           this.data = dataList;
         } else {

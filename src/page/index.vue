@@ -29,7 +29,7 @@
               <el-menu-item index="/modelGroup/manageModelGroup"><i class="el-icon-menu"></i>模型组管理</el-menu-item>
               <el-menu-item index="/samplePoint/manageSamplePoint"><i class="el-icon-menu"></i>采样点管理</el-menu-item>
               <el-menu-item index="/norm/manageNorm"><i class="el-icon-menu"></i>指标管理</el-menu-item>
-              <el-menu-item index="/systemManage/manageCharacteristicGrade"><i class="el-icon-menu"></i>特征牌号管理
+              <el-menu-item index="/featuresBrand/manageFeaturesBrand"><i class="el-icon-menu"></i>特征牌号管理
               </el-menu-item>
             </el-submenu>
             <el-menu-item index="/systemManage/manageOptimization"><i class="el-icon-platform-eleme"></i>优化管理

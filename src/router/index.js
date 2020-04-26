@@ -84,10 +84,10 @@ export default new Router({
           component :() => import('@/page/norm/manageNorm')
         },
         {
-          path: '/systemManage/manageCharacteristicGrade',
+          path: '/featuresBrand/manageFeaturesBrand',
           name: '特征牌号管理',
           hidden : true,
-          component :() => import('@/page/systemManage/manageCharacteristicGrade')
+          component :() => import('@/page/featuresBrand/manageFeaturesBrand')
         },
         {
           path: '/systemManage/manageOptimization',

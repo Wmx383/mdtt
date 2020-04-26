@@ -205,7 +205,7 @@ export default {
           page_sizes: [5, 10, 15, 20],  //每页显示多少条
           layout: "total, sizes, prev, pager, next, jumper"   // 翻页属性
         },
-        selectedDate: [],
+        selectedDate: {},
       },
       //查看模型
       viewModel: {
