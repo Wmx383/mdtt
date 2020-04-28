@@ -23,6 +23,36 @@
         >
           <el-input v-model="insertExpressionForm.formula" style="width: 100%" disabled></el-input>
         </el-form-item>
+        <el-form-item
+          prop='type'
+          label="类型:"
+          label-width="100px"
+          style="margin-bottom: 30px"
+        >
+          <el-select
+            v-model="insertExpressionForm.type"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="item in typeList"
+              :key="item.code"
+              :label="item.name"
+              :value="item.code">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item
+          prop='type'
+          label="单位:"
+          label-width="100px"
+          style="margin-bottom: 30px"
+        >
+          <el-input
+            v-model="insertExpressionForm.unit"
+            label-width="100px"
+            style="margin-bottom: 30px"
+          ></el-input>
+        </el-form-item>
 
         <el-form-item class="text_right">
           <el-button plain size="small" @click="_addParam"><i class="el-icon-plus"></i>&nbsp;&nbsp;添加参数</el-button>
@@ -94,8 +124,20 @@ export default {
         roomId: '',
         expression: '',
         formula : '',
-        formList: []
+        formList: [],
+        type : '',
+        unit : ''
       },
+      typeList : [{
+        code : '1',
+        name : '收率'
+      },{
+        code : '2',
+        name : '选择性',
+      },{
+        code : '3',
+        name : '吴明旭'
+      }],
       currentNodeList: {},
       treeDataList: [],
       defaultProps: {
@@ -213,7 +255,9 @@ export default {
             data: {
               expression: this.insertExpressionForm.expression,
               name: this.insertExpressionForm.name,
-              roomId: this.insertExpressionForm.roomId
+              roomId: this.insertExpressionForm.roomId,
+              typeId : this.insertExpressionForm.type,
+              unitId : this.insertExpressionForm.unit,
             }
             /*headers: {Authorization: token},*/
           }).then(res => {
