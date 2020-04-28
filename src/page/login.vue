@@ -48,7 +48,7 @@
                 </el-input>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" class="loginBtn" @click="login('loginUserForm')">
+                <el-button type="primary" class="loginBtn" :loading="loginButton.status" @click="login('loginUserForm')">
                   登录
                 </el-button>
               </el-form-item>
@@ -134,6 +134,9 @@
     },
     data() {
       return {
+        loginButton : {
+          status : false
+        },
         activeName: 'first',
         loginUserForm: {
           userName: '',
@@ -155,6 +158,7 @@
       login(loginUserForm) {
         this.$refs[loginUserForm].validate((valid) => {
           if(valid){
+            this.loginButton.status = true;
             this.$http({
               url: "/api/api/login",
               "content-type": "application/json",
@@ -166,8 +170,10 @@
                 utils.setStore('Token', res.data.result.token);
 
                 this.$router.push({path: "/exception/manageException"});
+                this.loginButton.status = false;
               } else {
                 alert(res.data.msg);
+                this.loginButton.status = false;
                 this.reload()
               }
             })
