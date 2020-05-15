@@ -1264,7 +1264,8 @@ export default {
       if (orgLevel == 5) {
         this._setTitle(ogName);
         await this._selectModelParamList(ogId);
-        await this._selectNewestParameter(ogId, this.tempList[0]);
+        //await this._selectNewestParameter(ogId, this.tempList[0]);
+        await this._selectNewestParameter(ogId);
         this._selectOutputTable();
         this._timingTask();
       }
@@ -1290,7 +1291,8 @@ export default {
         let node = that.$refs.viewOrgComRef._getCurrentNode();
         that.inputOutRelation.relationListBefore_A = JSON.parse(JSON.stringify(that.inputOutRelation.relationList_A));
         that.inputOutRelation.relationListBefore_B = JSON.parse(JSON.stringify(that.inputOutRelation.relationList_B));
-        that._selectNewestParameter(node.ogId, that.tempList[index]);
+       // that._selectNewestParameter(node.ogId, that.tempList[index]);
+        that._selectNewestParameter(node.ogId);
         //目前只能模拟定时器传假数据
       }, 15000);
     },
@@ -1406,7 +1408,7 @@ export default {
         }
       })
     },
-    async _selectNewestParameter (ogId, list) {
+    async _selectNewestParameter (ogId) {
       await this.$http({
         url: '/api/api/preHistory/getNewestFeatures?modelId=' + ogId + '',
         "content-type": "application/json",
@@ -1414,7 +1416,7 @@ export default {
         /*headers: {Authorization: token},*/
       }).then(res => {
         if (res.data.status == 1) {
-          //const list = res.data.result;
+          const list = res.data.result;
           //假数据011104010104查询结果
           /*const list = {
             "input": ["48.3168830872", "373.334106445", "327.420837402", "4.93264341354", "282.301818848", "309.436004639", "315.953674316", "57.1867294312", "68.1822967529"],
